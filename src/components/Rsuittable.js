@@ -2,8 +2,29 @@ import React, { memo } from 'react'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { faker } from '@faker-js/faker'
-import Whisper from 'rsuite/Whisper'
-import Popover from 'rsuite/Popover'
+// import Whisper from 'rsuite/Whisper'
+import Button from 'rsuite/Button'
+import { db } from '../firebase'
+import { useCollectionData } from 'react-firebase-hooks/firestore'
+
+const EditableCell = ({ rowData, dataKey, onChange, ...props }) => {
+  const editing = rowData.status === 'EDIT'
+  return (
+    <Cell {...props} className={editing ? 'table-content-editing' : ''}>
+      {editing ? (
+        <input
+          className="rs-input"
+          defaultValue={rowData[dataKey]}
+          onChange={(event) => {
+            onChange && onChange(rowData.id, dataKey, event.target.value)
+          }}
+        />
+      ) : (
+        <span className="table-content-edit-span">{rowData[dataKey]}</span>
+      )}
+    </Cell>
+  )
+}
 
 const BaseCell = React.forwardRef((props, ref) => {
   const { children, rowData, ...rest } = props
@@ -38,43 +59,96 @@ const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
   )
 }
 
-const NameCell = ({ rowData, dataKey, ...props }) => {
-  const speaker = (
-    <Popover title="Description">
-      <p>
-        <b>Name:</b> {`${rowData.firstName} ${rowData.lastName}`}{' '}
-      </p>
-      <p>
-        <b>Email:</b> {rowData.email}{' '}
-      </p>
-      <p>
-        <b>Company:</b> {rowData.companyName}{' '}
-      </p>
-      <p>
-        <b>Sentence:</b> {rowData.sentence}{' '}
-      </p>
-    </Popover>
-  )
+// const NameCell = ({ rowData, dataKey, ...props }) => {
+//   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
+//     const styles = {
+//       ...style,
+//       shadows: '0px 0px 10px rgba(0, 0, 0, 0.5)',
+//       color: '#000',
+//       background: '#fff',
+//       width: 200,
+//       opacity: 1,
+//       padding: 10,
+//       borderRadius: 4,
+//       boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
+//       position: 'absolute',
+//       zIndex: 1,
+//       transform: 'translate(0, -20px)',
+//     }
 
+//     return (
+//       <div {...rest} style={styles} ref={ref}>
+//         <p>
+//           <b>Name:</b> {`${rowData.firstName} ${rowData.lastName}`}{' '}
+//         </p>
+//         <p
+//           style={{
+//             display: 'flex',
+//             flexWrap: 'wrap',
+//           }}
+//         >
+//           <b>District:</b> {rowData.district}{' '}
+//         </p>
+//         <p>
+//           <b>City:</b> {rowData.city}{' '}
+//         </p>
+//         <p>
+//           <b>State:</b> {rowData.state}{' '}
+//         </p>
+//         <p>
+//           <b>Country:</b> {rowData.country}{' '}
+//         </p>
+//       </div>
+//     )
+//   })
+//   Overlay.displayName = 'Overlay'
+//   const speaker = (props, ref) => {
+//     const { className, top, onClose } = props
+//     return (
+//       <Overlay
+//         title="Description"
+//         style={{ top }}
+//         onClose={onClose}
+//         className={className}
+//         ref={ref}
+//         visible
+//       />
+//     )
+//   }
+
+//   return (
+//     <BaseCell rowData={rowData} {...props}>
+//       <Whisper trigger="click" placement="auto" speaker={speaker} enterable>
+//         <Button
+//           style={{
+//             background: '#fff',
+//             color: 'blue',
+//             border: '0px solid #000',
+//             lineHeight: '50px',
+//             textAlign: 'center',
+//             verticalAlign: 'middle',
+//             marginRight: '10px',
+//           }}
+//         >
+//           {rowData[dataKey].toLocaleString()}
+//         </Button>
+//       </Whisper>
+//     </BaseCell>
+//   )
+// }
+
+const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
   return (
-    <BaseCell rowData={rowData} {...props}>
-      <Whisper placement="top" speaker={speaker}>
-        <a>{rowData[dataKey].toLocaleString()}</a>
-      </Whisper>
-    </BaseCell>
-  )
-}
-
-const ActionCell = ({ rowData, dataKey, ...props }) => {
-  function handleAction() {
-    alert(`id:${rowData[dataKey]}`)
-    console.log(rowData, dataKey)
-  }
-
-  return (
-    <BaseCell {...props}>
-      <a onClick={handleAction}> Edit </a>|<a onClick={handleAction}> Remove </a>
-    </BaseCell>
+    <Cell {...props} style={{ padding: '6px' }}>
+      <Button
+        appearance="link"
+        onClick={() => {
+          onClick(rowData.id)
+        }}
+      >
+        {rowData.status === 'EDIT' ? 'Save' : 'Edit'}
+      </Button>
+    </Cell>
   )
 }
 
@@ -93,30 +167,23 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 InputCell.displayName = 'InputCell'
 
 function createRows() {
-  const now = Date.now()
   const rows = []
 
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 50; i++) {
     rows.push({
       id: i,
-      title: `Task #${i + 1}`,
-      companyName: faker.company.name(),
-      area: faker.name.jobArea(),
-      country: faker.address.country(),
-      contact: faker.internet.exampleEmail(),
+      avatar: faker.image.avatar(),
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
       email: faker.internet.exampleEmail(),
-      progress: Math.random() * 100,
-      startTimestamp: now - Math.round(Math.random() * 1e10),
-      endTimestamp: now + Math.round(Math.random() * 1e10),
-      budget: 500 + Math.random() * 10500,
-      transaction: faker.finance.transactionType(),
-      account: faker.finance.iban(),
-      version: faker.system.semver(),
-      available: Math.random() > 0.5,
-      avatar: faker.image.avatar(),
-      age: Math.round(Math.random() * 100),
+      contactNumber: faker.phone.number(),
+      add_1: faker.address.streetAddress(),
+      add_2: faker.address.secondaryAddress(),
+      pincode: faker.address.zipCode(),
+      district: faker.address.city(),
+      city: faker.address.city(),
+      state: faker.address.state(),
+      country: faker.address.country(),
       sentence: faker.lorem.sentence(),
     })
   }
@@ -124,7 +191,15 @@ function createRows() {
   return rows
 }
 
-const data = createRows()
+// data.map((item) => {
+//   return db
+//     .collection('user')
+//     .doc('one')
+//     .set(item)
+//     .then(() => {
+//       console.log('Document successfully written!')
+//     })
+// })
 
 const ImageCell = ({ rowData, dataKey, ...rest }) => (
   <Cell {...rest}>
@@ -146,6 +221,7 @@ const Resuittable = () => {
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
+  const [data, setData] = React.useState(createRows())
   const getData = () => {
     if (sortColumn && sortType) {
       return data.sort((a, b) => {
@@ -192,20 +268,34 @@ const Resuittable = () => {
     [checkedKeys],
   )
 
+  const handleChange = (id, key, value) => {
+    const nextData = Object.assign([], data)
+    nextData.find((item) => item.id === id)[key] = value
+    setData(nextData)
+  }
+  const handleEditState = (id) => {
+    const nextData = Object.assign([], data)
+    const activeItem = nextData.find((item) => item.id === id)
+    activeItem.status = activeItem.status ? null : 'EDIT'
+    setData(nextData)
+  }
   return (
     <>
       <Table
         virtualized
-        height={420}
+        height={600}
         data={getData()}
         sortColumn={sortColumn}
         sortType={sortType}
         onSortColumn={handleSortColumn}
         loading={loading}
         headerHeight={50}
+        bordered
+        cellBordered
         onRowClick={(data) => {
           console.log(data)
         }}
+        affixHorizontalScrollbar
       >
         <Column width={50} align="center" sortable>
           <HeaderCell style={{ padding: 0 }}>
@@ -219,47 +309,63 @@ const Resuittable = () => {
           </HeaderCell>
           <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
         </Column>
-        <Column width={100} resizable>
-          <HeaderCell>Avartar</HeaderCell>
-          <ImageCell dataKey="avatar" />
-        </Column>
+
         <Column width={70} align="center" fixed sortable>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
         </Column>
-        <Column width={160}>
-          <HeaderCell>Company</HeaderCell>
-          <NameCell dataKey="companyName" />
+        <Column width={130} fixed>
+          <HeaderCell>Avatar</HeaderCell>
+          <ImageCell dataKey="avatar" />
         </Column>
-        <Column width={130} fixed sortable>
-          <HeaderCell>Name</HeaderCell>
+        <Column width={100} sortable>
+          <HeaderCell>First Name</HeaderCell>
           <Cell dataKey="firstName" />
         </Column>
 
         <Column width={100} sortable>
-          <HeaderCell>Gender</HeaderCell>
+          <HeaderCell>Last Name</HeaderCell>
           <Cell dataKey="lastName" />
-        </Column>
-
-        <Column width={100} sortable>
-          <HeaderCell>Age</HeaderCell>
-          <Cell dataKey="age" />
-        </Column>
-        <Column width={100} sortable resizable>
-          <HeaderCell>Email</HeaderCell>
-          <Cell>
-            {(rowData, rowIndex) => {
-              return <a href={`mailto:${rowData.email}`}>{rowData.email}</a>
-            }}
-          </Cell>
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Email</HeaderCell>
-          <Cell dataKey="email" />
+          <EditableCell dataKey="email" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>contactNumber</HeaderCell>
+          <EditableCell dataKey="contactNumber" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>Address 1</HeaderCell>
+          <EditableCell dataKey="add_1" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>Address 2</HeaderCell>
+          <EditableCell dataKey="add_2" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>Pincode</HeaderCell>
+          <EditableCell dataKey="pincode" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>District</HeaderCell>
+          <EditableCell dataKey="district" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>City</HeaderCell>
+          <EditableCell dataKey="city" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>State</HeaderCell>
+          <EditableCell dataKey="state" onChange={handleChange} />
+        </Column>
+        <Column width={200} sortable>
+          <HeaderCell>Country</HeaderCell>
+          <EditableCell dataKey="country" onChange={handleChange} />
         </Column>
         <Column width={200}>
           <HeaderCell>Action</HeaderCell>
-          <ActionCell dataKey="id" />
+          <ActionCell dataKey="id" onClick={handleEditState} />
         </Column>
       </Table>
     </>
