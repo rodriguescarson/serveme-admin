@@ -82,7 +82,7 @@ const Home = () => {
                 xl={2}
                 key={'cas'}
               >
-                <CIcon icon={cilCog} size="9xl" />
+                <CIcon icon={cilCog} size="xxl" />
               </CCol>
               <CCardText>Add, Modify, Delete, View Spare Parts</CCardText>
               {/* <CListGroup>

@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useEffect } from 'react'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { faker } from '@faker-js/faker'
@@ -170,7 +170,7 @@ function createRows() {
   const rows = []
 
   for (let i = 0; i < 50; i++) {
-    rows.push({
+    const user = {
       id: i,
       avatar: faker.image.avatar(),
       firstName: faker.name.firstName(),
@@ -185,9 +185,21 @@ function createRows() {
       state: faker.address.state(),
       country: faker.address.country(),
       sentence: faker.lorem.sentence(),
-    })
+    }
+    rows.push(user)
   }
 
+  // const users = await db
+  //   .collection('user')
+  //   .get()
+  //   .then((querySnapshot) => {
+  //     querySnapshot.docs.map((doc) => {
+  //       rows.push(doc.data())
+  //       return doc.data()
+  //     })
+  //   })
+  // console.log('LOG 2', users)
+  // console.log(rows)
   return rows
 }
 
@@ -222,6 +234,7 @@ const Resuittable = () => {
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState(createRows())
+
   const getData = () => {
     if (sortColumn && sortType) {
       return data.sort((a, b) => {
