@@ -9,6 +9,7 @@ import {
   Input,
   Modal,
   SelectPicker,
+  Uploader,
 } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
@@ -286,10 +287,17 @@ const Users = () => {
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    password: '',
-    textarea: '',
+    contactNumber: '',
+    'add-1': '',
+    'add-2': '',
+    state: '',
+    city: '',
+    country: '',
+    pincode: '',
+    district: '',
   })
 
   const handleClose = () => {
@@ -368,6 +376,10 @@ const Users = () => {
         </Modal.Header>
         <Modal.Body>
           <Form fluid onChange={setFormValue} formValue={formValue}>
+            <Form.Group controlId="uploader">
+              <Form.ControlLabel>Profile Picture:</Form.ControlLabel>
+              <Form.Control name="uploader" accepter={Uploader} action="#" />
+            </Form.Group>
             <Form.Group controlId="firstName-9">
               <Form.ControlLabel>First Name</Form.ControlLabel>
               <Form.Control name="firstName" />
