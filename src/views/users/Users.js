@@ -92,7 +92,7 @@ const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
     </BaseCell>
   )
 }
-
+//edited
 // const NameCell = ({ rowData, dataKey, ...props }) => {
 //   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
 //     const styles = {
