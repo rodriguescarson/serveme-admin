@@ -6,12 +6,14 @@ import 'firebase/compat/firestore'
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCRWKnQII7abE1DECObcpf0kZZI8VZhx9g',
-  authDomain: 'chatbot-dbce.firebaseapp.com',
-  projectId: 'chatbot-dbce',
-  storageBucket: 'chatbot-dbce.appspot.com',
-  messagingSenderId: '1082274589518',
-  appId: '1:1082274589518:web:ccb2b09481273e6bea4c1f',
+  apiKey: 'AIzaSyCAJz0iWb-xGKo4MQ_s4OcaUD7XZQbrvFg',
+  authDomain: 'serveme-9906a.firebaseapp.com',
+  databaseURL: 'https://serveme-9906a-default-rtdb.firebaseio.com',
+  projectId: 'serveme-9906a',
+  storageBucket: 'serveme-9906a.appspot.com',
+  messagingSenderId: '686369981334',
+  appId: '1:686369981334:web:aa25b5d3d6fb6ae448d3b7',
+  measurementId: 'G-6175TRQF88',
 }
 // const db = firebase.firestore();
 
