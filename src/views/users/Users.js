@@ -1,11 +1,44 @@
 import React, { memo, useEffect } from 'react'
+import {
+  IconButton,
+  ButtonToolbar,
+  ButtonGroup,
+  FlexboxGrid,
+  Form,
+  Button,
+  Input,
+  Modal,
+  SelectPicker,
+} from 'rsuite'
+import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { faker } from '@faker-js/faker'
-// import Whisper from 'rsuite/Whisper'
-import Button from 'rsuite/Button'
 import { db } from '../../firebase'
 import { useCollectionData } from 'react-firebase-hooks/firestore'
+
+const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
+  label: item,
+  value: item,
+}))
+
+const selectDataDistrict = ['South-Goa', 'North-Goa'].map((item) => ({
+  label: item,
+  value: item,
+}))
+
+const selectDataCity = ['Panjim', 'Margao'].map((item) => ({
+  label: item,
+  value: item,
+}))
+
+const selectDataCountry = ['India', 'USA'].map((item) => ({
+  label: item,
+  value: item,
+}))
+
+const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
+Textarea.displayName = 'Textarea'
 
 const EditableCell = ({ rowData, dataKey, onChange, ...props }) => {
   const editing = rowData.status === 'EDIT'
@@ -152,6 +185,21 @@ const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
   )
 }
 
+const DeleteCell = ({ rowData, dataKey, onClick, ...props }) => {
+  return (
+    <Cell {...props} style={{ padding: '6px' }}>
+      <Button
+        appearance="link"
+        onClick={() => {
+          onClick(rowData.id)
+        }}
+      >
+        {'Delete'}
+      </Button>
+    </Cell>
+  )
+}
+
 const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
   function handleChange(event) {
     onChange(rowData.id, event.target.value)
@@ -235,6 +283,22 @@ const Users = () => {
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState(createRows())
 
+  // useState for add user
+  const [open, setOpen] = React.useState(false)
+  const [formValue, setFormValue] = React.useState({
+    name: '',
+    email: '',
+    password: '',
+    textarea: '',
+  })
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
   const getData = () => {
     if (sortColumn && sortType) {
       return data.sort((a, b) => {
@@ -292,8 +356,90 @@ const Users = () => {
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
+  const handleDeleteState = (id) => {
+    setData(data.filter((item) => item.id !== id))
+  }
   return (
     <>
+      {/* add new user button */}
+      <Modal open={open} onClose={handleClose} size="xs">
+        <Modal.Header>
+          <Modal.Title>New User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form fluid onChange={setFormValue} formValue={formValue}>
+            <Form.Group controlId="firstName-9">
+              <Form.ControlLabel>First Name</Form.ControlLabel>
+              <Form.Control name="firstName" />
+              <Form.HelpText>Required</Form.HelpText>
+            </Form.Group>
+            <Form.Group controlId="lastName-9">
+              <Form.ControlLabel>Last Name</Form.ControlLabel>
+              <Form.Control name="lastName" />
+              <Form.HelpText>Required</Form.HelpText>
+            </Form.Group>
+            <Form.Group controlId="email-9">
+              <Form.ControlLabel>Email</Form.ControlLabel>
+              <Form.Control name="email" type="email" />
+              <Form.HelpText>Required</Form.HelpText>
+            </Form.Group>
+            <Form.Group controlId="contactNumber-9">
+              <Form.ControlLabel>contactNumber</Form.ControlLabel>
+              <Form.Control name="contactNumber" type="number" />
+            </Form.Group>
+            {/* <Form.Group controlId="textarea-9">
+              <Form.ControlLabel>Textarea</Form.ControlLabel>
+              <Form.Control rows={5} name="textarea" accepter={Textarea} />
+            </Form.Group> */}
+            <Form.Group controlId="add-1-9">
+              <Form.ControlLabel>Address 1</Form.ControlLabel>
+              <Form.Control name="add-1" type="text" />
+            </Form.Group>
+            <Form.Group controlId="add-2-9">
+              <Form.ControlLabel>Address 2</Form.ControlLabel>
+              <Form.Control name="add-2" type="text" />
+            </Form.Group>
+            <Form.Group controlId="pincode-9">
+              <Form.ControlLabel>Pincode</Form.ControlLabel>
+              <Form.Control name="pincode" type="number" />
+            </Form.Group>
+            <Form.Group controlId="state-10">
+              <Form.ControlLabel>State</Form.ControlLabel>
+              <Form.Control name="state" data={selectDataState} accepter={SelectPicker} />
+            </Form.Group>
+            <Form.Group controlId="district-10">
+              <Form.ControlLabel>District</Form.ControlLabel>
+              <Form.Control name="district" data={selectDataDistrict} accepter={SelectPicker} />
+            </Form.Group>
+            <Form.Group controlId="city-10">
+              <Form.ControlLabel>City</Form.ControlLabel>
+              <Form.Control name="city" data={selectDataCity} accepter={SelectPicker} />
+            </Form.Group>
+            <Form.Group controlId="country-10">
+              <Form.ControlLabel>Country</Form.ControlLabel>
+              <Form.Control name="country" data={selectDataCountry} accepter={SelectPicker} />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleClose} appearance="primary">
+            Confirm
+          </Button>
+          <Button onClick={handleClose} appearance="subtle">
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <FlexboxGrid justify="end" style={{ marginBottom: 10 }}>
+        <FlexboxGrid.Item colspan={2}>
+          <IconButton icon={<PlusIcon />} color="red" appearance="primary" onClick={handleOpen}>
+            Add
+          </IconButton>
+        </FlexboxGrid.Item>
+      </FlexboxGrid>
+      {/* end of add new user button */}
+      {/* table */}
       <Table
         virtualized
         height={600}
@@ -377,8 +523,12 @@ const Users = () => {
           <EditableCell dataKey="country" onChange={handleChange} />
         </Column>
         <Column width={200}>
-          <HeaderCell>Action</HeaderCell>
+          <HeaderCell>Edit</HeaderCell>
           <ActionCell dataKey="id" onClick={handleEditState} />
+        </Column>
+        <Column width={200}>
+          <HeaderCell>Delete</HeaderCell>
+          <DeleteCell dataKey="id" onClick={handleDeleteState} />
         </Column>
       </Table>
     </>
