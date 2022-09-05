@@ -93,6 +93,7 @@ const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
   )
 }
 //edited
+//edit 2
 // const NameCell = ({ rowData, dataKey, ...props }) => {
 //   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
 //     const styles = {
