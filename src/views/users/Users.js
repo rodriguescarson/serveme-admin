@@ -219,38 +219,40 @@ InputCell.displayName = 'InputCell'
 //change this
 function createRows() {
   const rows = []
+  const dataB = db.collection('serveme-users')
 
-  for (let i = 0; i < 50; i++) {
-    const user = {
-      id: i,
-      avatar: faker.image.avatar(),
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-      email: faker.internet.exampleEmail(),
-      contactNumber: faker.phone.number(),
-      add_1: faker.address.streetAddress(),
-      add_2: faker.address.secondaryAddress(),
-      pincode: faker.address.zipCode(),
-      district: faker.address.city(),
-      city: faker.address.city(),
-      state: faker.address.state(),
-      country: faker.address.country(),
-      sentence: faker.lorem.sentence(),
-    }
-    rows.push(user)
-  }
+  dataB
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        console.log('Document data:')
+      } else {
+        // doc.data() will be undefined in this case
+        console.log('No such document!')
+      }
+    })
+    .catch((error) => {
+      console.log('Error getting document:', error)
+    })
 
-  // const users = await db
-  //   .collection('user')
-  //   .get()
-  //   .then((querySnapshot) => {
-  //     querySnapshot.docs.map((doc) => {
-  //       rows.push(doc.data())
-  //       return doc.data()
-  //     })
-  //   })
-  // console.log('LOG 2', users)
-  // console.log(rows)
+  // for (let i = 0; i < 50; i++) {
+  //   const user = {
+  //     id: i,
+  //     avatar: faker.image.avatar(),
+  //     firstName: faker.name.firstName(),
+  //     lastName: faker.name.lastName(),
+  //     email: faker.internet.exampleEmail(),
+  //     contactNumber: faker.phone.number(),
+  //     add_1: faker.address.streetAddress(),
+  //     add_2: faker.address.secondaryAddress(),
+  //     pincode: faker.address.zipCode(),
+  //     district: faker.address.city(),
+  //     city: faker.address.city(),
+  //     state: faker.address.state(),
+  //     country: faker.address.country(),
+  //     sentence: faker.lorem.sentence(),
+  //   }
+  // }
   return rows
 }
 
@@ -300,6 +302,7 @@ const Users = () => {
     pincode: '',
     district: '',
   })
+  useEffect(() => {}, [])
 
   const handleClose = () => {
     setOpen(false)
