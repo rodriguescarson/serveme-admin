@@ -207,8 +207,8 @@ function createRows() {
   for (let i = 0; i < 50; i++) {
     const servicelist = {
       id: i,
-      Type: faker.address.city(),
-      Cost: faker.phone.number(),
+      type: faker.address.city(),
+      cost: faker.phone.number(),
     }
     rows.push(servicelist)
   }
@@ -237,20 +237,20 @@ function createRows() {
 //     })
 // })
 
-const ImageCell = ({ rowData, dataKey, ...rest }) => (
-  <Cell {...rest}>
-    <img
-      src={rowData[dataKey]}
-      width="50"
-      alt="avtar"
-      style={{
-        borderRadius: '50%',
-        verticalAlign: 'middle',
-        marginRight: '10px',
-      }}
-    />
-  </Cell>
-)
+// const ImageCell = ({ rowData, dataKey, ...rest }) => (
+//   <Cell {...rest}>
+//     <img
+//       src={rowData[dataKey]}
+//       width="50"
+//       alt="avtar"
+//       style={{
+//         borderRadius: '50%',
+//         verticalAlign: 'middle',
+//         marginRight: '10px',
+//       }}
+//     />
+//   </Cell>
+// )
 
 const ServiceLists = () => {
   const [checkedKeys, setCheckedKeys] = React.useState([])
@@ -342,10 +342,6 @@ const ServiceLists = () => {
         </Modal.Header>
         <Modal.Body>
           <Form fluid onChange={setFormValue} formValue={formValue}>
-            <Form.Group controlId="uploader">
-              <Form.ControlLabel>Profile Picture:</Form.ControlLabel>
-              <Form.Control name="uploader" accepter={Uploader} action="#" />
-            </Form.Group>
             <Form.Group controlId="city-9">
               <Form.ControlLabel>Type</Form.ControlLabel>
               <Form.Control name="city" data={selectDataType} accepter={SelectPicker} />
@@ -414,11 +410,11 @@ const ServiceLists = () => {
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Type</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
+          <EditableCell dataKey="type" onChange={handleChange} />
         </Column>
         <Column width={100} sortable>
           <HeaderCell>Cost</HeaderCell>
-          <Cell dataKey="contactNumber" />
+          <Cell dataKey="cost" />
         </Column>
         <Column width={200}>
           <HeaderCell>Edit</HeaderCell>
@@ -433,4 +429,3 @@ const ServiceLists = () => {
   )
 }
 export default ServiceLists
-
