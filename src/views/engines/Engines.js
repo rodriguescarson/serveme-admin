@@ -222,10 +222,10 @@ function createRows() {
     const engines = {
       id: i,
       avatar: faker.image.avatar(),
-      Enginemodel: faker.address.city(),
-      Altmake: faker.address.city(),
-      Enginemake: faker.address.city(),
-      Controllermode: faker.address.city(),
+      engineModel: faker.address.city(),
+      altMake: faker.address.city(),
+      engineMake: faker.address.city(),
+      controllerMode: faker.address.city(),
     }
     rows.push(engines)
   }
@@ -279,10 +279,10 @@ const Engines = () => {
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
-    Enginemodel: '',
-    Altmake: '',
-    Enginemake: '',
-    Controllermode: '',
+    engineModel: '',
+    altMake: '',
+    engineMake: '',
+    controllerMode: '',
   })
 
   const handleClose = () => {
@@ -363,19 +363,19 @@ const Engines = () => {
           <Form fluid onChange={setFormValue} formValue={formValue}>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Enginemodel</Form.ControlLabel>
-              <Form.Control name="city" data={selectDataEnginemodel} accepter={SelectPicker} />
+              <Form.Control name="engineModel" data={selectDataEnginemodel} accepter={SelectPicker} />
             </Form.Group>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Altmake</Form.ControlLabel>
-              <Form.Control name="city" data={selectDataAltmake} accepter={SelectPicker} />
+              <Form.Control name="altMake" data={selectDataAltmake} accepter={SelectPicker} />
             </Form.Group>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Enginemake</Form.ControlLabel>
-              <Form.Control name="city" data={selectDataEnginemake} accepter={SelectPicker} />
+              <Form.Control name="engineMake" data={selectDataEnginemake} accepter={SelectPicker} />
             </Form.Group>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Controllermode</Form.ControlLabel>
-              <Form.Control name="city" data={selectDataControllermode} accepter={SelectPicker} />
+              <Form.Control name="controllerMode" data={selectDataControllermode} accepter={SelectPicker} />
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -434,15 +434,15 @@ const Engines = () => {
 
         <Column width={200} sortable>
           <HeaderCell>Engine Model</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
+          <EditableCell dataKey="engineModel" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>AltMake</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
+          <EditableCell dataKey="altMake" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Engine Make</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
+          <EditableCell dataKey="engineMake" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Controller Mode</HeaderCell>
