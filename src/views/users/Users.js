@@ -216,8 +216,6 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 
 InputCell.displayName = 'InputCell'
 
-//change this
-
 // data.map((item) => {
 //   return db
 //     .collection('user')
@@ -279,6 +277,7 @@ const Users = () => {
     pincode: '',
     district: '',
   })
+  useEffect(() => {}, [])
 
   const handleClose = () => {
     setOpen(false)
