@@ -249,9 +249,9 @@ const Users = () => {
   const [data, setData] = React.useState(createRows())
 
   async function createRows() {
-    const docsArr = (db, collection) => {
+    const docsArr = (db, collectionName) => {
       return db
-        .collection('user')
+        .collection(collectionName)
         .get()
         .then((snapshot) => snapshot.docs.map((x) => x.data()))
     }
