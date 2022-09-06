@@ -223,7 +223,7 @@ function createRows() {
 
   for (let i = 0; i < 50; i++) {
     const provider = {
-      sp_id: i,
+      id: i,
       fullName: faker.name.fullName(),
       email: faker.internet.exampleEmail(),
       contactNumber: faker.phone.number(),
@@ -499,4 +499,4 @@ const ServiceProvider = () => {
     </>
   )
 }
-export default ServiceProvider;
+export default ServiceProvider
