@@ -216,6 +216,7 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 
 InputCell.displayName = 'InputCell'
 
+//change this
 function createRows() {
   const rows = []
 
@@ -284,7 +285,6 @@ const Users = () => {
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState(createRows())
-
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
@@ -353,7 +353,7 @@ const Users = () => {
     },
     [checkedKeys],
   )
-
+  //change this
   const handleChange = (id, key, value) => {
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
@@ -365,6 +365,8 @@ const Users = () => {
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
+
+  //change this
   const handleDeleteState = (id) => {
     setData(data.filter((item) => item.id !== id))
   }
