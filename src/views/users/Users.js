@@ -259,10 +259,8 @@ const Users = () => {
     }
     ;(async () => {
       const arr = await docsArr(db, 'user')
-      return arr
-    })().then((arr) => {
       setData(arr)
-    })
+    })()
   }
   // useState for add user
   const [open, setOpen] = React.useState(false)
