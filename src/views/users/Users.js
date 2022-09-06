@@ -216,46 +216,6 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 
 InputCell.displayName = 'InputCell'
 
-//change this
-function createRows() {
-  const rows = []
-  const dataB = db.collection('serveme-users')
-
-  dataB
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        console.log('Document data:')
-      } else {
-        // doc.data() will be undefined in this case
-        console.log('No such document!')
-      }
-    })
-    .catch((error) => {
-      console.log('Error getting document:', error)
-    })
-
-  // for (let i = 0; i < 50; i++) {
-  //   const user = {
-  //     id: i,
-  //     avatar: faker.image.avatar(),
-  //     firstName: faker.name.firstName(),
-  //     lastName: faker.name.lastName(),
-  //     email: faker.internet.exampleEmail(),
-  //     contactNumber: faker.phone.number(),
-  //     add_1: faker.address.streetAddress(),
-  //     add_2: faker.address.secondaryAddress(),
-  //     pincode: faker.address.zipCode(),
-  //     district: faker.address.city(),
-  //     city: faker.address.city(),
-  //     state: faker.address.state(),
-  //     country: faker.address.country(),
-  //     sentence: faker.lorem.sentence(),
-  //   }
-  // }
-  return rows
-}
-
 // data.map((item) => {
 //   return db
 //     .collection('user')
@@ -287,6 +247,21 @@ const Users = () => {
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState(createRows())
+
+  async function createRows() {
+    const docsArr = (db, collection) => {
+      return db
+        .collection('user')
+        .get()
+        .then((snapshot) => snapshot.docs.map((x) => x.data()))
+    }
+    ;(async () => {
+      const arr = await docsArr(db, 'user')
+      return arr
+    })().then((arr) => {
+      setData(arr)
+    })
+  }
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
