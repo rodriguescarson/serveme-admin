@@ -363,7 +363,11 @@ const Engines = () => {
           <Form fluid onChange={setFormValue} formValue={formValue}>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Enginemodel</Form.ControlLabel>
-              <Form.Control name="engineModel" data={selectDataEnginemodel} accepter={SelectPicker} />
+              <Form.Control
+                name="engineModel"
+                data={selectDataEnginemodel}
+                accepter={SelectPicker}
+              />
             </Form.Group>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Altmake</Form.ControlLabel>
@@ -375,7 +379,11 @@ const Engines = () => {
             </Form.Group>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Controllermode</Form.ControlLabel>
-              <Form.Control name="controllerMode" data={selectDataControllermode} accepter={SelectPicker} />
+              <Form.Control
+                name="controllerMode"
+                data={selectDataControllermode}
+                accepter={SelectPicker}
+              />
             </Form.Group>
           </Form>
         </Modal.Body>
