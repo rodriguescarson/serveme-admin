@@ -17,6 +17,8 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { db } from '../../../firebase'
 import { Modal, Button, ButtonToolbar, Placeholder } from 'rsuite'
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
+import { getDatabase, ref, set } from 'firebase/database'
 
 const Register = () => {
   const [open, setOpen] = React.useState(false)
@@ -38,31 +40,55 @@ const Register = () => {
   const [username, setUserName] = useState('')
   const handleSubmit = async (event) => {
     event.preventDefault()
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        auth.currentUser
-          .sendEmailVerification()
+    const auth = getAuth()
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        sendEmailVerification(auth.currentUser)
           .then(() => {
-            db.collection('serveme-admin')
-              .doc(auth.currentUser.uid)
-              .set({
-                email,
-                password,
-                username,
-              })
-              .then(() => {
-                console.log('Document successfully written!')
-              })
-            handleOpen('Please check your email for verification')
+            // Email verification sent!
+            const db = getDatabase()
+            set(ref(db, 'admins/' + userCredential.user.uid), {
+              username,
+              email,
+              password,
+            })
+
+            handleOpen('Email verification sent!')
             navigate('/')
           })
-          .catch((err) => handleOpen(err))
+          .catch((error) => {
+            handleOpen(error)
+          })
       })
-      .catch((err) => {
-        handleOpen(err)
+      .catch((error) => {
+        handleOpen(error)
       })
   }
+  // auth
+  //   .createUserWithEmailAndPassword(email, password)
+  //   .then(() => {
+  //     auth.currentUser
+  //       .sendEmailVerification()
+  //       .then(() => {
+  //         db.collection('serveme-admin')
+  //           .doc(auth.currentUser.uid)
+  //           .set({
+  //             email,
+  //             password,
+  //             username,
+  //           })
+  //           .then(() => {
+  //             console.log('Document successfully written!')
+  //           })
+  //         handleOpen('Please check your email for verification')
+  //         navigate('/')
+  //       })
+  //       .catch((err) => handleOpen(err))
+  //   })
+  //   .catch((err) => {
+  //     handleOpen(err)
+  //   })
+  // }
   return (
     <>
       <Modal open={open} onClose={handleClose}>

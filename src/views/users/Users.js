@@ -15,7 +15,7 @@ import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { faker } from '@faker-js/faker'
-import { db } from '../../firebase'
+import { getDatabase, ref, set, child, push, update, get, remove } from 'firebase/database'
 
 //cell imports
 import {
@@ -27,6 +27,8 @@ import {
   ImageCell,
   InputCell,
 } from '../../utils/tableComponents'
+import { auth } from '../../firebase'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
 
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
@@ -57,7 +59,7 @@ const Users = () => {
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
-  const [data, setData] = React.useState(createRows())
+  const [data, setData] = React.useState([])
   //delete states
   const [deleteUserModal, setDeleteUserModal] = React.useState(false)
   const handleCloseDeleteModal = () => setDeleteUserModal(false)
@@ -124,17 +126,44 @@ const Users = () => {
     },
     [checkedKeys],
   )
+
+  const handleEditState = (id) => {
+    const nextData = Object.assign([], data)
+    const activeItem = nextData.find((item) => item.id === id)
+    activeItem.status = activeItem.status ? null : 'EDIT'
+    setData(nextData)
+  }
   // end of table functions
 
   // posting data to firebase
   useEffect(() => {
-    if (formValue.firstName !== '') {
-      db.collection('serveme-users')
-        .doc()
-        .set(formValue)
-        .then(() => {
-          console.log('Document successfully written!')
+    if (
+      formValue.firstName !== '' &&
+      formValue.lastName !== '' &&
+      formValue.email !== '' &&
+      formValue.contactNumber !== '' &&
+      formValue['add-1'] !== '' &&
+      formValue['add-2'] !== '' &&
+      formValue.state !== '' &&
+      formValue.city !== '' &&
+      formValue.country !== '' &&
+      formValue.pincode !== '' &&
+      formValue.district !== ''
+    ) {
+      createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
+        .then((userCredential) => {
+          const user = userCredential.user
+          const uid = user.uid
+          const db = getDatabase()
+          set(ref(db, 'users/customers/' + uid), formValue)
         })
+        .catch((error) => {
+          const errorCode = error.code
+          const errorMessage = error.message
+          console.log(errorCode, errorMessage)
+        })
+    } else {
+      console.log('error')
     }
   }, [formValue])
 
@@ -151,63 +180,65 @@ const Users = () => {
   const handleOpen = () => {
     setOpen(true)
   }
-
-  // retrieving data from firebase
-  async function createRows() {
-    // const rows = []
-    // for (let i = 0; i < 100; i++) {
-    //   rows.push({
-    //     id: i,
-    //     name: faker.name.firstName(),
-    //     email: faker.internet.email(),
-    //     phone: faker.phone.number(),
-    //     state: faker.address.state(),
-    //     district: faker.address.city(),
-    //     city: faker.address.city(),
-    //     country: faker.address.country(),
-    //     status: 'VIEW',
-    //   })
-    // }
-    // return rows
-    const docsArr = (db, collectionName) => {
-      return db
-        .collection(collectionName)
-        .get()
-        .then((snapshot) =>
-          snapshot.docs.map((x) => {
-            // id is the document id
-            console.log(x.id)
-            return { id: x.id, ...x.data() }
-          }),
-        )
-    }
-    ;(async () => {
-      const arr = await docsArr(db, 'user')
-      setData(arr)
-    })()
-  }
+  // ;(() => {
+  //   const rows = []
+  //   for (let i = 0; i < 100; i++) {
+  //     const user = {
+  //       id: i,
+  //       avatar: faker.image.avatar(),
+  //       firstName: faker.name.firstName(),
+  //       lastName: faker.name.lastName(),
+  //       email: faker.internet.exampleEmail(),
+  //       contactNumber: faker.phone.number(),
+  //       add_1: faker.address.streetAddress(),
+  //       add_2: faker.address.secondaryAddress(),
+  //       pincode: faker.address.zipCode(),
+  //       district: faker.address.city(),
+  //       city: faker.address.city(),
+  //       state: faker.address.state(),
+  //       country: faker.address.country(),
+  //       sentence: faker.lorem.sentence(),
+  //     }
+  //     rows.push(user)
+  //   }
+  //   const db = getDatabase()
+  //   set(ref(db, 'users/customers/'), rows)
+  // })()
+  useEffect(() => {
+    const dbRef = ref(getDatabase())
+    get(child(dbRef, `users/customers`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(Object.values(snapshot.val()))
+          console.log(snapshot.val())
+        } else {
+          console.log('No data available')
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }, [])
 
   //change this - update data in firebase
   const handleChange = (id, key, value) => {
-    db.collection('user')
-      .doc(id)
-      .update({ [key]: value })
+    // db.collection('user')
+    //   .doc(id)
+    //   .update({ [key]: value })
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
-  }
-
-  //change this - edit data from firebase
-  const handleEditState = (id) => {
-    const nextData = Object.assign([], data)
-    const activeItem = nextData.find((item) => item.id === id)
-    activeItem.status = activeItem.status ? null : 'EDIT'
-    setData(nextData)
+    const db = getDatabase()
+    update(ref(db, 'users/customers/' + id), {
+      [key]: value,
+    })
   }
   //change this - delete from firebase
   const handleDeleteState = (id) => {
     // delete data[id]
     //
+    const db = getDatabase()
+    remove(ref(db, 'users/customers/' + id))
     console.log(id)
     setData(data.filter((item) => item.id !== id))
   }
@@ -237,6 +268,11 @@ const Users = () => {
             <Form.Group controlId="email-9">
               <Form.ControlLabel>Email</Form.ControlLabel>
               <Form.Control name="email" type="email" />
+              <Form.HelpText>Required</Form.HelpText>
+            </Form.Group>
+            <Form.Group controlId="password-9">
+              <Form.ControlLabel>Password</Form.ControlLabel>
+              <Form.Control name="password" />
               <Form.HelpText>Required</Form.HelpText>
             </Form.Group>
             <Form.Group controlId="contactNumber-9">
