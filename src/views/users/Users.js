@@ -17,6 +17,17 @@ import 'rsuite-table/dist/css/rsuite-table.css'
 import { faker } from '@faker-js/faker'
 import { db } from '../../firebase'
 
+//cell imports
+import {
+  ActionCell,
+  BaseCell,
+  CheckCell,
+  DeleteCell,
+  EditableCell,
+  ImageCell,
+  InputCell,
+} from '../../utils/tableComponents'
+
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
   value: item,
@@ -40,131 +51,18 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
 
-const EditableCell = ({ rowData, dataKey, onChange, ...props }) => {
-  const editing = rowData.status === 'EDIT'
-  return (
-    <Cell {...props} className={editing ? 'table-content-editing' : ''}>
-      {editing ? (
-        <input
-          className="rs-input"
-          defaultValue={rowData[dataKey]}
-          onChange={(event) => {
-            onChange && onChange(rowData.id, dataKey, event.target.value)
-          }}
-        />
-      ) : (
-        <span className="table-content-edit-span">{rowData[dataKey]}</span>
-      )}
-    </Cell>
-  )
-}
-
-const BaseCell = React.forwardRef((props, ref) => {
-  const { children, rowData, ...rest } = props
-  return (
-    <Cell
-      ref={ref}
-      rowData={rowData}
-      onDoubleClick={() => {
-        console.log(rowData)
-      }}
-      {...rest}
-    >
-      {children}
-    </Cell>
-  )
-})
-
-BaseCell.displayName = 'BaseCell'
-
-const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
-  return (
-    <BaseCell {...props} style={{ padding: 0 }}>
-      <div style={{ lineHeight: '46px' }}>
-        <input
-          type="checkbox"
-          value={rowData[dataKey]}
-          onChange={onChange}
-          checked={checkedKeys.some((item) => item === rowData[dataKey])}
-        />
-      </div>
-    </BaseCell>
-  )
-}
-
-const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {rowData.status === 'EDIT' ? 'Save' : 'Edit'}
-      </Button>
-    </Cell>
-  )
-}
-
-const DeleteCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {'Delete'}
-      </Button>
-    </Cell>
-  )
-}
-
-const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
-  function handleChange(event) {
-    onChange(rowData.id, event.target.value)
-  }
-
-  return (
-    <BaseCell {...props}>
-      <input value={data[rowData.id]} onChange={handleChange} />
-    </BaseCell>
-  )
-})
-
-InputCell.displayName = 'InputCell'
-
-const ImageCell = ({ rowData, dataKey, ...rest }) => (
-  <Cell {...rest}>
-    <img
-      src={rowData[dataKey]}
-      width="50"
-      alt="avtar"
-      style={{
-        borderRadius: '50%',
-        verticalAlign: 'middle',
-        marginRight: '10px',
-      }}
-    />
-  </Cell>
-)
-
 const Users = () => {
+  //table states
   const [checkedKeys, setCheckedKeys] = React.useState([])
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState(createRows())
+  //delete states
   const [deleteUserModal, setDeleteUserModal] = React.useState(false)
   const handleCloseDeleteModal = () => setDeleteUserModal(false)
-  const handleShowDeleteModal = (id) => {
-    setDeleteUserModal(true)
-    setDeleteId(id)
-  }
   const [deleteId, setDeleteId] = React.useState()
-  // useState for add user
+  // add states
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
     firstName: '',
@@ -179,58 +77,8 @@ const Users = () => {
     pincode: '',
     district: '',
   })
-  useEffect(() => {
-    if (formValue.firstName !== '') {
-      db.collection('serveme-users')
-        .doc()
-        .set(formValue)
-        .then(() => {
-          console.log('Document successfully written!')
-        })
-    }
-  }, [formValue])
 
-  const handleClose = () => {
-    setOpen(false)
-  }
-  const handleOpen = () => {
-    setOpen(true)
-  }
-
-  async function createRows() {
-    // const rows = []
-    // for (let i = 0; i < 100; i++) {
-    //   rows.push({
-    //     id: i,
-    //     name: faker.name.firstName(),
-    //     email: faker.internet.email(),
-    //     phone: faker.phone.number(),
-    //     state: faker.address.state(),
-    //     district: faker.address.city(),
-    //     city: faker.address.city(),
-    //     country: faker.address.country(),
-    //     status: 'VIEW',
-    //   })
-    // }
-    // return rows
-    const docsArr = (db, collectionName) => {
-      return db
-        .collection(collectionName)
-        .get()
-        .then((snapshot) =>
-          snapshot.docs.map((x) => {
-            // id is the document id
-            console.log(x.id)
-            return { id: x.id, ...x.data() }
-          }),
-        )
-    }
-    ;(async () => {
-      const arr = await docsArr(db, 'user')
-      setData(arr)
-    })()
-  }
-
+  // table functions
   const getData = () => {
     if (sortColumn && sortType) {
       return data.sort((a, b) => {
@@ -276,7 +124,70 @@ const Users = () => {
     },
     [checkedKeys],
   )
-  //change this
+  // end of table functions
+
+  // posting data to firebase
+  useEffect(() => {
+    if (formValue.firstName !== '') {
+      db.collection('serveme-users')
+        .doc()
+        .set(formValue)
+        .then(() => {
+          console.log('Document successfully written!')
+        })
+    }
+  }, [formValue])
+
+  // setting states for delete
+  const handleShowDeleteModal = (id) => {
+    setDeleteUserModal(true)
+    setDeleteId(id)
+  }
+
+  // handle states for add
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
+  // retrieving data from firebase
+  async function createRows() {
+    // const rows = []
+    // for (let i = 0; i < 100; i++) {
+    //   rows.push({
+    //     id: i,
+    //     name: faker.name.firstName(),
+    //     email: faker.internet.email(),
+    //     phone: faker.phone.number(),
+    //     state: faker.address.state(),
+    //     district: faker.address.city(),
+    //     city: faker.address.city(),
+    //     country: faker.address.country(),
+    //     status: 'VIEW',
+    //   })
+    // }
+    // return rows
+    const docsArr = (db, collectionName) => {
+      return db
+        .collection(collectionName)
+        .get()
+        .then((snapshot) =>
+          snapshot.docs.map((x) => {
+            // id is the document id
+            console.log(x.id)
+            return { id: x.id, ...x.data() }
+          }),
+        )
+    }
+    ;(async () => {
+      const arr = await docsArr(db, 'user')
+      setData(arr)
+    })()
+  }
+
+  //change this - update data in firebase
   const handleChange = (id, key, value) => {
     db.collection('user')
       .doc(id)
@@ -285,13 +196,15 @@ const Users = () => {
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
   }
+
+  //change this - edit data from firebase
   const handleEditState = (id) => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.id === id)
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
-  //change this
+  //change this - delete from firebase
   const handleDeleteState = (id) => {
     // delete data[id]
     //
