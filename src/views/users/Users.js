@@ -16,7 +16,6 @@ import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { faker } from '@faker-js/faker'
 import { db } from '../../firebase'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
@@ -92,85 +91,6 @@ const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
     </BaseCell>
   )
 }
-//edited
-//edit 2
-// const NameCell = ({ rowData, dataKey, ...props }) => {
-//   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
-//     const styles = {
-//       ...style,
-//       shadows: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-//       color: '#000',
-//       background: '#fff',
-//       width: 200,
-//       opacity: 1,
-//       padding: 10,
-//       borderRadius: 4,
-//       boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-//       position: 'absolute',
-//       zIndex: 1,
-//       transform: 'translate(0, -20px)',
-//     }
-
-//     return (
-//       <div {...rest} style={styles} ref={ref}>
-//         <p>
-//           <b>Name:</b> {`${rowData.firstName} ${rowData.lastName}`}{' '}
-//         </p>
-//         <p
-//           style={{
-//             display: 'flex',
-//             flexWrap: 'wrap',
-//           }}
-//         >
-//           <b>District:</b> {rowData.district}{' '}
-//         </p>
-//         <p>
-//           <b>City:</b> {rowData.city}{' '}
-//         </p>
-//         <p>
-//           <b>State:</b> {rowData.state}{' '}
-//         </p>
-//         <p>
-//           <b>Country:</b> {rowData.country}{' '}
-//         </p>
-//       </div>
-//     )
-//   })
-//   Overlay.displayName = 'Overlay'
-//   const speaker = (props, ref) => {
-//     const { className, top, onClose } = props
-//     return (
-//       <Overlay
-//         title="Description"
-//         style={{ top }}
-//         onClose={onClose}
-//         className={className}
-//         ref={ref}
-//         visible
-//       />
-//     )
-//   }
-
-//   return (
-//     <BaseCell rowData={rowData} {...props}>
-//       <Whisper trigger="click" placement="auto" speaker={speaker} enterable>
-//         <Button
-//           style={{
-//             background: '#fff',
-//             color: 'blue',
-//             border: '0px solid #000',
-//             lineHeight: '50px',
-//             textAlign: 'center',
-//             verticalAlign: 'middle',
-//             marginRight: '10px',
-//           }}
-//         >
-//           {rowData[dataKey].toLocaleString()}
-//         </Button>
-//       </Whisper>
-//     </BaseCell>
-//   )
-// }
 
 const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
   return (
@@ -216,16 +136,6 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 
 InputCell.displayName = 'InputCell'
 
-// data.map((item) => {
-//   return db
-//     .collection('user')
-//     .doc('one')
-//     .set(item)
-//     .then(() => {
-//       console.log('Document successfully written!')
-//     })
-// })
-
 const ImageCell = ({ rowData, dataKey, ...rest }) => (
   <Cell {...rest}>
     <img
@@ -247,25 +157,13 @@ const Users = () => {
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState(createRows())
-
-  async function createRows() {
-    const docsArr = (db, collectionName) => {
-      return db
-        .collection(collectionName)
-        .get()
-        .then((snapshot) =>
-          snapshot.docs.map((x) => {
-            // id is the document id
-            console.log(x.id)
-            return { id: x.id, ...x.data() }
-          }),
-        )
-    }
-    ;(async () => {
-      const arr = await docsArr(db, 'user')
-      setData(arr)
-    })()
+  const [deleteUserModal, setDeleteUserModal] = React.useState(false)
+  const handleCloseDeleteModal = () => setDeleteUserModal(false)
+  const handleShowDeleteModal = (id) => {
+    setDeleteUserModal(true)
+    setDeleteId(id)
   }
+  const [deleteId, setDeleteId] = React.useState()
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
@@ -282,7 +180,7 @@ const Users = () => {
     district: '',
   })
   useEffect(() => {
-    if (formValue.firstName != '') {
+    if (formValue.firstName !== '') {
       db.collection('serveme-users')
         .doc()
         .set(formValue)
@@ -297,6 +195,40 @@ const Users = () => {
   }
   const handleOpen = () => {
     setOpen(true)
+  }
+
+  async function createRows() {
+    // const rows = []
+    // for (let i = 0; i < 100; i++) {
+    //   rows.push({
+    //     id: i,
+    //     name: faker.name.firstName(),
+    //     email: faker.internet.email(),
+    //     phone: faker.phone.number(),
+    //     state: faker.address.state(),
+    //     district: faker.address.city(),
+    //     city: faker.address.city(),
+    //     country: faker.address.country(),
+    //     status: 'VIEW',
+    //   })
+    // }
+    // return rows
+    const docsArr = (db, collectionName) => {
+      return db
+        .collection(collectionName)
+        .get()
+        .then((snapshot) =>
+          snapshot.docs.map((x) => {
+            // id is the document id
+            console.log(x.id)
+            return { id: x.id, ...x.data() }
+          }),
+        )
+    }
+    ;(async () => {
+      const arr = await docsArr(db, 'user')
+      setData(arr)
+    })()
   }
 
   const getData = () => {
@@ -346,6 +278,9 @@ const Users = () => {
   )
   //change this
   const handleChange = (id, key, value) => {
+    db.collection('user')
+      .doc(id)
+      .update({ [key]: value })
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
@@ -356,11 +291,11 @@ const Users = () => {
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
-
   //change this
   const handleDeleteState = (id) => {
     // delete data[id]
-    db.collection('user').doc(id).delete()
+    //
+    console.log(id)
     setData(data.filter((item) => item.id !== id))
   }
   return (
@@ -536,9 +471,31 @@ const Users = () => {
         </Column>
         <Column width={200}>
           <HeaderCell>Delete</HeaderCell>
-          <DeleteCell dataKey="id" onClick={handleDeleteState} />
+          <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
         </Column>
       </Table>
+
+      {/* Delete Modal */}
+      <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
+        <Modal.Header>
+          <Modal.Title>Delete User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this user?</Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={() => {
+              handleDeleteState(deleteId)
+              handleCloseDeleteModal()
+            }}
+            appearance="primary"
+          >
+            Confirm
+          </Button>
+          <Button onClick={handleCloseDeleteModal} appearance="subtle">
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }
