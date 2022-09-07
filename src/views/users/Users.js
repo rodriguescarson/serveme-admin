@@ -253,7 +253,13 @@ const Users = () => {
       return db
         .collection(collectionName)
         .get()
-        .then((snapshot) => snapshot.docs.map((x) => x.data()))
+        .then((snapshot) =>
+          snapshot.docs.map((x) => {
+            // id is the document id
+            console.log(x.id)
+            return { id: x.id, ...x.data() }
+          }),
+        )
     }
     ;(async () => {
       const arr = await docsArr(db, 'user')
@@ -353,6 +359,8 @@ const Users = () => {
 
   //change this
   const handleDeleteState = (id) => {
+    // delete data[id]
+    db.collection('user').doc(id).delete()
     setData(data.filter((item) => item.id !== id))
   }
   return (
