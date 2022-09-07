@@ -281,7 +281,16 @@ const Users = () => {
     pincode: '',
     district: '',
   })
-  useEffect(() => {}, [])
+  useEffect(() => {
+    if (formValue.firstName != '') {
+      db.collection('serveme-users')
+        .doc()
+        .set(formValue)
+        .then(() => {
+          console.log('Document successfully written!')
+        })
+    }
+  }, [formValue])
 
   const handleClose = () => {
     setOpen(false)
