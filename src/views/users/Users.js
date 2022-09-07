@@ -16,7 +16,7 @@ import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { faker } from '@faker-js/faker'
 import { getDatabase, ref, set, child, push, update, get, remove } from 'firebase/database'
-
+import { getAuth } from 'firebase/auth'
 //cell imports
 import {
   ActionCell,
@@ -27,8 +27,7 @@ import {
   ImageCell,
   InputCell,
 } from '../../utils/tableComponents'
-import { auth } from '../../firebase'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { auth, createUserWithEmailAndPassword } from 'firebase/auth'
 
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
@@ -71,6 +70,7 @@ const Users = () => {
     lastName: '',
     email: '',
     contactNumber: '',
+    password: '',
     'add-1': '',
     'add-2': '',
     state: '',
@@ -136,36 +136,25 @@ const Users = () => {
   // end of table functions
 
   // posting data to firebase
-  useEffect(() => {
-    if (
-      formValue.firstName !== '' &&
-      formValue.lastName !== '' &&
-      formValue.email !== '' &&
-      formValue.contactNumber !== '' &&
-      formValue['add-1'] !== '' &&
-      formValue['add-2'] !== '' &&
-      formValue.state !== '' &&
-      formValue.city !== '' &&
-      formValue.country !== '' &&
-      formValue.pincode !== '' &&
-      formValue.district !== ''
-    ) {
-      createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
-        .then((userCredential) => {
-          const user = userCredential.user
-          const uid = user.uid
-          const db = getDatabase()
-          set(ref(db, 'users/customers/' + uid), formValue)
+  const addDataToFirebase = (data) => {
+    console.log(data)
+    const auth = getAuth()
+    createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
+      .then((userCredential) => {
+        const user = userCredential.user
+        const uid = user.uid
+        const db = getDatabase()
+        set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
+          console.log('Data saved!')
+          handleClose()
         })
-        .catch((error) => {
-          const errorCode = error.code
-          const errorMessage = error.message
-          console.log(errorCode, errorMessage)
-        })
-    } else {
-      console.log('error')
-    }
-  }, [formValue])
+      })
+      .catch((error) => {
+        const errorCode = error.code
+        const errorMessage = error.message
+        console.log(errorCode, errorMessage)
+      })
+  }
 
   // setting states for delete
   const handleShowDeleteModal = (id) => {
@@ -272,7 +261,7 @@ const Users = () => {
             </Form.Group>
             <Form.Group controlId="password-9">
               <Form.ControlLabel>Password</Form.ControlLabel>
-              <Form.Control name="password" />
+              <Form.Control name="password" type="password" />
               <Form.HelpText>Required</Form.HelpText>
             </Form.Group>
             <Form.Group controlId="contactNumber-9">
@@ -314,7 +303,7 @@ const Users = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={addDataToFirebase} appearance="primary">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
