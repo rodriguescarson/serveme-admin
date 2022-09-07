@@ -16,8 +16,9 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
-import { auth } from '../../../firebase'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { Modal, Button, ButtonToolbar, Placeholder } from 'rsuite'
+const auth = getAuth()
 
 const Login = () => {
   const [open, setOpen] = React.useState(false)
@@ -37,10 +38,10 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then(({ user }) => {
-        console.log(user)
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user
         navigate('/')
       })
       .catch((error) => {
