@@ -12,6 +12,8 @@ import {
   Modal,
   SelectPicker,
   Uploader,
+  Message,
+  useToaster,
 } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
@@ -58,7 +60,7 @@ const model = Schema.Model({
   lastName: Schema.Types.StringType().isRequired('This field is required.'),
   email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
   contactNumber: Schema.Types.StringType().isRequired('This field is required.'),
-  password: Schema.Types.StringType().isRequired('This field is required.'),
+  password: Schema.Types.StringType().isRequired('This field is required.').maxLength(6),
 })
 // no changes
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
@@ -100,7 +102,12 @@ const Users = () => {
     pincode: '',
     district: '',
   })
-
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type="success">
+      User Added Successfully
+    </Message>
+  )
   // table functions
   const getData = () => {
     if (sortColumn && sortType) {
@@ -178,7 +185,24 @@ const Users = () => {
         const db = getDatabase()
         set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
           console.log('Data saved!')
+          const nextData = getData()
+          setData([...nextData, { id: uid, ...formValue }])
           handleClose()
+          toaster.push(message, 'topCenter')
+          setFormValue({
+            firstName: '',
+            lastName: '',
+            email: '',
+            contactNumber: '',
+            password: '',
+            'add-1': '',
+            'add-2': '',
+            state: '',
+            city: '',
+            country: '',
+            pincode: '',
+            district: '',
+          })
         })
       })
       .catch((error) => {
@@ -236,7 +260,6 @@ const Users = () => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
-          console.log(snapshot.val())
         } else {
           console.log('No data available')
         }
@@ -267,7 +290,6 @@ const Users = () => {
     const db = getDatabase()
     // changew only this
     remove(ref(db, 'users/customers/' + id))
-    console.log(id)
     setData(data.filter((item) => item.id !== id))
   }
 
@@ -364,9 +386,6 @@ const Users = () => {
         headerHeight={50}
         bordered
         cellBordered
-        onRowClick={(data) => {
-          console.log(data)
-        }}
         affixHorizontalScrollbar
       >
         <Column width={50} align="center" sortable>
