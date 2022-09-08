@@ -60,7 +60,10 @@ const model = Schema.Model({
   lastName: Schema.Types.StringType().isRequired('This field is required.'),
   email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
   contactNumber: Schema.Types.StringType().isRequired('This field is required.'),
-  password: Schema.Types.StringType().isRequired('This field is required.').maxLength(6),
+  password: Schema.Types.StringType()
+    .isRequired('This field is required.')
+    .minLength(6)
+    .maxLength(100),
 })
 // no changes
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
@@ -89,6 +92,7 @@ const Users = () => {
   const formRef = React.useRef()
   ///change
   const [formValue, setFormValue] = React.useState({
+    avatar: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
     firstName: '',
     lastName: '',
     email: '',
@@ -303,11 +307,11 @@ const Users = () => {
         <Modal.Body>
           <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
             <TextField
-              cid="uploader"
-              name="uploader"
+              cid="avatar"
+              name="avatar"
               label="Profile Picture"
               accepter={Uploader}
-              action="#"
+              // action="#"
             />
             <TextField cid="firstName-9" name="firstName" label="First Name" />
             <TextField cid="firstName-9" name="lastName" label="Last Name" />
@@ -388,7 +392,7 @@ const Users = () => {
         cellBordered
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
@@ -401,7 +405,7 @@ const Users = () => {
           <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
         </Column>
 
-        <Column width={70} align="center" fixed sortable>
+        <Column width={70} fixed sortable>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
         </Column>
@@ -411,14 +415,13 @@ const Users = () => {
         </Column>
         <Column width={100} sortable>
           <HeaderCell>First Name</HeaderCell>
-          <Cell dataKey="firstName" />
+          <EditableCell dataKey="firstName" />
         </Column>
-
-        <Column width={100} sortable>
+        <Column width={100} sortable onChange={handleChange}>
           <HeaderCell>Last Name</HeaderCell>
-          <Cell dataKey="lastName" />
+          <EditableCell dataKey="lastName" />
         </Column>
-        <Column width={200} sortable>
+        <Column width={200} sortable onChange={handleChange}>
           <HeaderCell>Email</HeaderCell>
           <EditableCell dataKey="email" onChange={handleChange} />
         </Column>
