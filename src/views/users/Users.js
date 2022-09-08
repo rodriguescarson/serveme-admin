@@ -260,7 +260,6 @@ const Users = () => {
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
-          console.log(typeof snapshot.val())
         } else {
           console.log('No data available')
         }
@@ -291,7 +290,6 @@ const Users = () => {
     const db = getDatabase()
     // changew only this
     remove(ref(db, 'users/customers/' + id))
-    console.log(id)
     setData(data.filter((item) => item.id !== id))
   }
 
@@ -388,9 +386,6 @@ const Users = () => {
         headerHeight={50}
         bordered
         cellBordered
-        onRowClick={(data) => {
-          console.log(data)
-        }}
         affixHorizontalScrollbar
       >
         <Column width={50} align="center" sortable>
