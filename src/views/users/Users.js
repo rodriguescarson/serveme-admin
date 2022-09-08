@@ -1,5 +1,5 @@
 //remains same
-import React, { memo, useEffect } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import {
   IconButton,
   ButtonToolbar,
@@ -32,6 +32,7 @@ import {
   InputCell,
 } from '../../utils/tableComponents'
 import { auth, createUserWithEmailAndPassword } from 'firebase/auth'
+import { getStorage, ref as storageRe, uploadBytes } from 'firebase/storage'
 
 // change according to your needs
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
@@ -112,6 +113,22 @@ const Users = () => {
       User Added Successfully
     </Message>
   )
+  useEffect(() => {
+    if (formValue.avatar[0].blobFile) {
+      const file = formValue.avatar[0].blobFile
+      const storage = getStorage()
+      const storageRef = storageRe(storage, `/userAvatars/${file.name}`)
+      uploadBytes(storageRef, file)
+        .then((snapshot) => {
+          console.log('Uploaded a blob or file!', snapshot.ref.fullPath)
+          console.log('url', snapshot.ref.name)
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    }
+  }, [formValue])
+
   // table functions
   const getData = () => {
     if (sortColumn && sortType) {
@@ -187,6 +204,20 @@ const Users = () => {
         const user = userCredential.user
         const uid = user.uid
         const db = getDatabase()
+
+        if (formValue.avatar[0].blobFile) {
+          const file = formValue.avatar[0].blobFile
+          const storage = getStorage()
+          console.log(`/userAvatars/${uid}`)
+          const storageRef = storageRe(storage, `/userAvatars/${uid}`)
+          uploadBytes(storageRef, file)
+            .then((snapshot) => {
+              console.log('Uploaded a blob or file!', snapshot.ref.fullPath)
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+        }
         set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
           console.log('Data saved!')
           const nextData = getData()
@@ -311,7 +342,7 @@ const Users = () => {
               name="avatar"
               label="Profile Picture"
               accepter={Uploader}
-              // action="#"
+              // action=""
             />
             <TextField cid="firstName-9" name="firstName" label="First Name" />
             <TextField cid="firstName-9" name="lastName" label="Last Name" />
