@@ -89,6 +89,7 @@ const Users = () => {
   const formRef = React.useRef()
   ///change
   const [formValue, setFormValue] = React.useState({
+    avatar: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
     firstName: '',
     lastName: '',
     email: '',
@@ -388,7 +389,7 @@ const Users = () => {
         cellBordered
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
@@ -401,7 +402,7 @@ const Users = () => {
           <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
         </Column>
 
-        <Column width={70} align="center" fixed sortable>
+        <Column width={70} fixed sortable>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
         </Column>
@@ -411,14 +412,13 @@ const Users = () => {
         </Column>
         <Column width={100} sortable>
           <HeaderCell>First Name</HeaderCell>
-          <Cell dataKey="firstName" />
+          <EditableCell dataKey="firstName" />
         </Column>
-
-        <Column width={100} sortable>
+        <Column width={100} sortable onChange={handleChange}>
           <HeaderCell>Last Name</HeaderCell>
-          <Cell dataKey="lastName" />
+          <EditableCell dataKey="lastName" />
         </Column>
-        <Column width={200} sortable>
+        <Column width={200} sortable onChange={handleChange}>
           <HeaderCell>Email</HeaderCell>
           <EditableCell dataKey="email" onChange={handleChange} />
         </Column>
