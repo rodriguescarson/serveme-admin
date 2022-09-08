@@ -60,7 +60,10 @@ const model = Schema.Model({
   lastName: Schema.Types.StringType().isRequired('This field is required.'),
   email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
   contactNumber: Schema.Types.StringType().isRequired('This field is required.'),
-  password: Schema.Types.StringType().isRequired('This field is required.').maxLength(6),
+  password: Schema.Types.StringType()
+    .isRequired('This field is required.')
+    .minLength(6)
+    .maxLength(100),
 })
 // no changes
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
@@ -304,11 +307,11 @@ const Users = () => {
         <Modal.Body>
           <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
             <TextField
-              cid="uploader"
-              name="uploader"
+              cid="avatar"
+              name="avatar"
               label="Profile Picture"
               accepter={Uploader}
-              action="#"
+              // action="#"
             />
             <TextField cid="firstName-9" name="firstName" label="First Name" />
             <TextField cid="firstName-9" name="lastName" label="Last Name" />
