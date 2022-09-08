@@ -1,3 +1,4 @@
+//remains same
 import React, { memo, useEffect } from 'react'
 import {
   IconButton,
@@ -30,6 +31,7 @@ import {
 } from '../../utils/tableComponents'
 import { auth, createUserWithEmailAndPassword } from 'firebase/auth'
 
+// change according to your needs
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
   value: item,
@@ -50,6 +52,7 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
   value: item,
 }))
 
+// change form validation according to your needs
 const model = Schema.Model({
   firstName: Schema.Types.StringType().isRequired('This field is required.'),
   lastName: Schema.Types.StringType().isRequired('This field is required.'),
@@ -57,7 +60,7 @@ const model = Schema.Model({
   contactNumber: Schema.Types.StringType().isRequired('This field is required.'),
   password: Schema.Types.StringType().isRequired('This field is required.'),
 })
-
+// no changes
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
 
@@ -82,6 +85,7 @@ const Users = () => {
   // add states
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
+  ///change
   const [formValue, setFormValue] = React.useState({
     firstName: '',
     lastName: '',
@@ -153,11 +157,19 @@ const Users = () => {
   // end of table functions
 
   // posting data to firebase
+  // make changes
   const addDataToFirebase = (data) => {
     if (!formRef.current.check()) {
       console.error('Form Error')
       return
     }
+    // only add this
+    // const db = getDatabase()
+    // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
+    //   console.log('Data saved!')
+    //   handleClose()
+    // })
+    // only
     const auth = getAuth()
     createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
       .then((userCredential) => {
@@ -213,8 +225,13 @@ const Users = () => {
   //   const db = getDatabase()
   //   set(ref(db, 'users/customers/'), rows)
   // })()
+  ///
+  //
+  //make changes - retirve data from firebase
+
   useEffect(() => {
     const dbRef = ref(getDatabase())
+    // changew only this
     get(child(dbRef, `users/customers`))
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -238,6 +255,7 @@ const Users = () => {
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
+    // changew only this
     update(ref(db, 'users/customers/' + id), {
       [key]: value,
     })
@@ -247,6 +265,7 @@ const Users = () => {
     // delete data[id]
     //
     const db = getDatabase()
+    // changew only this
     remove(ref(db, 'users/customers/' + id))
     console.log(id)
     setData(data.filter((item) => item.id !== id))
@@ -425,7 +444,7 @@ const Users = () => {
           <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
         </Column>
       </Table>
-
+      {/* // no changes */}
       {/* Delete Modal */}
       <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
         <Modal.Header>
