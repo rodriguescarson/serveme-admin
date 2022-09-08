@@ -5,6 +5,7 @@ import {
   ButtonGroup,
   FlexboxGrid,
   Form,
+  Schema,
   Button,
   Input,
   Modal,
@@ -48,6 +49,14 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
   label: item,
   value: item,
 }))
+
+const model = Schema.Model({
+  firstName: Schema.Types.StringType().isRequired('This field is required.'),
+  lastName: Schema.Types.StringType().isRequired('This field is required.'),
+  email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
+  contactNumber: Schema.Types.StringType().isRequired('This field is required.'),
+  password: Schema.Types.StringType().isRequired('This field is required.'),
+})
 
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
@@ -231,6 +240,14 @@ const Users = () => {
     console.log(id)
     setData(data.filter((item) => item.id !== id))
   }
+
+  const TextField = ({ cid, name, label, accepter, ...rest }) => (
+    <Form.Group controlId={cid}>
+      <Form.ControlLabel>{label}</Form.ControlLabel>
+      <Form.Control name={name} accepter={accepter} {...rest} />
+    </Form.Group>
+  )
+
   return (
     <>
       {/* add new user button */}
@@ -239,71 +256,63 @@ const Users = () => {
           <Modal.Title>New User</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form fluid onChange={setFormValue} formValue={formValue}>
-            <Form.Group controlId="uploader">
-              <Form.ControlLabel>Profile Picture:</Form.ControlLabel>
-              <Form.Control name="uploader" accepter={Uploader} action="#" />
-            </Form.Group>
-            <Form.Group controlId="firstName-9">
-              <Form.ControlLabel>First Name</Form.ControlLabel>
-              <Form.Control name="firstName" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="lastName-9">
-              <Form.ControlLabel>Last Name</Form.ControlLabel>
-              <Form.Control name="lastName" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="email-9">
-              <Form.ControlLabel>Email</Form.ControlLabel>
-              <Form.Control name="email" type="email" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="password-9">
-              <Form.ControlLabel>Password</Form.ControlLabel>
-              <Form.Control name="password" type="password" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="contactNumber-9">
-              <Form.ControlLabel>contactNumber</Form.ControlLabel>
-              <Form.Control name="contactNumber" type="number" />
-            </Form.Group>
+          <Form fluid model={model}>
+            <TextField
+              cid="uploader"
+              name="uploader"
+              label="Profile Picture"
+              accepter={Uploader}
+              action="#"
+            />
+            <TextField cid="firstName-9" name="firstName" label="First Name" />
+            <TextField cid="firstName-9" name="lastName" label="Last Name" />
+            <TextField cid="email-9" name="email" label="Email" type="email" />
+            <TextField cid="password-9" name="password" label="Password" type="password" />
+            <TextField
+              cid="contactNumber-9"
+              name="contactNumber"
+              label="Contact Number"
+              type="number"
+            />
             {/* <Form.Group controlId="textarea-9">
               <Form.ControlLabel>Textarea</Form.ControlLabel>
               <Form.Control rows={5} name="textarea" accepter={Textarea} />
             </Form.Group> */}
-            <Form.Group controlId="add-1-9">
-              <Form.ControlLabel>Address 1</Form.ControlLabel>
-              <Form.Control name="add-1" type="text" />
-            </Form.Group>
-            <Form.Group controlId="add-2-9">
-              <Form.ControlLabel>Address 2</Form.ControlLabel>
-              <Form.Control name="add-2" type="text" />
-            </Form.Group>
-            <Form.Group controlId="pincode-9">
-              <Form.ControlLabel>Pincode</Form.ControlLabel>
-              <Form.Control name="pincode" type="number" />
-            </Form.Group>
-            <Form.Group controlId="state-10">
-              <Form.ControlLabel>State</Form.ControlLabel>
-              <Form.Control name="state" data={selectDataState} accepter={SelectPicker} />
-            </Form.Group>
-            <Form.Group controlId="district-10">
-              <Form.ControlLabel>District</Form.ControlLabel>
-              <Form.Control name="district" data={selectDataDistrict} accepter={SelectPicker} />
-            </Form.Group>
-            <Form.Group controlId="city-10">
-              <Form.ControlLabel>City</Form.ControlLabel>
-              <Form.Control name="city" data={selectDataCity} accepter={SelectPicker} />
-            </Form.Group>
-            <Form.Group controlId="country-10">
-              <Form.ControlLabel>Country</Form.ControlLabel>
-              <Form.Control name="country" data={selectDataCountry} accepter={SelectPicker} />
-            </Form.Group>
+            <TextField cid="add-1-9" name="add-1" label="Address 1" type="text" />
+            <TextField cid="add-2-9" name="add-2" label="Address 2" type="text" />
+            <TextField cid="pincode-9" name="pincode" label="Pincode" type="number" />
+            <TextField
+              cid="state-10"
+              name="state"
+              label="State"
+              data={selectDataState}
+              accepter={SelectPicker}
+            />
+            <TextField
+              cid="district-10"
+              name="district"
+              label="District"
+              data={selectDataDistrict}
+              accepter={SelectPicker}
+            />
+            <TextField
+              cid="city-10"
+              name="city"
+              label="City"
+              data={selectDataCity}
+              accepter={SelectPicker}
+            />
+            <TextField
+              cid="country-10"
+              name="country"
+              label="Country"
+              data={selectDataCountry}
+              accepter={SelectPicker}
+            />
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={addDataToFirebase} appearance="primary">
+          <Button onClick={addDataToFirebase} appearance="primary" type="submit">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
