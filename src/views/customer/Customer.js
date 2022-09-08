@@ -375,7 +375,7 @@ const Customer = () => {
       {/* add new user button */}
       <Modal open={open} onClose={handleClose} size="xs">
         <Modal.Header>
-          <Modal.Title>New User</Modal.Title>
+          <Modal.Title>New Customer</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form fluid onChange={setFormValue} formValue={formValue}>
