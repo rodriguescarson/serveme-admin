@@ -61,6 +61,13 @@ const model = Schema.Model({
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
 
+const TextField = ({ cid, name, label, accepter, ...rest }) => (
+  <Form.Group controlId={cid}>
+    <Form.ControlLabel>{label}</Form.ControlLabel>
+    <Form.Control name={name} accepter={accepter} {...rest} />
+  </Form.Group>
+)
+
 const Users = () => {
   //table states
   const [checkedKeys, setCheckedKeys] = React.useState([])
@@ -74,6 +81,7 @@ const Users = () => {
   const [deleteId, setDeleteId] = React.useState()
   // add states
   const [open, setOpen] = React.useState(false)
+  const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
     firstName: '',
     lastName: '',
@@ -146,7 +154,10 @@ const Users = () => {
 
   // posting data to firebase
   const addDataToFirebase = (data) => {
-    console.log(data)
+    if (!formRef.current.check()) {
+      console.error('Form Error')
+      return
+    }
     const auth = getAuth()
     createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
       .then((userCredential) => {
@@ -241,13 +252,6 @@ const Users = () => {
     setData(data.filter((item) => item.id !== id))
   }
 
-  const TextField = ({ cid, name, label, accepter, ...rest }) => (
-    <Form.Group controlId={cid}>
-      <Form.ControlLabel>{label}</Form.ControlLabel>
-      <Form.Control name={name} accepter={accepter} {...rest} />
-    </Form.Group>
-  )
-
   return (
     <>
       {/* add new user button */}
@@ -256,7 +260,7 @@ const Users = () => {
           <Modal.Title>New User</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form fluid model={model}>
+          <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
             <TextField
               cid="uploader"
               name="uploader"
