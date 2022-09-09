@@ -99,8 +99,8 @@ const Users = () => {
     email: '',
     contactNumber: '',
     password: '',
-    'add-1': '',
-    'add-2': '',
+    add1: '',
+    add2: '',
     state: '',
     city: '',
     country: '',
@@ -221,8 +221,8 @@ const Users = () => {
                       email: '',
                       contactNumber: '',
                       password: '',
-                      'add-1': '',
-                      'add-2': '',
+                      add1: '',
+                      add2: '',
                       state: '',
                       city: '',
                       country: '',
@@ -337,8 +337,8 @@ const Users = () => {
               <Form.ControlLabel>Textarea</Form.ControlLabel>
               <Form.Control rows={5} name="textarea" accepter={Textarea} />
             </Form.Group> */}
-            <TextField cid="add-1-9" name="add-1" label="Address 1" type="text" />
-            <TextField cid="add-2-9" name="add-2" label="Address 2" type="text" />
+            <TextField cid="add1-9" name="add1" label="Address 1" type="text" />
+            <TextField cid="add2-9" name="add2" label="Address 2" type="text" />
             <TextField cid="pincode-9" name="pincode" label="Pincode" type="number" />
             <TextField
               cid="state-10"
