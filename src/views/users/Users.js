@@ -1,9 +1,7 @@
 //remains same
-import React, { memo, useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   IconButton,
-  ButtonToolbar,
-  ButtonGroup,
   FlexboxGrid,
   Form,
   Schema,
@@ -11,29 +9,25 @@ import {
   Input,
   Modal,
   SelectPicker,
-  Uploader,
   Message,
   useToaster,
 } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { faker } from '@faker-js/faker'
-import { getDatabase, ref, set, child, push, update, get, remove } from 'firebase/database'
+import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
 //cell imports
 import {
   ActionCell,
-  BaseCell,
   CheckCell,
   DeleteCell,
   EditableCell,
   ImageCell,
-  InputCell,
 } from '../../utils/tableComponents'
-import { auth, createUserWithEmailAndPassword } from 'firebase/auth'
-import { getStorage, ref as storageRe, uploadBytes } from 'firebase/storage'
-
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
+import ImageUploader from '../../utils/formComponents/ImageUploader'
 // change according to your needs
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
@@ -91,9 +85,15 @@ const Users = () => {
   // add states
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
+  // message toast
+  const [messageVal, setMessageVal] = React.useState({
+    message: '',
+    type: 'success',
+  })
   ///change
   const [formValue, setFormValue] = React.useState({
-    avatar: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+    avatarUrl: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+    avatar: null,
     firstName: '',
     lastName: '',
     email: '',
@@ -107,27 +107,13 @@ const Users = () => {
     pincode: '',
     district: '',
   })
+  //toast
   const toaster = useToaster()
   const message = (
-    <Message showIcon type="success">
-      User Added Successfully
+    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
+      {messageVal.message}
     </Message>
   )
-  useEffect(() => {
-    if (formValue.avatar[0].blobFile) {
-      const file = formValue.avatar[0].blobFile
-      const storage = getStorage()
-      const storageRef = storageRe(storage, `/userAvatars/${file.name}`)
-      uploadBytes(storageRef, file)
-        .then((snapshot) => {
-          console.log('Uploaded a blob or file!', snapshot.ref.fullPath)
-          console.log('url', snapshot.ref.name)
-        })
-        .catch((e) => {
-          console.log(e)
-        })
-    }
-  }, [formValue])
 
   // table functions
   const getData = () => {
@@ -188,7 +174,8 @@ const Users = () => {
   // make changes
   const addDataToFirebase = (data) => {
     if (!formRef.current.check()) {
-      console.error('Form Error')
+      setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
+      toaster.push(message, 'topCenter')
       return
     }
     // only add this
@@ -208,42 +195,59 @@ const Users = () => {
         if (formValue.avatar[0].blobFile) {
           const file = formValue.avatar[0].blobFile
           const storage = getStorage()
-          console.log(`/userAvatars/${uid}`)
           const storageRef = storageRe(storage, `/userAvatars/${uid}`)
           uploadBytes(storageRef, file)
             .then((snapshot) => {
-              console.log('Uploaded a blob or file!', snapshot.ref.fullPath)
+              getDownloadURL(storageRe(storage, snapshot.ref.fullPath))
+                .then((downloadURL) => {
+                  setFormValue({ ...formValue, avatarUrl: downloadURL })
+                  return downloadURL
+                })
+                .then((downloadURL) => {
+                  set(ref(db, 'users/customers/' + uid), {
+                    id: uid,
+                    ...formValue,
+                    avatarUrl: downloadURL,
+                  }).then(() => {
+                    const nextData = getData()
+                    setData([...nextData, { id: uid, ...formValue, avatarUrl: downloadURL }])
+                    handleClose()
+                    setMessageVal({ message: 'User added successfully', type: 'success' })
+                    toaster.push(message, 'topCenter')
+                    setFormValue({
+                      avatar: null,
+                      firstName: '',
+                      lastName: '',
+                      email: '',
+                      contactNumber: '',
+                      password: '',
+                      'add-1': '',
+                      'add-2': '',
+                      state: '',
+                      city: '',
+                      country: '',
+                      pincode: '',
+                      district: '',
+                      avatarUrl: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+                    })
+                  })
+                })
             })
             .catch((e) => {
-              console.log(e)
+              setMessageVal({ message: e.message, type: 'error' })
+              toaster.push(message, 'topCenter')
             })
         }
-        set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-          console.log('Data saved!')
-          const nextData = getData()
-          setData([...nextData, { id: uid, ...formValue }])
-          handleClose()
-          toaster.push(message, 'topCenter')
-          setFormValue({
-            firstName: '',
-            lastName: '',
-            email: '',
-            contactNumber: '',
-            password: '',
-            'add-1': '',
-            'add-2': '',
-            state: '',
-            city: '',
-            country: '',
-            pincode: '',
-            district: '',
-          })
-        })
       })
       .catch((error) => {
         const errorCode = error.code
-        const errorMessage = error.message
-        console.log(errorCode, errorMessage)
+        if (errorCode === 'auth/email-already-in-use') {
+          setMessageVal({ message: 'Email already in use', type: 'error' })
+          toaster.push(message, 'topCenter')
+        } else if (errorCode === 'auth/invalid-email') {
+          setMessageVal({ message: 'Invalid email', type: 'error' })
+          toaster.push(message, 'topCenter')
+        }
       })
   }
 
@@ -260,33 +264,6 @@ const Users = () => {
   const handleOpen = () => {
     setOpen(true)
   }
-  // ;(() => {
-  //   const rows = []
-  //   for (let i = 0; i < 100; i++) {
-  //     const user = {
-  //       id: i,
-  //       avatar: faker.image.avatar(),
-  //       firstName: faker.name.firstName(),
-  //       lastName: faker.name.lastName(),
-  //       email: faker.internet.exampleEmail(),
-  //       contactNumber: faker.phone.number(),
-  //       add_1: faker.address.streetAddress(),
-  //       add_2: faker.address.secondaryAddress(),
-  //       pincode: faker.address.zipCode(),
-  //       district: faker.address.city(),
-  //       city: faker.address.city(),
-  //       state: faker.address.state(),
-  //       country: faker.address.country(),
-  //       sentence: faker.lorem.sentence(),
-  //     }
-  //     rows.push(user)
-  //   }
-  //   const db = getDatabase()
-  //   set(ref(db, 'users/customers/'), rows)
-  // })()
-  ///
-  //
-  //make changes - retirve data from firebase
 
   useEffect(() => {
     const dbRef = ref(getDatabase())
@@ -296,11 +273,13 @@ const Users = () => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
         } else {
-          console.log('No data available')
+          setMessageVal({ message: 'No data available', type: 'error' })
+          toaster.push(message, 'topCenter')
         }
       })
       .catch((error) => {
-        console.error(error)
+        setMessageVal({ message: error.message, type: 'error' })
+        toaster.push(message, 'topCenter')
       })
   }, [])
 
@@ -341,8 +320,8 @@ const Users = () => {
               cid="avatar"
               name="avatar"
               label="Profile Picture"
-              accepter={Uploader}
-              // action=""
+              accepter={ImageUploader}
+              action="//jsonplaceholder.typicode.com/posts/"
             />
             <TextField cid="firstName-9" name="firstName" label="First Name" />
             <TextField cid="firstName-9" name="lastName" label="Last Name" />
@@ -442,7 +421,7 @@ const Users = () => {
         </Column>
         <Column width={130} fixed>
           <HeaderCell>Avatar</HeaderCell>
-          <ImageCell dataKey="avatar" />
+          <ImageCell dataKey="avatarUrl" />
         </Column>
         <Column width={100} sortable>
           <HeaderCell>First Name</HeaderCell>
