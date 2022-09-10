@@ -176,6 +176,7 @@ const SpareParts = () => {
       return
     }
     // only add this
+    const uid = user.uid
     const db = getDatabase()
     set(ref(db, 'spareparts/spare/' + uid), { id: uid, ...formValue }).then(() => {
     console.log('Data saved!')
@@ -185,7 +186,7 @@ const SpareParts = () => {
     const auth = getAuth()
     createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
       .then((userCredential) => {
-        const user = userCredential.user
+        const spare = userCredential.user
         const uid = user.uid
         const db = getDatabase()
 
