@@ -51,10 +51,9 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 
 // change form validation according to your needs
 const model = Schema.Model({
-  firstName: Schema.Types.StringType().isRequired('This field is required.'),
-  lastName: Schema.Types.StringType().isRequired('This field is required.'),
+  full_name: Schema.Types.StringType().isRequired('This field is required.'),
   email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
-  contactNumber: Schema.Types.StringType().isRequired('This field is required.'),
+  contact_no: Schema.Types.StringType().isRequired('This field is required.'),
   password: Schema.Types.StringType()
     .isRequired('This field is required.')
     .minLength(6)
@@ -92,15 +91,14 @@ const Users = () => {
   })
   ///change
   const [formValue, setFormValue] = React.useState({
-    avatarUrl: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+    avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
     avatar: null,
-    firstName: '',
-    lastName: '',
+    full_name: '',
     email: '',
-    contactNumber: '',
+    contact_no: '',
     password: '',
-    add1: '',
-    add2: '',
+    add_1: '',
+    add_2: '',
     state: '',
     city: '',
     country: '',
@@ -200,35 +198,34 @@ const Users = () => {
             .then((snapshot) => {
               getDownloadURL(storageRe(storage, snapshot.ref.fullPath))
                 .then((downloadURL) => {
-                  setFormValue({ ...formValue, avatarUrl: downloadURL })
+                  setFormValue({ ...formValue, avatar_url: downloadURL })
                   return downloadURL
                 })
                 .then((downloadURL) => {
                   set(ref(db, 'users/customers/' + uid), {
                     id: uid,
                     ...formValue,
-                    avatarUrl: downloadURL,
+                    avatar_url: downloadURL,
                   }).then(() => {
                     const nextData = getData()
-                    setData([...nextData, { id: uid, ...formValue, avatarUrl: downloadURL }])
+                    setData([...nextData, { id: uid, ...formValue, avatar_url: downloadURL }])
                     handleClose()
                     setMessageVal({ message: 'User added successfully', type: 'success' })
                     toaster.push(message, 'topCenter')
                     setFormValue({
                       avatar: null,
-                      firstName: '',
-                      lastName: '',
+                      full_name: '',
                       email: '',
-                      contactNumber: '',
+                      contact_no: '',
                       password: '',
-                      add1: '',
-                      add2: '',
+                      add_1: '',
+                      add_2: '',
                       state: '',
                       city: '',
                       country: '',
                       pincode: '',
                       district: '',
-                      avatarUrl: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+                      avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
                     })
                   })
                 })
@@ -323,13 +320,12 @@ const Users = () => {
               accepter={ImageUploader}
               action="//jsonplaceholder.typicode.com/posts/"
             />
-            <TextField cid="firstName-9" name="firstName" label="First Name" />
-            <TextField cid="firstName-9" name="lastName" label="Last Name" />
+            <TextField cid="full_name-9" name="full_name" label="Full Name" />
             <TextField cid="email-9" name="email" label="Email" type="email" />
             <TextField cid="password-9" name="password" label="Password" type="password" />
             <TextField
               cid="contactNumber-9"
-              name="contactNumber"
+              name="contact_no"
               label="Contact Number"
               type="number"
             />
@@ -337,8 +333,8 @@ const Users = () => {
               <Form.ControlLabel>Textarea</Form.ControlLabel>
               <Form.Control rows={5} name="textarea" accepter={Textarea} />
             </Form.Group> */}
-            <TextField cid="add1-9" name="add1" label="Address 1" type="text" />
-            <TextField cid="add2-9" name="add2" label="Address 2" type="text" />
+            <TextField cid="add_1-9" name="add_1" label="Address 1" type="text" />
+            <TextField cid="add_2-9" name="add_2" label="Address 2" type="text" />
             <TextField cid="pincode-9" name="pincode" label="Pincode" type="number" />
             <TextField
               cid="state-10"
@@ -421,15 +417,11 @@ const Users = () => {
         </Column>
         <Column width={130} fixed>
           <HeaderCell>Avatar</HeaderCell>
-          <ImageCell dataKey="avatarUrl" />
+          <ImageCell dataKey="avatar_url" />
         </Column>
         <Column width={100} sortable>
-          <HeaderCell>First Name</HeaderCell>
-          <EditableCell dataKey="firstName" />
-        </Column>
-        <Column width={100} sortable onChange={handleChange}>
-          <HeaderCell>Last Name</HeaderCell>
-          <EditableCell dataKey="lastName" />
+          <HeaderCell>Full Name</HeaderCell>
+          <EditableCell dataKey="full_name" />
         </Column>
         <Column width={200} sortable onChange={handleChange}>
           <HeaderCell>Email</HeaderCell>
@@ -437,7 +429,7 @@ const Users = () => {
         </Column>
         <Column width={200} sortable>
           <HeaderCell>contactNumber</HeaderCell>
-          <EditableCell dataKey="contactNumber" onChange={handleChange} />
+          <EditableCell dataKey="contact_no" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Address 1</HeaderCell>
