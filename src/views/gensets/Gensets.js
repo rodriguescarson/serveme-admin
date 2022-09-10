@@ -203,7 +203,7 @@ function createRows() {
     const gensets = {
       id: i,
       avatar: faker.image.avatar(),
-      GensetName: faker.name.firstName(),
+      gensetName: faker.name.firstName(),
     }
     rows.push(gensets)
   }
@@ -405,7 +405,7 @@ const Gensets = () => {
         </Column>
         <Column width={100} sortable>
           <HeaderCell>Genset Name</HeaderCell>
-          <Cell dataKey="firstName" />
+          <Cell dataKey="gensetName" />
         </Column>
         <Column width={200}>
           <HeaderCell>Edit</HeaderCell>

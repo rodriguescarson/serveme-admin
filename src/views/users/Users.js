@@ -1,23 +1,34 @@
-import React, { memo, useEffect } from 'react'
+//remains same
+import React, { useEffect } from 'react'
 import {
   IconButton,
-  ButtonToolbar,
-  ButtonGroup,
   FlexboxGrid,
   Form,
+  Schema,
   Button,
   Input,
   Modal,
   SelectPicker,
-  Uploader,
+  Message,
+  useToaster,
 } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { faker } from '@faker-js/faker'
-import { db } from '../../firebase'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
-
+import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
+import { getAuth } from 'firebase/auth'
+//cell imports
+import {
+  ActionCell,
+  CheckCell,
+  DeleteCell,
+  EditableCell,
+  ImageCell,
+} from '../../utils/tableComponents'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
+import ImageUploader from '../../utils/formComponents/ImageUploader'
+// change according to your needs
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
   value: item,
@@ -38,276 +49,71 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
   value: item,
 }))
 
+// change form validation according to your needs
+const model = Schema.Model({
+  full_name: Schema.Types.StringType().isRequired('This field is required.'),
+  email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
+  contact_no: Schema.Types.StringType().isRequired('This field is required.'),
+  password: Schema.Types.StringType()
+    .isRequired('This field is required.')
+    .minLength(6)
+    .maxLength(100),
+})
+// no changes
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
 
-const EditableCell = ({ rowData, dataKey, onChange, ...props }) => {
-  const editing = rowData.status === 'EDIT'
-  return (
-    <Cell {...props} className={editing ? 'table-content-editing' : ''}>
-      {editing ? (
-        <input
-          className="rs-input"
-          defaultValue={rowData[dataKey]}
-          onChange={(event) => {
-            onChange && onChange(rowData.id, dataKey, event.target.value)
-          }}
-        />
-      ) : (
-        <span className="table-content-edit-span">{rowData[dataKey]}</span>
-      )}
-    </Cell>
-  )
-}
-
-const BaseCell = React.forwardRef((props, ref) => {
-  const { children, rowData, ...rest } = props
-  return (
-    <Cell
-      ref={ref}
-      rowData={rowData}
-      onDoubleClick={() => {
-        console.log(rowData)
-      }}
-      {...rest}
-    >
-      {children}
-    </Cell>
-  )
-})
-
-BaseCell.displayName = 'BaseCell'
-
-const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
-  return (
-    <BaseCell {...props} style={{ padding: 0 }}>
-      <div style={{ lineHeight: '46px' }}>
-        <input
-          type="checkbox"
-          value={rowData[dataKey]}
-          onChange={onChange}
-          checked={checkedKeys.some((item) => item === rowData[dataKey])}
-        />
-      </div>
-    </BaseCell>
-  )
-}
-//edited
-//edit 2
-// const NameCell = ({ rowData, dataKey, ...props }) => {
-//   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
-//     const styles = {
-//       ...style,
-//       shadows: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-//       color: '#000',
-//       background: '#fff',
-//       width: 200,
-//       opacity: 1,
-//       padding: 10,
-//       borderRadius: 4,
-//       boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-//       position: 'absolute',
-//       zIndex: 1,
-//       transform: 'translate(0, -20px)',
-//     }
-
-//     return (
-//       <div {...rest} style={styles} ref={ref}>
-//         <p>
-//           <b>Name:</b> {`${rowData.firstName} ${rowData.lastName}`}{' '}
-//         </p>
-//         <p
-//           style={{
-//             display: 'flex',
-//             flexWrap: 'wrap',
-//           }}
-//         >
-//           <b>District:</b> {rowData.district}{' '}
-//         </p>
-//         <p>
-//           <b>City:</b> {rowData.city}{' '}
-//         </p>
-//         <p>
-//           <b>State:</b> {rowData.state}{' '}
-//         </p>
-//         <p>
-//           <b>Country:</b> {rowData.country}{' '}
-//         </p>
-//       </div>
-//     )
-//   })
-//   Overlay.displayName = 'Overlay'
-//   const speaker = (props, ref) => {
-//     const { className, top, onClose } = props
-//     return (
-//       <Overlay
-//         title="Description"
-//         style={{ top }}
-//         onClose={onClose}
-//         className={className}
-//         ref={ref}
-//         visible
-//       />
-//     )
-//   }
-
-//   return (
-//     <BaseCell rowData={rowData} {...props}>
-//       <Whisper trigger="click" placement="auto" speaker={speaker} enterable>
-//         <Button
-//           style={{
-//             background: '#fff',
-//             color: 'blue',
-//             border: '0px solid #000',
-//             lineHeight: '50px',
-//             textAlign: 'center',
-//             verticalAlign: 'middle',
-//             marginRight: '10px',
-//           }}
-//         >
-//           {rowData[dataKey].toLocaleString()}
-//         </Button>
-//       </Whisper>
-//     </BaseCell>
-//   )
-// }
-
-const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {rowData.status === 'EDIT' ? 'Save' : 'Edit'}
-      </Button>
-    </Cell>
-  )
-}
-
-const DeleteCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {'Delete'}
-      </Button>
-    </Cell>
-  )
-}
-
-const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
-  function handleChange(event) {
-    onChange(rowData.id, event.target.value)
-  }
-
-  return (
-    <BaseCell {...props}>
-      <input value={data[rowData.id]} onChange={handleChange} />
-    </BaseCell>
-  )
-})
-
-InputCell.displayName = 'InputCell'
-
-//change this
-function createRows() {
-  const rows = []
-
-  for (let i = 0; i < 50; i++) {
-    const user = {
-      id: i,
-      avatar: faker.image.avatar(),
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-      email: faker.internet.exampleEmail(),
-      contactNumber: faker.phone.number(),
-      add_1: faker.address.streetAddress(),
-      add_2: faker.address.secondaryAddress(),
-      pincode: faker.address.zipCode(),
-      district: faker.address.city(),
-      city: faker.address.city(),
-      state: faker.address.state(),
-      country: faker.address.country(),
-      sentence: faker.lorem.sentence(),
-    }
-    rows.push(user)
-  }
-
-  // const users = await db
-  //   .collection('user')
-  //   .get()
-  //   .then((querySnapshot) => {
-  //     querySnapshot.docs.map((doc) => {
-  //       rows.push(doc.data())
-  //       return doc.data()
-  //     })
-  //   })
-  // console.log('LOG 2', users)
-  // console.log(rows)
-  return rows
-}
-
-// data.map((item) => {
-//   return db
-//     .collection('user')
-//     .doc('one')
-//     .set(item)
-//     .then(() => {
-//       console.log('Document successfully written!')
-//     })
-// })
-
-const ImageCell = ({ rowData, dataKey, ...rest }) => (
-  <Cell {...rest}>
-    <img
-      src={rowData[dataKey]}
-      width="50"
-      alt="avtar"
-      style={{
-        borderRadius: '50%',
-        verticalAlign: 'middle',
-        marginRight: '10px',
-      }}
-    />
-  </Cell>
+const TextField = ({ cid, name, label, accepter, ...rest }) => (
+  <Form.Group controlId={cid}>
+    <Form.ControlLabel>{label}</Form.ControlLabel>
+    <Form.Control name={name} accepter={accepter} {...rest} />
+  </Form.Group>
 )
 
 const Users = () => {
+  //table states
   const [checkedKeys, setCheckedKeys] = React.useState([])
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
-  const [data, setData] = React.useState(createRows())
-  // useState for add user
+  const [data, setData] = React.useState([])
+  //delete states
+  const [deleteUserModal, setDeleteUserModal] = React.useState(false)
+  const handleCloseDeleteModal = () => setDeleteUserModal(false)
+  const [deleteId, setDeleteId] = React.useState()
+  // add states
   const [open, setOpen] = React.useState(false)
+  const formRef = React.useRef()
+  // message toast
+  const [messageVal, setMessageVal] = React.useState({
+    message: '',
+    type: 'success',
+  })
+  ///change
   const [formValue, setFormValue] = React.useState({
-    firstName: '',
-    lastName: '',
+    avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+    avatar: null,
+    full_name: '',
     email: '',
-    contactNumber: '',
-    'add-1': '',
-    'add-2': '',
+    contact_no: '',
+    password: '',
+    add_1: '',
+    add_2: '',
     state: '',
     city: '',
     country: '',
     pincode: '',
     district: '',
   })
+  //toast
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
+      {messageVal.message}
+    </Message>
+  )
 
-  const handleClose = () => {
-    setOpen(false)
-  }
-  const handleOpen = () => {
-    setOpen(true)
-  }
-
+  // table functions
   const getData = () => {
     if (sortColumn && sortType) {
       return data.sort((a, b) => {
@@ -353,23 +159,151 @@ const Users = () => {
     },
     [checkedKeys],
   )
-  //change this
-  const handleChange = (id, key, value) => {
-    const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
-    setData(nextData)
-  }
+
   const handleEditState = (id) => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.id === id)
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
+  // end of table functions
 
-  //change this
+  // posting data to firebase
+  // make changes
+  const addDataToFirebase = (data) => {
+    if (!formRef.current.check()) {
+      setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
+      toaster.push(message, 'topCenter')
+      return
+    }
+    // only add this
+    // const db = getDatabase()
+    // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
+    //   console.log('Data saved!')
+    //   handleClose()
+    // })
+    // only
+    const auth = getAuth()
+    createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
+      .then((userCredential) => {
+        const user = userCredential.user
+        const uid = user.uid
+        const db = getDatabase()
+
+        if (formValue.avatar[0].blobFile) {
+          const file = formValue.avatar[0].blobFile
+          const storage = getStorage()
+          const storageRef = storageRe(storage, `/userAvatars/${uid}`)
+          uploadBytes(storageRef, file)
+            .then((snapshot) => {
+              getDownloadURL(storageRe(storage, snapshot.ref.fullPath))
+                .then((downloadURL) => {
+                  setFormValue({ ...formValue, avatar_url: downloadURL })
+                  return downloadURL
+                })
+                .then((downloadURL) => {
+                  set(ref(db, 'users/customers/' + uid), {
+                    id: uid,
+                    ...formValue,
+                    avatar_url: downloadURL,
+                  }).then(() => {
+                    const nextData = getData()
+                    setData([...nextData, { id: uid, ...formValue, avatar_url: downloadURL }])
+                    handleClose()
+                    setMessageVal({ message: 'User added successfully', type: 'success' })
+                    toaster.push(message, 'topCenter')
+                    setFormValue({
+                      avatar: null,
+                      full_name: '',
+                      email: '',
+                      contact_no: '',
+                      password: '',
+                      add_1: '',
+                      add_2: '',
+                      state: '',
+                      city: '',
+                      country: '',
+                      pincode: '',
+                      district: '',
+                      avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+                    })
+                  })
+                })
+            })
+            .catch((e) => {
+              setMessageVal({ message: e.message, type: 'error' })
+              toaster.push(message, 'topCenter')
+            })
+        }
+      })
+      .catch((error) => {
+        const errorCode = error.code
+        if (errorCode === 'auth/email-already-in-use') {
+          setMessageVal({ message: 'Email already in use', type: 'error' })
+          toaster.push(message, 'topCenter')
+        } else if (errorCode === 'auth/invalid-email') {
+          setMessageVal({ message: 'Invalid email', type: 'error' })
+          toaster.push(message, 'topCenter')
+        }
+      })
+  }
+
+  // setting states for delete
+  const handleShowDeleteModal = (id) => {
+    setDeleteUserModal(true)
+    setDeleteId(id)
+  }
+
+  // handle states for add
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
+  useEffect(() => {
+    const dbRef = ref(getDatabase())
+    // changew only this
+    get(child(dbRef, `users/customers`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(Object.values(snapshot.val()))
+        } else {
+          setMessageVal({ message: 'No data available', type: 'error' })
+          toaster.push(message, 'topCenter')
+        }
+      })
+      .catch((error) => {
+        setMessageVal({ message: error.message, type: 'error' })
+        toaster.push(message, 'topCenter')
+      })
+  }, [])
+
+  //change this - update data in firebase
+  const handleChange = (id, key, value) => {
+    // db.collection('user')
+    //   .doc(id)
+    //   .update({ [key]: value })
+    const nextData = Object.assign([], data)
+    nextData.find((item) => item.id === id)[key] = value
+    setData(nextData)
+    const db = getDatabase()
+    // changew only this
+    update(ref(db, 'users/customers/' + id), {
+      [key]: value,
+    })
+  }
+  //change this - delete from firebase
   const handleDeleteState = (id) => {
+    // delete data[id]
+    //
+    const db = getDatabase()
+    // changew only this
+    remove(ref(db, 'users/customers/' + id))
     setData(data.filter((item) => item.id !== id))
   }
+
   return (
     <>
       {/* add new user button */}
@@ -378,66 +312,62 @@ const Users = () => {
           <Modal.Title>New User</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form fluid onChange={setFormValue} formValue={formValue}>
-            <Form.Group controlId="uploader">
-              <Form.ControlLabel>Profile Picture:</Form.ControlLabel>
-              <Form.Control name="uploader" accepter={Uploader} action="#" />
-            </Form.Group>
-            <Form.Group controlId="firstName-9">
-              <Form.ControlLabel>First Name</Form.ControlLabel>
-              <Form.Control name="firstName" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="lastName-9">
-              <Form.ControlLabel>Last Name</Form.ControlLabel>
-              <Form.Control name="lastName" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="email-9">
-              <Form.ControlLabel>Email</Form.ControlLabel>
-              <Form.Control name="email" type="email" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="contactNumber-9">
-              <Form.ControlLabel>contactNumber</Form.ControlLabel>
-              <Form.Control name="contactNumber" type="number" />
-            </Form.Group>
+          <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
+            <TextField
+              cid="avatar"
+              name="avatar"
+              label="Profile Picture"
+              accepter={ImageUploader}
+              action="//jsonplaceholder.typicode.com/posts/"
+            />
+            <TextField cid="full_name-9" name="full_name" label="Full Name" />
+            <TextField cid="email-9" name="email" label="Email" type="email" />
+            <TextField cid="password-9" name="password" label="Password" type="password" />
+            <TextField
+              cid="contactNumber-9"
+              name="contact_no"
+              label="Contact Number"
+              type="number"
+            />
             {/* <Form.Group controlId="textarea-9">
               <Form.ControlLabel>Textarea</Form.ControlLabel>
               <Form.Control rows={5} name="textarea" accepter={Textarea} />
             </Form.Group> */}
-            <Form.Group controlId="add-1-9">
-              <Form.ControlLabel>Address 1</Form.ControlLabel>
-              <Form.Control name="add-1" type="text" />
-            </Form.Group>
-            <Form.Group controlId="add-2-9">
-              <Form.ControlLabel>Address 2</Form.ControlLabel>
-              <Form.Control name="add-2" type="text" />
-            </Form.Group>
-            <Form.Group controlId="pincode-9">
-              <Form.ControlLabel>Pincode</Form.ControlLabel>
-              <Form.Control name="pincode" type="number" />
-            </Form.Group>
-            <Form.Group controlId="state-10">
-              <Form.ControlLabel>State</Form.ControlLabel>
-              <Form.Control name="state" data={selectDataState} accepter={SelectPicker} />
-            </Form.Group>
-            <Form.Group controlId="district-10">
-              <Form.ControlLabel>District</Form.ControlLabel>
-              <Form.Control name="district" data={selectDataDistrict} accepter={SelectPicker} />
-            </Form.Group>
-            <Form.Group controlId="city-10">
-              <Form.ControlLabel>City</Form.ControlLabel>
-              <Form.Control name="city" data={selectDataCity} accepter={SelectPicker} />
-            </Form.Group>
-            <Form.Group controlId="country-10">
-              <Form.ControlLabel>Country</Form.ControlLabel>
-              <Form.Control name="country" data={selectDataCountry} accepter={SelectPicker} />
-            </Form.Group>
+            <TextField cid="add_1-9" name="add_1" label="Address 1" type="text" />
+            <TextField cid="add_2-9" name="add_2" label="Address 2" type="text" />
+            <TextField cid="pincode-9" name="pincode" label="Pincode" type="number" />
+            <TextField
+              cid="state-10"
+              name="state"
+              label="State"
+              data={selectDataState}
+              accepter={SelectPicker}
+            />
+            <TextField
+              cid="district-10"
+              name="district"
+              label="District"
+              data={selectDataDistrict}
+              accepter={SelectPicker}
+            />
+            <TextField
+              cid="city-10"
+              name="city"
+              label="City"
+              data={selectDataCity}
+              accepter={SelectPicker}
+            />
+            <TextField
+              cid="country-10"
+              name="country"
+              label="Country"
+              data={selectDataCountry}
+              accepter={SelectPicker}
+            />
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={addDataToFirebase} appearance="primary" type="submit">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
@@ -466,12 +396,9 @@ const Users = () => {
         headerHeight={50}
         bordered
         cellBordered
-        onRowClick={(data) => {
-          console.log(data)
-        }}
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
@@ -484,38 +411,33 @@ const Users = () => {
           <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
         </Column>
 
-        <Column width={70} align="center" fixed sortable>
+        <Column width={70} fixed sortable>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
         </Column>
         <Column width={130} fixed>
           <HeaderCell>Avatar</HeaderCell>
-          <ImageCell dataKey="avatar" />
+          <ImageCell dataKey="avatar_url" />
         </Column>
         <Column width={100} sortable>
-          <HeaderCell>First Name</HeaderCell>
-          <Cell dataKey="firstName" />
+          <HeaderCell>Full Name</HeaderCell>
+          <EditableCell dataKey="full_name" />
         </Column>
-
-        <Column width={100} sortable>
-          <HeaderCell>Last Name</HeaderCell>
-          <Cell dataKey="lastName" />
-        </Column>
-        <Column width={200} sortable>
+        <Column width={200} sortable onChange={handleChange}>
           <HeaderCell>Email</HeaderCell>
           <EditableCell dataKey="email" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>contactNumber</HeaderCell>
-          <EditableCell dataKey="contactNumber" onChange={handleChange} />
+          <EditableCell dataKey="contact_no" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Address 1</HeaderCell>
-          <EditableCell dataKey="add_1" onChange={handleChange} />
+          <EditableCell dataKey="add1" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Address 2</HeaderCell>
-          <EditableCell dataKey="add_2" onChange={handleChange} />
+          <EditableCell dataKey="add2" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Pincode</HeaderCell>
@@ -543,9 +465,31 @@ const Users = () => {
         </Column>
         <Column width={200}>
           <HeaderCell>Delete</HeaderCell>
-          <DeleteCell dataKey="id" onClick={handleDeleteState} />
+          <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
         </Column>
       </Table>
+      {/* // no changes */}
+      {/* Delete Modal */}
+      <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
+        <Modal.Header>
+          <Modal.Title>Delete User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this user?</Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={() => {
+              handleDeleteState(deleteId)
+              handleCloseDeleteModal()
+            }}
+            appearance="primary"
+          >
+            Confirm
+          </Button>
+          <Button onClick={handleCloseDeleteModal} appearance="subtle">
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }
