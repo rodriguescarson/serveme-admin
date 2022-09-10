@@ -433,11 +433,11 @@ const Users = () => {
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Address 1</HeaderCell>
-          <EditableCell dataKey="add_1" onChange={handleChange} />
+          <EditableCell dataKey="add1" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Address 2</HeaderCell>
-          <EditableCell dataKey="add_2" onChange={handleChange} />
+          <EditableCell dataKey="add2" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Pincode</HeaderCell>
