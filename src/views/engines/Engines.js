@@ -341,12 +341,13 @@ const Engines = () => {
 
   //Have to add engine id
   const addDataToFirebase = (data) => {
-    const db = getDatabase()
-    set(ref(db, 'machinery/spares/'), {
+    const newPostRef = postsRef.push()
+    newPostRef.set({
+      id: newPostRef.key,
       ...formValue,
     })
     const nextData = getData()
-    setData([...nextData, { ...formValue }])
+    setData([...nextData, { id: newPostRef.key, ...formValue }])
     handleClose()
   }
 
