@@ -236,6 +236,12 @@ const ServiceLists = () => {
     Cost: '',
   })
 
+  // message toast
+  const [messageVal, setMessageVal] = React.useState({
+    message: '',
+    type: 'success',
+  })
+
   //toast
   const toaster = useToaster()
   const message = (

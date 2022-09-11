@@ -14,9 +14,6 @@ import {
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { faker } from '@faker-js/faker'
-import { db } from '../../firebase'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
@@ -231,6 +228,12 @@ const Gensets = () => {
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
     GensetName: '',
+  })
+
+  // message toast
+  const [messageVal, setMessageVal] = React.useState({
+    message: '',
+    type: 'success',
   })
 
   //toast
