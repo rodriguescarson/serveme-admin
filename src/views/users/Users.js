@@ -105,6 +105,7 @@ const Users = () => {
     pincode: '',
     district: '',
   })
+
   //toast
   const toaster = useToaster()
   const message = (
@@ -143,6 +144,7 @@ const Users = () => {
       setSortType(sortType)
     }, 500)
   }
+
   const handleCheckAll = React.useCallback((event) => {
     const checked = event.target.checked
     const keys = checked ? data.map((item) => item.id) : []
@@ -160,12 +162,6 @@ const Users = () => {
     [checkedKeys],
   )
 
-  const handleEditState = (id) => {
-    const nextData = Object.assign([], data)
-    const activeItem = nextData.find((item) => item.id === id)
-    activeItem.status = activeItem.status ? null : 'EDIT'
-    setData(nextData)
-  }
   // end of table functions
 
   // posting data to firebase
@@ -176,6 +172,7 @@ const Users = () => {
       toaster.push(message, 'topCenter')
       return
     }
+
     // only add this
     // const db = getDatabase()
     // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
@@ -294,6 +291,14 @@ const Users = () => {
       [key]: value,
     })
   }
+
+  const handleEditState = (id) => {
+    const nextData = Object.assign([], data)
+    const activeItem = nextData.find((item) => item.id === id)
+    activeItem.status = activeItem.status ? null : 'EDIT'
+    setData(nextData)
+  }
+
   //change this - delete from firebase
   const handleDeleteState = (id) => {
     // delete data[id]

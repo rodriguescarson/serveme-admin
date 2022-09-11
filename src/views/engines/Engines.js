@@ -2,22 +2,18 @@
 import React, { memo, useEffect } from 'react'
 import {
   IconButton,
-  ButtonToolbar,
-  ButtonGroup,
   FlexboxGrid,
   Form,
   Button,
   Input,
   Modal,
   SelectPicker,
-  Uploader,
+  Message,
+  useToaster,
 } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { faker } from '@faker-js/faker'
-import { db } from '../../firebase'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 const selectDataEnginemodel = ['abc', 'def', 'efg'].map((item) => ({
   label: item,
@@ -33,6 +29,7 @@ const selectDataEnginemake = ['mno', 'pqr'].map((item) => ({
   label: item,
   value: item,
 }))
+
 const selectDataControllermode = ['stu', 'vwxyz'].map((item) => ({
   label: item,
   value: item,
@@ -215,35 +212,6 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 
 InputCell.displayName = 'InputCell'
 
-function createRows() {
-  const rows = []
-
-  for (let i = 0; i < 50; i++) {
-    const engines = {
-      id: i,
-      avatar: faker.image.avatar(),
-      engineModel: faker.address.city(),
-      altMake: faker.address.city(),
-      engineMake: faker.address.city(),
-      controllerMode: faker.address.city(),
-    }
-    rows.push(engines)
-  }
-
-  // const users = await db
-  //   .collection('user')
-  //   .get()
-  //   .then((querySnapshot) => {
-  //     querySnapshot.docs.map((doc) => {
-  //       rows.push(doc.data())
-  //       return doc.data()
-  //     })
-  //   })
-  // console.log('LOG 2', users)
-  // console.log(rows)
-  return rows
-}
-
 // data.map((item) => {
 //   return db
 //     .collection('user')
@@ -274,7 +242,7 @@ const Engines = () => {
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
-  const [data, setData] = React.useState(createRows())
+  const [data, setData] = React.useState([])
 
   // useState for add user
   const [open, setOpen] = React.useState(false)
@@ -285,12 +253,38 @@ const Engines = () => {
     controllerMode: '',
   })
 
+  //toast
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
+      {messageVal.message}
+    </Message>
+  )
+
   const handleClose = () => {
     setOpen(false)
   }
   const handleOpen = () => {
     setOpen(true)
   }
+
+  useEffect(() => {
+    const dbRef = ref(getDatabase())
+    // changew only this
+    get(child(dbRef, `machinery/spares`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(Object.values(snapshot.val()))
+        } else {
+          setMessageVal({ message: 'No data available', type: 'error' })
+          toaster.push(message, 'topCenter')
+        }
+      })
+      .catch((error) => {
+        setMessageVal({ message: error.message, type: 'error' })
+        toaster.push(message, 'topCenter')
+      })
+  }, [])
 
   const getData = () => {
     if (sortColumn && sortType) {
@@ -321,6 +315,7 @@ const Engines = () => {
       setSortType(sortType)
     }, 500)
   }
+
   const handleCheckAll = React.useCallback((event) => {
     const checked = event.target.checked
     const keys = checked ? data.map((item) => item.id) : []
@@ -338,20 +333,40 @@ const Engines = () => {
     [checkedKeys],
   )
 
+  //Have to add engine id
+  const addDataToFirebase = (data) => {
+    const db = getDatabase()
+    set(ref(db, 'machinery/spares/'), {
+      ...formValue,
+    })
+    const nextData = getData()
+    setData([...nextData, { ...formValue }])
+    handleClose()
+  }
+
   const handleChange = (id, key, value) => {
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
+    const db = getDatabase()
+    update(ref(db, 'machinery/spares/' + id), {
+      [key]: value,
+    })
   }
+
   const handleEditState = (id) => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.id === id)
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
+
   const handleDeleteState = (id) => {
+    const db = getDatabase()
+    remove(ref(db, 'machinery/spares/' + id))
     setData(data.filter((item) => item.id !== id))
   }
+
   return (
     <>
       {/* add new Engine button */}
@@ -360,7 +375,7 @@ const Engines = () => {
           <Modal.Title>New Engine</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form fluid onChange={setFormValue} formValue={formValue}>
+          <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue}>
             <Form.Group controlId="city-10">
               <Form.ControlLabel>Enginemodel</Form.ControlLabel>
               <Form.Control
@@ -388,7 +403,7 @@ const Engines = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={addDataToFirebase} appearance="primary">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
