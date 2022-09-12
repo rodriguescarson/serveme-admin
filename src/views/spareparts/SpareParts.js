@@ -256,6 +256,7 @@ const SpareParts = () => {
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState([])
+
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
@@ -269,6 +270,21 @@ const SpareParts = () => {
     model: '',
   })
 
+  // message toast
+  const [messageVal, setMessageVal] = React.useState({
+    message: '',
+    type: 'success',
+  })
+
+  //toast
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
+      {messageVal.message}
+    </Message>
+  )
+
+  // handle states for add
   const handleClose = () => {
     setOpen(false)
   }
@@ -342,31 +358,6 @@ const SpareParts = () => {
     [checkedKeys],
   )
 
-  // end of table functions
-
-  // posting data to firebase
-  // make changes
-
-  // setting states for delete
-  const handleShowDeleteModal = (id) => {
-    setDeleteUserModal(true)
-    setDeleteId(id)
-  }
-
-  //change this - update data in firebase
-  const handleChange = (id, key, value) => {
-    // db.collection('user')
-    //   .doc(id)
-    //   .update({ [key]: value })
-    const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
-    setData(nextData)
-    const db = getDatabase()
-    update(ref(db, 'machinery/spares/' + id), {
-      [key]: value,
-    })
-  }
-
   const addDataToFirebase = (data) => {
     const db = getDatabase()
     const Ref = ref(db, 'machinery/spares')
@@ -382,6 +373,16 @@ const SpareParts = () => {
       Eng_id: '',
     })
     handleClose()
+  }
+
+  const handleChange = (id, key, value) => {
+    const nextData = Object.assign([], data)
+    nextData.find((item) => item.id === id)[key] = value
+    setData(nextData)
+    const db = getDatabase()
+    update(ref(db, 'machinery/spares/' + id), {
+      [key]: value,
+    })
   }
 
   const handleEditState = (id) => {
@@ -425,7 +426,7 @@ const SpareParts = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={addDataToFirebase} appearance="primary" type="submit">
+          <Button onClick={addDataToFirebase} appearance="primary">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
