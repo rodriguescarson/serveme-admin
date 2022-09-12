@@ -14,6 +14,7 @@ import {
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
+import { getDatabase, ref, push, set, child, update, get, remove } from 'firebase/database'
 
 const selectDataType = ['abc', 'def', 'ghi'].map((item) => ({
   label: item,
@@ -231,6 +232,7 @@ const ServiceLists = () => {
 
   // useState for add service
   const [open, setOpen] = React.useState(false)
+  const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
     Type: '',
     Cost: '',
@@ -305,13 +307,15 @@ const ServiceLists = () => {
   )
 
   const addDataToFirebase = (data) => {
-    const newPostRef = postsRef.push()
-    newPostRef.set({
-      id: newPostRef.key,
+    const db = getDatabase()
+    const Ref = ref(db, 'service_schedule')
+    const newRef = push(Ref)
+    set(newRef, {
+      id: newRef.key,
       ...formValue,
     })
     const nextData = getData()
-    setData([...nextData, { id: newPostRef.key, ...formValue }])
+    setData([...nextData, { id: newRef.key, ...formValue }])
     handleClose()
   }
 
@@ -414,7 +418,7 @@ const ServiceLists = () => {
         }}
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input

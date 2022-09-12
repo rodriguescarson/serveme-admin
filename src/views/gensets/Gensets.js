@@ -14,6 +14,7 @@ import {
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
+import { getDatabase, ref, push, set, child, update, get, remove } from 'firebase/database'
 
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
@@ -226,6 +227,7 @@ const Gensets = () => {
 
   // useState for add user
   const [open, setOpen] = React.useState(false)
+  const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
     GensetName: '',
   })
@@ -247,6 +249,7 @@ const Gensets = () => {
   const handleClose = () => {
     setOpen(false)
   }
+
   const handleOpen = () => {
     setOpen(true)
   }
@@ -280,6 +283,7 @@ const Gensets = () => {
       setSortType(sortType)
     }, 500)
   }
+
   const handleCheckAll = React.useCallback((event) => {
     const checked = event.target.checked
     const keys = checked ? data.map((item) => item.id) : []
@@ -298,13 +302,18 @@ const Gensets = () => {
   )
 
   const addDataToFirebase = (data) => {
-    const newPostRef = postsRef.push()
-    newPostRef.set({
-      id: newPostRef.key,
+    const db = getDatabase()
+    const Ref = ref(db, 'machinery/genset')
+    const newRef = push(Ref)
+    set(newRef, {
+      id: newRef.key,
       ...formValue,
     })
     const nextData = getData()
-    setData([...nextData, { id: newPostRef.key, ...formValue }])
+    setData([...nextData, { id: newRef.key, ...formValue }])
+    setFormValue({
+      GensetName: '',
+    })
     handleClose()
   }
 
@@ -326,15 +335,15 @@ const Gensets = () => {
       })
   }, [])
 
-  const handleChange = (id, key, value) => {
-    const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
-    setData(nextData)
-    const db = getDatabase()
-    update(ref(db, 'machinery/genset/' + id), {
-      [key]: value,
-    })
-  }
+  // const handleChange = (id, key, value) => {
+  //   const nextData = Object.assign([], data)
+  //   nextData.find((item) => item.id === id)[key] = value
+  //   setData(nextData)
+  //   const db = getDatabase()
+  //   update(ref(db, 'machinery/genset/' + id), {
+  //     [key]: value,
+  //   })
+  // }
 
   const handleEditState = (id) => {
     const nextData = Object.assign([], data)
@@ -362,9 +371,9 @@ const Gensets = () => {
               <Form.ControlLabel>Genset Img:</Form.ControlLabel>
               <Form.Control name="uploader" accepter={Uploader} action="#" />
             </Form.Group>
-            <Form.Group controlId="firstName-9">
+            <Form.Group controlId="GensetName-9">
               <Form.ControlLabel>Genset Name</Form.ControlLabel>
-              <Form.Control name="firstName" />
+              <Form.Control name="GensetName" />
               <Form.HelpText>Required</Form.HelpText>
             </Form.Group>
           </Form>
@@ -404,7 +413,7 @@ const Gensets = () => {
         }}
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
@@ -427,7 +436,7 @@ const Gensets = () => {
         </Column>
         <Column width={100} sortable>
           <HeaderCell>Genset Name</HeaderCell>
-          <Cell dataKey="gensetName" />
+          <Cell dataKey="GensetName" />
         </Column>
         <Column width={200}>
           <HeaderCell>Edit</HeaderCell>
