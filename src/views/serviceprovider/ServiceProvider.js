@@ -223,14 +223,19 @@ function createRows() {
 
   for (let i = 0; i < 50; i++) {
     const provider = {
-      id: i,
+      service_provider_id: i,
+      service_schedule_id: faker.service_schedule_id.serviceScheduleId(),
+      gen_id: faker.gen_id.genId(),
       fullName: faker.name.fullName(),
       email: faker.internet.exampleEmail(),
       contactNumber: faker.phone.number(),
       add_1: faker.address.streetAddress(),
       add_2: faker.address.secondaryAddress(),
+      state: faker.address.state(),
+      country: faker.address.country(),
       pincode: faker.address.zipCode(),
-      engineer: faker.name.jobType(),
+      district: faker.address.city(),
+      city: faker.address.city(),
     }
     rows.push(provider)
   }
@@ -289,7 +294,12 @@ const ServiceProvider = () => {
     'add-1': '',
     'add-2': '',
     pincode: '',
-    engineer: '',
+    country: '',
+    state: '',
+    gen_id: '',
+    service_schedule_id: '',
+    district: '',
+    city: '',
   })
 
   const handleClose = () => {
@@ -345,9 +355,9 @@ const ServiceProvider = () => {
     [checkedKeys],
   )
   //change this
-  const handleChange = (id, key, value) => {
+  const handleChange = (service_provider_id, key, value) => {
     const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
+    nextData.find((item) => item.service_provider_id === service_provider_id)[key] = value
     setData(nextData)
   }
   const handleEditState = (id) => {
@@ -358,8 +368,8 @@ const ServiceProvider = () => {
   }
 
   //change this
-  const handleDeleteState = (id) => {
-    setData(data.filter((item) => item.id !== id))
+  const handleDeleteState = (service_provider_id) => {
+    setData(data.filter((item) => item.service_provider_id !== service_provider_id))
   }
   return (
     <>
