@@ -259,13 +259,6 @@ const SpareParts = () => {
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
-  // message toast
-  const [messageVal, setMessageVal] = React.useState({
-    message: '',
-    type: 'success',
-  })
-  ///change
-  const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
     avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
     avatar: null,
@@ -276,13 +269,13 @@ const SpareParts = () => {
     model: '',
   })
 
-  //toast
-  const toaster = useToaster()
-  const message = (
-    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
-      {messageVal.message}
-    </Message>
-  )
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleOpen = () => {
+    setOpen(true)
+  }
 
   useEffect(() => {
     const dbRef = ref(getDatabase())
@@ -353,126 +346,12 @@ const SpareParts = () => {
 
   // posting data to firebase
   // make changes
-  const addDataToFirebase = (data) => {
-    if (!formRef.current.check()) {
-      setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
-      toaster.push(message, 'topCenter')
-      return
-    }
-
-    // only add this
-    // const db = getDatabase()
-    // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-    //   console.log('Data saved!')
-    //   handleClose()
-    // })
-    // only
-    const db = getDatabase()
-    set(ref(db, 'machinery/spares/' + uid), { id: uid, ...formValue }).then(() => {
-      setMessageVal({ message: 'Spare added successfully', type: 'success' })
-      toaster.push(message, 'topCenter')
-      setFormValue({
-        avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
-        avatar: null,
-        image: '',
-        available: '',
-        cost: '',
-        description: '',
-        model: '',
-      })
-      console.log('Data saved!')
-      handleClose()
-    })
-    /*const auth = getAuth()
-    createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
-      .then((userCredential) => {
-        const user = userCredential.user
-        const uid = user.uid
-        const db = getDatabase()
-
-        if (formValue.avatar[0].blobFile) {
-          const file = formValue.avatar[0].blobFile
-          const storage = getStorage()
-          const storageRef = storageRe(storage, `/userAvatars/${uid}`)
-          uploadBytes(storageRef, file)
-            .then((snapshot) => {
-              getDownloadURL(storageRe(storage, snapshot.ref.fullPath))
-                .then((downloadURL) => {
-                  setFormValue({ ...formValue, avatar_url: downloadURL })
-                  return downloadURL
-                })
-                .then((downloadURL) => {
-                  set(ref(db, 'machinery/spares/' + uid), {
-                    id: uid,
-                    ...formValue,
-                    avatar_url: downloadURL,
-                  }).then(() => {
-                    const nextData = getData()
-                    setData([...nextData, { id: uid, ...formValue, avatar_url: downloadURL }])
-                    handleClose()
-                    setMessageVal({ message: 'User added successfully', type: 'success' })
-                    toaster.push(message, 'topCenter')
-                    setFormValue({
-                      avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
-                      avatar: null,
-                      image: '',
-                      available: '',
-                      cost: '',
-                      description: '',
-                      model: '',
-                    })
-                  })
-                })
-            })
-            .catch((e) => {
-              setMessageVal({ message: e.message, type: 'error' })
-              toaster.push(message, 'topCenter')
-            })
-        }
-      })
-      .catch((error) => {
-        const errorCode = error.code
-        if (errorCode === 'auth/email-already-in-use') {
-          setMessageVal({ message: 'Email already in use', type: 'error' })
-          toaster.push(message, 'topCenter')
-        } else if (errorCode === 'auth/invalid-email') {
-          setMessageVal({ message: 'Invalid email', type: 'error' })
-          toaster.push(message, 'topCenter')
-        }
-      })*/
-  }
 
   // setting states for delete
   const handleShowDeleteModal = (id) => {
     setDeleteUserModal(true)
     setDeleteId(id)
   }
-
-  // handle states for add
-  const handleClose = () => {
-    setOpen(false)
-  }
-  const handleOpen = () => {
-    setOpen(true)
-  }
-
-  useEffect(() => {
-    const dbRef = ref(getDatabase())
-    // changew only this
-    get(child(dbRef, `machinery/spares`))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          setData(Object.values(snapshot.val()))
-        } else {
-          setMessageVal({ message: 'No data available', type: 'error' })
-          toaster.push(message, 'topCenter')
-        }
-      })
-      .catch((error) => {
-        setMessageVal({ message: error.message, type: 'error' })
-        toaster.push(message, 'topCenter')
-      })
-  }, [])
 
   //change this - update data in firebase
   const handleChange = (id, key, value) => {
@@ -546,7 +425,7 @@ const SpareParts = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={addDataToFirebase} appearance="primary">
+          <Button onClick={addDataToFirebase} appearance="primary" type="submit">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
@@ -577,7 +456,7 @@ const SpareParts = () => {
         cellBordered
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable fixed fixed>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
