@@ -15,20 +15,8 @@ import {
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
-import { getAuth } from 'firebase/auth'
-//cell imports
-import {
-  ActionCell,
-  CheckCell,
-  DeleteCell,
-  EditableCell,
-  ImageCell,
-} from '../../utils/tableComponents'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
-import ImageUploader from '../../utils/formComponents/ImageUploader'
-// change according to your needs
+import { getDatabase, ref, push, set, child, update, get, remove } from 'firebase/database'
+
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
   value: item,
@@ -60,11 +48,205 @@ const model = Schema.Model({
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
 
-const TextField = ({ cid, name, label, accepter, ...rest }) => (
-  <Form.Group controlId={cid}>
-    <Form.ControlLabel>{label}</Form.ControlLabel>
-    <Form.Control name={name} accepter={accepter} {...rest} />
-  </Form.Group>
+const EditableCell = ({ rowData, dataKey, onChange, ...props }) => {
+  const editing = rowData.status === 'EDIT'
+  return (
+    <Cell {...props} className={editing ? 'table-content-editing' : ''}>
+      {editing ? (
+        <input
+          className="rs-input"
+          defaultValue={rowData[dataKey]}
+          onChange={(event) => {
+            onChange && onChange(rowData.id, dataKey, event.target.value)
+          }}
+        />
+      ) : (
+        <span className="table-content-edit-span">{rowData[dataKey]}</span>
+      )}
+    </Cell>
+  )
+}
+
+const BaseCell = React.forwardRef((props, ref) => {
+  const { children, rowData, ...rest } = props
+  return (
+    <Cell
+      ref={ref}
+      rowData={rowData}
+      onDoubleClick={() => {
+        console.log(rowData)
+      }}
+      {...rest}
+    >
+      {children}
+    </Cell>
+  )
+})
+
+BaseCell.displayName = 'BaseCell'
+
+const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
+  return (
+    <BaseCell {...props} style={{ padding: 0 }}>
+      <div style={{ lineHeight: '46px' }}>
+        <input
+          type="checkbox"
+          value={rowData[dataKey]}
+          onChange={onChange}
+          checked={checkedKeys.some((item) => item === rowData[dataKey])}
+        />
+      </div>
+    </BaseCell>
+  )
+}
+
+//edited
+//edit 2
+// const NameCell = ({ rowData, dataKey, ...props }) => {
+//   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
+//     const styles = {
+//       ...style,
+//       shadows: '0px 0px 10px rgba(0, 0, 0, 0.5)',
+//       color: '#000',
+//       background: '#fff',
+//       width: 200,
+//       opacity: 1,
+//       padding: 10,
+//       borderRadius: 4,
+//       boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
+//       position: 'absolute',
+//       zIndex: 1,
+//       transform: 'translate(0, -20px)',
+//     }
+
+//     return (
+//       <div {...rest} style={styles} ref={ref}>
+//         <p>
+//           <b>Name:</b> {`${rowData.firstName} ${rowData.lastName}`}{' '}
+//         </p>
+//         <p
+//           style={{
+//             display: 'flex',
+//             flexWrap: 'wrap',
+//           }}
+//         >
+//           <b>District:</b> {rowData.district}{' '}
+//         </p>
+//         <p>
+//           <b>City:</b> {rowData.city}{' '}
+//         </p>
+//         <p>
+//           <b>State:</b> {rowData.state}{' '}
+//         </p>
+//         <p>
+//           <b>Country:</b> {rowData.country}{' '}
+//         </p>
+//       </div>
+//     )
+//   })
+//   Overlay.displayName = 'Overlay'
+//   const speaker = (props, ref) => {
+//     const { className, top, onClose } = props
+//     return (
+//       <Overlay
+//         title="Description"
+//         style={{ top }}
+//         onClose={onClose}
+//         className={className}
+//         ref={ref}
+//         visible
+//       />
+//     )
+//   }
+
+//   return (
+//     <BaseCell rowData={rowData} {...props}>
+//       <Whisper trigger="click" placement="auto" speaker={speaker} enterable>
+//         <Button
+//           style={{
+//             background: '#fff',
+//             color: 'blue',
+//             border: '0px solid #000',
+//             lineHeight: '50px',
+//             textAlign: 'center',
+//             verticalAlign: 'middle',
+//             marginRight: '10px',
+//           }}
+//         >
+//           {rowData[dataKey].toLocaleString()}
+//         </Button>
+//       </Whisper>
+//     </BaseCell>
+//   )
+// }
+
+const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
+  return (
+    <Cell {...props} style={{ padding: '6px' }}>
+      <Button
+        appearance="link"
+        onClick={() => {
+          onClick(rowData.id)
+        }}
+      >
+        {rowData.status === 'EDIT' ? 'Save' : 'Edit'}
+      </Button>
+    </Cell>
+  )
+}
+
+const DeleteCell = ({ rowData, dataKey, onClick, ...props }) => {
+  return (
+    <Cell {...props} style={{ padding: '6px' }}>
+      <Button
+        appearance="link"
+        onClick={() => {
+          onClick(rowData.id)
+        }}
+      >
+        {'Delete'}
+      </Button>
+    </Cell>
+  )
+}
+
+const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
+  function handleChange(event) {
+    onChange(rowData.id, event.target.value)
+  }
+
+  return (
+    <BaseCell {...props}>
+      <input value={data[rowData.id]} onChange={handleChange} />
+    </BaseCell>
+  )
+})
+
+InputCell.displayName = 'InputCell'
+
+// data.map((item) => {
+//   return db
+//     .collection('user')
+//     .doc('one')
+//     .set(item)
+//     .then(() => {
+//       console.log('Document successfully written!')
+//     })
+// })
+
+const ImageCell = ({ rowData, dataKey, ...rest }) => (
+  <Cell {...rest}>
+    <img
+      src={rowData[dataKey]}
+      width="50"
+      alt="avtar"
+      style={{
+        borderRadius: '50%',
+        verticalAlign: 'middle',
+        marginRight: '10px',
+      }}
+    />
+  </Cell>
 )
 
 const SpareParts = () => {
@@ -74,11 +256,7 @@ const SpareParts = () => {
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState([])
-  //delete states
-  const [deleteUserModal, setDeleteUserModal] = React.useState(false)
-  const handleCloseDeleteModal = () => setDeleteUserModal(false)
-  const [deleteId, setDeleteId] = React.useState()
-  // add states
+  // useState for add user
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   // message toast
@@ -87,6 +265,7 @@ const SpareParts = () => {
     type: 'success',
   })
   ///change
+  const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
     avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
     avatar: null,
@@ -105,7 +284,24 @@ const SpareParts = () => {
     </Message>
   )
 
-  // table functions
+  useEffect(() => {
+    const dbRef = ref(getDatabase())
+    // changew only this
+    get(child(dbRef, `machinery/spares`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(Object.values(snapshot.val()))
+        } else {
+          setMessageVal({ message: 'No data available', type: 'error' })
+          toaster.push(message, 'topCenter')
+        }
+      })
+      .catch((error) => {
+        setMessageVal({ message: error.message, type: 'error' })
+        toaster.push(message, 'topCenter')
+      })
+  }, [])
+
   const getData = () => {
     if (sortColumn && sortType) {
       return data.sort((a, b) => {
@@ -287,10 +483,26 @@ const SpareParts = () => {
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
-    // changew only this
     update(ref(db, 'machinery/spares/' + id), {
       [key]: value,
     })
+  }
+
+  const addDataToFirebase = (data) => {
+    const db = getDatabase()
+    const Ref = ref(db, 'machinery/spares')
+    const newRef = push(Ref)
+    set(newRef, {
+      id: newRef.key,
+      ...formValue,
+    })
+    const nextData = getData()
+    setData([...nextData, { id: newRef.key, ...formValue }])
+    setFormValue({
+      partName: '',
+      Eng_id: '',
+    })
+    handleClose()
   }
 
   const handleEditState = (id) => {
@@ -302,10 +514,7 @@ const SpareParts = () => {
 
   //change this - delete from firebase
   const handleDeleteState = (id) => {
-    // delete data[id]
-    //
     const db = getDatabase()
-    // changew only this
     remove(ref(db, 'machinery/spares/' + id))
     setData(data.filter((item) => item.id !== id))
   }
@@ -319,15 +528,15 @@ const SpareParts = () => {
         </Modal.Header>
         <Modal.Body>
           <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
-          <TextField
+            <TextField
               cid="image"
               name="image"
               label="Profile Picture"
               accepter={ImageUploader}
               action="//jsonplaceholder.typicode.com/posts/"
             />
-            <TextField cid="available-9" name="available" label="Available"/>
-            <TextField cid="cost-9" name="cost" label="Cost"/>
+            <TextField cid="available-9" name="available" label="Available" />
+            <TextField cid="cost-9" name="cost" label="Cost" />
             {/* <Form.Group controlId="textarea-9">
               <Form.ControlLabel>Textarea</Form.ControlLabel>
               <Form.Control rows={5} name="textarea" accepter={Textarea} />
@@ -337,7 +546,7 @@ const SpareParts = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={addDataToFirebase} appearance="primary" type="submit">
+          <Button onClick={addDataToFirebase} appearance="primary">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
@@ -368,7 +577,7 @@ const SpareParts = () => {
         cellBordered
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable fixed>
+        <Column width={50} align="center" sortable fixed fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
@@ -391,7 +600,7 @@ const SpareParts = () => {
         </Column>
         <Column width={200}>
           <HeaderCell>Available</HeaderCell>
-          <EditableCell dataKey="available" onClick={handleEditState}/>
+          <EditableCell dataKey="available" onClick={handleEditState} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Cost</HeaderCell>

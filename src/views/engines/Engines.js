@@ -14,6 +14,7 @@ import {
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
+import { getDatabase, ref, push, set, child, update, get, remove } from 'firebase/database'
 
 const selectDataEnginemodel = ['abc', 'def', 'efg'].map((item) => ({
   label: item,
@@ -246,6 +247,7 @@ const Engines = () => {
 
   // useState for add user
   const [open, setOpen] = React.useState(false)
+  const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
     engineModel: '',
     altMake: '',
@@ -277,7 +279,7 @@ const Engines = () => {
   useEffect(() => {
     const dbRef = ref(getDatabase())
     // changew only this
-    get(child(dbRef, `machinery/spares`))
+    get(child(dbRef, `machinery/engines`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
@@ -339,15 +341,22 @@ const Engines = () => {
     [checkedKeys],
   )
 
-  //Have to add engine id
   const addDataToFirebase = (data) => {
-    const newPostRef = postsRef.push()
-    newPostRef.set({
-      id: newPostRef.key,
+    const db = getDatabase()
+    const Ref = ref(db, 'machinery/engines')
+    const newRef = push(Ref)
+    set(newRef, {
+      id: newRef.key,
       ...formValue,
     })
     const nextData = getData()
-    setData([...nextData, { id: newPostRef.key, ...formValue }])
+    setData([...nextData, { id: newRef.key, ...formValue }])
+    setFormValue({
+      engineModel: '',
+      altMake: '',
+      engineMake: '',
+      controllerMode: '',
+    })
     handleClose()
   }
 
@@ -356,7 +365,7 @@ const Engines = () => {
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
-    update(ref(db, 'machinery/spares/' + id), {
+    update(ref(db, 'machinery/engines/' + id), {
       [key]: value,
     })
   }
@@ -370,7 +379,7 @@ const Engines = () => {
 
   const handleDeleteState = (id) => {
     const db = getDatabase()
-    remove(ref(db, 'machinery/spares/' + id))
+    remove(ref(db, 'machinery/engines/' + id))
     setData(data.filter((item) => item.id !== id))
   }
 
@@ -383,7 +392,7 @@ const Engines = () => {
         </Modal.Header>
         <Modal.Body>
           <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue}>
-            <Form.Group controlId="city-10">
+            <Form.Group controlId="engineModel-10">
               <Form.ControlLabel>Enginemodel</Form.ControlLabel>
               <Form.Control
                 name="engineModel"
@@ -391,15 +400,15 @@ const Engines = () => {
                 accepter={SelectPicker}
               />
             </Form.Group>
-            <Form.Group controlId="city-10">
+            <Form.Group controlId="altMake-10">
               <Form.ControlLabel>Altmake</Form.ControlLabel>
               <Form.Control name="altMake" data={selectDataAltmake} accepter={SelectPicker} />
             </Form.Group>
-            <Form.Group controlId="city-10">
+            <Form.Group controlId="engineMake-10">
               <Form.ControlLabel>Enginemake</Form.ControlLabel>
               <Form.Control name="engineMake" data={selectDataEnginemake} accepter={SelectPicker} />
             </Form.Group>
-            <Form.Group controlId="city-10">
+            <Form.Group controlId="controllerMode-10">
               <Form.ControlLabel>Controllermode</Form.ControlLabel>
               <Form.Control
                 name="controllerMode"
@@ -444,7 +453,7 @@ const Engines = () => {
         }}
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
@@ -476,7 +485,7 @@ const Engines = () => {
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Controller Mode</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
+          <EditableCell dataKey="controllerMode" onChange={handleChange} />
         </Column>
 
         <Column width={200}>
