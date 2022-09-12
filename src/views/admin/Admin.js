@@ -223,20 +223,10 @@ function createRows() {
 
   for (let i = 0; i < 50; i++) {
     const admin = {
-      id: i,
-      avatar: faker.image.avatar(),
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
-      email: faker.internet.exampleEmail(),
-      contactNumber: faker.phone.number(),
-      add_1: faker.address.streetAddress(),
-      add_2: faker.address.secondaryAddress(),
-      pincode: faker.address.zipCode(),
-      district: faker.address.city(),
-      city: faker.address.city(),
-      state: faker.address.state(),
-      country: faker.address.country(),
-      sentence: faker.lorem.sentence(),
+      a_id: i,
+      userName: faker.name.userName(),
+      password: faker.password.password(),
+      email: faker.internet.exampleEmail()
     }
     rows.push(admin)
   }
@@ -355,9 +345,9 @@ const Admin = () => {
     [checkedKeys],
   )
   //change this
-  const handleChange = (id, key, value) => {
+  const handleChange = (a_id, key, value) => {
     const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
+    nextData.find((item) => item.a_id === a_id)[key] = value
     setData(nextData)
   }
   const handleEditState = (id) => {
@@ -368,8 +358,8 @@ const Admin = () => {
   }
 
   //change this
-  const handleDeleteState = (id) => {
-    setData(data.filter((item) => item.id !== id))
+  const handleDeleteState = (a_id) => {
+    setData(data.filter((item) => item.a_id !== a_id))
   }
   return (
     <>
