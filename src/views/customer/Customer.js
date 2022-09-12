@@ -105,6 +105,7 @@ const Customer = () => {
     pincode: '',
     district: '',
   })
+
   //toast
   const toaster = useToaster()
   const message = (
@@ -143,6 +144,7 @@ const Customer = () => {
       setSortType(sortType)
     }, 500)
   }
+
   const handleCheckAll = React.useCallback((event) => {
     const checked = event.target.checked
     const keys = checked ? data.map((item) => item.id) : []
@@ -160,12 +162,6 @@ const Customer = () => {
     [checkedKeys],
   )
 
-  const handleEditState = (id) => {
-    const nextData = Object.assign([], data)
-    const activeItem = nextData.find((item) => item.id === id)
-    activeItem.status = activeItem.status ? null : 'EDIT'
-    setData(nextData)
-  }
   // end of table functions
 
   // posting data to firebase
@@ -176,6 +172,7 @@ const Customer = () => {
       toaster.push(message, 'topCenter')
       return
     }
+
     // only add this
     // const db = getDatabase()
     // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
@@ -294,6 +291,14 @@ const Customer = () => {
       [key]: value,
     })
   }
+
+  const handleEditState = (id) => {
+    const nextData = Object.assign([], data)
+    const activeItem = nextData.find((item) => item.id === id)
+    activeItem.status = activeItem.status ? null : 'EDIT'
+    setData(nextData)
+  }
+
   //change this - delete from firebase
   const handleDeleteState = (id) => {
     // delete data[id]
@@ -309,7 +314,7 @@ const Customer = () => {
       {/* add new user button */}
       <Modal open={open} onClose={handleClose} size="xs">
         <Modal.Header>
-          <Modal.Title>New User</Modal.Title>
+          <Modal.Title>New Customer</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
@@ -472,9 +477,9 @@ const Customer = () => {
       {/* Delete Modal */}
       <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
         <Modal.Header>
-          <Modal.Title>Delete User</Modal.Title>
+          <Modal.Title>Delete Customer</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this user?</Modal.Body>
+        <Modal.Body>Are you sure you want to delete this Customer?</Modal.Body>
         <Modal.Footer>
           <Button
             onClick={() => {

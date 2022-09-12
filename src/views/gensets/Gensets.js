@@ -2,22 +2,18 @@
 import React, { memo, useEffect } from 'react'
 import {
   IconButton,
-  ButtonToolbar,
-  ButtonGroup,
   FlexboxGrid,
   Form,
   Button,
   Input,
   Modal,
-  SelectPicker,
   Uploader,
+  Message,
+  useToaster,
 } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { faker } from '@faker-js/faker'
-import { db } from '../../firebase'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
@@ -196,32 +192,6 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 
 InputCell.displayName = 'InputCell'
 
-function createRows() {
-  const rows = []
-
-  for (let i = 0; i < 50; i++) {
-    const gensets = {
-      id: i,
-      avatar: faker.image.avatar(),
-      gensetName: faker.name.firstName(),
-    }
-    rows.push(gensets)
-  }
-
-  // const users = await db
-  //   .collection('user')
-  //   .get()
-  //   .then((querySnapshot) => {
-  //     querySnapshot.docs.map((doc) => {
-  //       rows.push(doc.data())
-  //       return doc.data()
-  //     })
-  //   })
-  // console.log('LOG 2', users)
-  // console.log(rows)
-  return rows
-}
-
 // data.map((item) => {
 //   return db
 //     .collection('user')
@@ -252,13 +222,27 @@ const Gensets = () => {
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
-  const [data, setData] = React.useState(createRows())
+  const [data, setData] = React.useState([])
 
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const [formValue, setFormValue] = React.useState({
     GensetName: '',
   })
+
+  // message toast
+  const [messageVal, setMessageVal] = React.useState({
+    message: '',
+    type: 'success',
+  })
+
+  //toast
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
+      {messageVal.message}
+    </Message>
+  )
 
   const handleClose = () => {
     setOpen(false)
@@ -313,20 +297,58 @@ const Gensets = () => {
     [checkedKeys],
   )
 
+  const addDataToFirebase = (data) => {
+    const newPostRef = postsRef.push()
+    newPostRef.set({
+      id: newPostRef.key,
+      ...formValue,
+    })
+    const nextData = getData()
+    setData([...nextData, { id: newPostRef.key, ...formValue }])
+    handleClose()
+  }
+
+  useEffect(() => {
+    const dbRef = ref(getDatabase())
+    // changew only this
+    get(child(dbRef, `machinery/genset`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(Object.values(snapshot.val()))
+        } else {
+          setMessageVal({ message: 'No data available', type: 'error' })
+          toaster.push(message, 'topCenter')
+        }
+      })
+      .catch((error) => {
+        setMessageVal({ message: error.message, type: 'error' })
+        toaster.push(message, 'topCenter')
+      })
+  }, [])
+
   const handleChange = (id, key, value) => {
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
+    const db = getDatabase()
+    update(ref(db, 'machinery/genset/' + id), {
+      [key]: value,
+    })
   }
+
   const handleEditState = (id) => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.id === id)
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
+
   const handleDeleteState = (id) => {
+    const db = getDatabase()
+    remove(ref(db, 'machinery/genset/' + id))
     setData(data.filter((item) => item.id !== id))
   }
+
   return (
     <>
       {/* add new genset button */}
@@ -335,7 +357,7 @@ const Gensets = () => {
           <Modal.Title>New Genset</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form fluid onChange={setFormValue} formValue={formValue}>
+          <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue}>
             <Form.Group controlId="uploader">
               <Form.ControlLabel>Genset Img:</Form.ControlLabel>
               <Form.Control name="uploader" accepter={Uploader} action="#" />
@@ -348,7 +370,7 @@ const Gensets = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={addDataToFirebase} appearance="primary">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
