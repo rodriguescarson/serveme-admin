@@ -2,22 +2,19 @@
 import React, { memo, useEffect } from 'react'
 import {
   IconButton,
-  ButtonToolbar,
-  ButtonGroup,
   FlexboxGrid,
   Form,
   Button,
   Input,
   Modal,
   SelectPicker,
-  Uploader,
+  Message,
+  useToaster,
 } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { faker } from '@faker-js/faker'
-import { db } from '../../firebase'
-import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { getDatabase, ref, push, set, child, update, get, remove } from 'firebase/database'
 
 const selectDataEnginemodel = ['abc', 'def', 'efg'].map((item) => ({
   label: item,
@@ -33,6 +30,7 @@ const selectDataEnginemake = ['mno', 'pqr'].map((item) => ({
   label: item,
   value: item,
 }))
+
 const selectDataControllermode = ['stu', 'vwxyz'].map((item) => ({
   label: item,
   value: item,
@@ -215,35 +213,6 @@ const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
 
 InputCell.displayName = 'InputCell'
 
-function createRows() {
-  const rows = []
-
-  for (let i = 0; i < 50; i++) {
-    const engines = {
-      id: i,
-      avatar: faker.image.avatar(),
-      engineModel: faker.address.city(),
-      altMake: faker.address.city(),
-      engineMake: faker.address.city(),
-      controllerMode: faker.address.city(),
-    }
-    rows.push(engines)
-  }
-
-  // const users = await db
-  //   .collection('user')
-  //   .get()
-  //   .then((querySnapshot) => {
-  //     querySnapshot.docs.map((doc) => {
-  //       rows.push(doc.data())
-  //       return doc.data()
-  //     })
-  //   })
-  // console.log('LOG 2', users)
-  // console.log(rows)
-  return rows
-}
-
 // data.map((item) => {
 //   return db
 //     .collection('user')
@@ -274,10 +243,11 @@ const Engines = () => {
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
-  const [data, setData] = React.useState(createRows())
+  const [data, setData] = React.useState([])
 
   // useState for add user
   const [open, setOpen] = React.useState(false)
+  const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
     engineModel: '',
     altMake: '',
@@ -285,12 +255,44 @@ const Engines = () => {
     controllerMode: '',
   })
 
+  // message toast
+  const [messageVal, setMessageVal] = React.useState({
+    message: '',
+    type: 'success',
+  })
+
+  //toast
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
+      {messageVal.message}
+    </Message>
+  )
+
   const handleClose = () => {
     setOpen(false)
   }
   const handleOpen = () => {
     setOpen(true)
   }
+
+  useEffect(() => {
+    const dbRef = ref(getDatabase())
+    // changew only this
+    get(child(dbRef, `machinery/engines`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(Object.values(snapshot.val()))
+        } else {
+          setMessageVal({ message: 'No data available', type: 'error' })
+          toaster.push(message, 'topCenter')
+        }
+      })
+      .catch((error) => {
+        setMessageVal({ message: error.message, type: 'error' })
+        toaster.push(message, 'topCenter')
+      })
+  }, [])
 
   const getData = () => {
     if (sortColumn && sortType) {
@@ -321,6 +323,7 @@ const Engines = () => {
       setSortType(sortType)
     }, 500)
   }
+
   const handleCheckAll = React.useCallback((event) => {
     const checked = event.target.checked
     const keys = checked ? data.map((item) => item.id) : []
@@ -338,20 +341,48 @@ const Engines = () => {
     [checkedKeys],
   )
 
+  const addDataToFirebase = (data) => {
+    const db = getDatabase()
+    const Ref = ref(db, 'machinery/engines')
+    const newRef = push(Ref)
+    set(newRef, {
+      id: newRef.key,
+      ...formValue,
+    })
+    const nextData = getData()
+    setData([...nextData, { id: newRef.key, ...formValue }])
+    setFormValue({
+      engineModel: '',
+      altMake: '',
+      engineMake: '',
+      controllerMode: '',
+    })
+    handleClose()
+  }
+
   const handleChange = (id, key, value) => {
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
+    const db = getDatabase()
+    update(ref(db, 'machinery/engines/' + id), {
+      [key]: value,
+    })
   }
+
   const handleEditState = (id) => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.id === id)
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
+
   const handleDeleteState = (id) => {
+    const db = getDatabase()
+    remove(ref(db, 'machinery/engines/' + id))
     setData(data.filter((item) => item.id !== id))
   }
+
   return (
     <>
       {/* add new Engine button */}
@@ -360,8 +391,8 @@ const Engines = () => {
           <Modal.Title>New Engine</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form fluid onChange={setFormValue} formValue={formValue}>
-            <Form.Group controlId="city-10">
+          <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue}>
+            <Form.Group controlId="engineModel-10">
               <Form.ControlLabel>Enginemodel</Form.ControlLabel>
               <Form.Control
                 name="engineModel"
@@ -369,15 +400,15 @@ const Engines = () => {
                 accepter={SelectPicker}
               />
             </Form.Group>
-            <Form.Group controlId="city-10">
+            <Form.Group controlId="altMake-10">
               <Form.ControlLabel>Altmake</Form.ControlLabel>
               <Form.Control name="altMake" data={selectDataAltmake} accepter={SelectPicker} />
             </Form.Group>
-            <Form.Group controlId="city-10">
+            <Form.Group controlId="engineMake-10">
               <Form.ControlLabel>Enginemake</Form.ControlLabel>
               <Form.Control name="engineMake" data={selectDataEnginemake} accepter={SelectPicker} />
             </Form.Group>
-            <Form.Group controlId="city-10">
+            <Form.Group controlId="controllerMode-10">
               <Form.ControlLabel>Controllermode</Form.ControlLabel>
               <Form.Control
                 name="controllerMode"
@@ -388,7 +419,7 @@ const Engines = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={addDataToFirebase} appearance="primary">
             Confirm
           </Button>
           <Button onClick={handleClose} appearance="subtle">
@@ -422,7 +453,7 @@ const Engines = () => {
         }}
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable>
+        <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
             <div style={{ lineHeight: '40px' }}>
               <input
@@ -454,7 +485,7 @@ const Engines = () => {
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Controller Mode</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
+          <EditableCell dataKey="controllerMode" onChange={handleChange} />
         </Column>
 
         <Column width={200}>

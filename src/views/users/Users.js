@@ -52,7 +52,11 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 // change form validation according to your needs
 const model = Schema.Model({
   full_name: Schema.Types.StringType().isRequired('This field is required.'),
-  email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
+  email: Schema.Types.StringType()
+    .isEmail('Please enter a valid email address.')
+    .addRule((value, data) => {
+      const auth = getAuth()
+    }, 'Email already exists'),
   contact_no: Schema.Types.StringType().isRequired('This field is required.'),
   password: Schema.Types.StringType()
     .isRequired('This field is required.')
@@ -105,6 +109,7 @@ const Users = () => {
     pincode: '',
     district: '',
   })
+
   //toast
   const toaster = useToaster()
   const message = (
@@ -143,6 +148,7 @@ const Users = () => {
       setSortType(sortType)
     }, 500)
   }
+
   const handleCheckAll = React.useCallback((event) => {
     const checked = event.target.checked
     const keys = checked ? data.map((item) => item.id) : []
@@ -160,12 +166,6 @@ const Users = () => {
     [checkedKeys],
   )
 
-  const handleEditState = (id) => {
-    const nextData = Object.assign([], data)
-    const activeItem = nextData.find((item) => item.id === id)
-    activeItem.status = activeItem.status ? null : 'EDIT'
-    setData(nextData)
-  }
   // end of table functions
 
   // posting data to firebase
@@ -176,6 +176,7 @@ const Users = () => {
       toaster.push(message, 'topCenter')
       return
     }
+
     // only add this
     // const db = getDatabase()
     // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
@@ -189,8 +190,8 @@ const Users = () => {
         const user = userCredential.user
         const uid = user.uid
         const db = getDatabase()
-
-        if (formValue.avatar[0].blobFile) {
+        if (formValue.avatar) {
+          console.log('blobFile')
           const file = formValue.avatar[0].blobFile
           const storage = getStorage()
           const storageRef = storageRe(storage, `/userAvatars/${uid}`)
@@ -231,12 +232,38 @@ const Users = () => {
                 })
             })
             .catch((e) => {
+              console.log(e)
               setMessageVal({ message: e.message, type: 'error' })
               toaster.push(message, 'topCenter')
             })
+        } else {
+          console.log('no file')
+          set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
+            const nextData = getData()
+            setData([...nextData, { id: uid, ...formValue }])
+            handleClose()
+            setMessageVal({ message: 'User added successfully', type: 'success' })
+            toaster.push(message, 'topCenter')
+            setFormValue({
+              avatar: null,
+              full_name: '',
+              email: '',
+              contact_no: '',
+              password: '',
+              add_1: '',
+              add_2: '',
+              state: '',
+              city: '',
+              country: '',
+              pincode: '',
+              district: '',
+              avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+            })
+          })
         }
       })
       .catch((error) => {
+        console.log(error)
         const errorCode = error.code
         if (errorCode === 'auth/email-already-in-use') {
           setMessageVal({ message: 'Email already in use', type: 'error' })
@@ -294,6 +321,14 @@ const Users = () => {
       [key]: value,
     })
   }
+
+  const handleEditState = (id) => {
+    const nextData = Object.assign([], data)
+    const activeItem = nextData.find((item) => item.id === id)
+    activeItem.status = activeItem.status ? null : 'EDIT'
+    setData(nextData)
+  }
+
   //change this - delete from firebase
   const handleDeleteState = (id) => {
     // delete data[id]
