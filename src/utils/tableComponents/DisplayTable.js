@@ -2,6 +2,7 @@ import React from 'react'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import {
   ActionCell,
+  CheckCell,
   DeleteCell,
   EditableCell,
   ImageCell,
@@ -26,38 +27,6 @@ function DisplayTable({
   handleDeleteState,
   deleteId,
 }) {
-  const [sortColumn, setSortColumn] = React.useState()
-  const [sortType, setSortType] = React.useState()
-  const [loading, setLoading] = React.useState(false)
-  const getData = () => {
-    if (sortColumn && sortType) {
-      return data.sort((a, b) => {
-        let x = a[sortColumn]
-        let y = b[sortColumn]
-        if (typeof x === 'string') {
-          x = x.charCodeAt()
-        }
-        if (typeof y === 'string') {
-          y = y.charCodeAt()
-        }
-        if (sortType === 'asc') {
-          return x - y
-        } else {
-          return y - x
-        }
-      })
-    }
-    return data
-  }
-  const handleSortColumn = (sortColumn, sortType) => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setSortColumn(sortColumn)
-      setSortType(sortType)
-    }, 500)
-  }
-
   return (
     <>
       <Table
@@ -73,27 +42,36 @@ function DisplayTable({
         cellBordered
         affixHorizontalScrollbar
       >
+        <Column width={50} align="center" sortable fixed>
+          <HeaderCell style={{ padding: 0 }}>
+            <div style={{ lineHeight: '40px' }}>
+              <input
+                type="checkbox"
+                onChange={handleCheckAll}
+                checked={checkedKeys.length === data.length}
+              />
+            </div>
+          </HeaderCell>
+          <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
+        </Column>
+
+        <Column width={70} fixed sortable>
+          <HeaderCell>Id</HeaderCell>
+          <Cell dataKey="id" />
+        </Column>
+
         {TableParams.map((item, i) => {
-          if (!item.isId) {
-            return !item.isAvatar ? (
-              <Column key={i} width={item.width} sortable onChange={handleChange}>
-                <HeaderCell>{item.value}</HeaderCell>
-                <EditableCell dataKey={item.dataKey} onChange={handleChange} />
-              </Column>
-            ) : (
-              <Column key={i} width={item.width} fixed>
-                <HeaderCell>{item.value}</HeaderCell>
-                <ImageCell dataKey="avatar_url" />
-              </Column>
-            )
-          } else {
-            return (
-              <Column key={i} width={item.width} fixed sortable>
-                <HeaderCell>{item.value}</HeaderCell>
-                <Cell dataKey={item.dataKey} />
-              </Column>
-            )
-          }
+          return !item.isAvatar ? (
+            <Column key={i} width={item.width} sortable onChange={handleChange}>
+              <HeaderCell>{item.value}</HeaderCell>
+              <EditableCell dataKey={item.dataKey} onChange={handleChange} />
+            </Column>
+          ) : (
+            <Column width={item.width} fixed>
+              <HeaderCell>{item.value}</HeaderCell>
+              <ImageCell dataKey="avatar_url" />
+            </Column>
+          )
         })}
         <Column width={200}>
           <HeaderCell>Edit</HeaderCell>

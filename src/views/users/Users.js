@@ -282,12 +282,6 @@ const Users = () => {
   //change down here
   const TableParams = [
     {
-      isId: true,
-      value: 'Id',
-      width: 70,
-      dataKey: 'id',
-    },
-    {
       isAvatar: true,
       value: 'Avatar',
       width: 130,
