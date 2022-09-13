@@ -47,7 +47,7 @@ const Register = () => {
           .then(() => {
             // Email verification sent!
             const db = getDatabase()
-            set(ref(db, 'admins/' + userCredential.user.uid), {
+            set(ref(db, 'user/admin/' + userCredential.user.uid), {
               username,
               email,
               password,

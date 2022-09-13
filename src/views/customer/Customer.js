@@ -199,7 +199,7 @@ const Customer = () => {
                   return downloadURL
                 })
                 .then((downloadURL) => {
-                  set(ref(db, 'users/customers/' + uid), {
+                  set(ref(db, 'users/customer/' + uid), {
                     id: uid,
                     ...formValue,
                     avatar_url: downloadURL,
@@ -262,7 +262,7 @@ const Customer = () => {
   useEffect(() => {
     const dbRef = ref(getDatabase())
     // changew only this
-    get(child(dbRef, `users/customers`))
+    get(child(dbRef, `users/customer`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
@@ -287,7 +287,7 @@ const Customer = () => {
     setData(nextData)
     const db = getDatabase()
     // changew only this
-    update(ref(db, 'users/customers/' + id), {
+    update(ref(db, 'users/customer/' + id), {
       [key]: value,
     })
   }
@@ -305,7 +305,7 @@ const Customer = () => {
     //
     const db = getDatabase()
     // changew only this
-    remove(ref(db, 'users/customers/' + id))
+    remove(ref(db, 'users/customer/' + id))
     setData(data.filter((item) => item.id !== id))
   }
 

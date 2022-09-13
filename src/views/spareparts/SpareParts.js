@@ -15,6 +15,13 @@ import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, push, set, child, update, get, remove } from 'firebase/database'
+import {
+  ActionCell,
+  CheckCell,
+  DeleteCell,
+  EditableCell,
+  ImageCell,
+} from '../../utils/tableComponents'
 import ImageUploader from '../../utils/formComponents/ImageUploader'
 
 const selectDataAvailable = ['In Stock', 'Out Of Stock'].map((item) => ({
@@ -24,59 +31,6 @@ const selectDataAvailable = ['In Stock', 'Out Of Stock'].map((item) => ({
 
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
-
-const EditableCell = ({ rowData, dataKey, onChange, ...props }) => {
-  const editing = rowData.status === 'EDIT'
-  return (
-    <Cell {...props} className={editing ? 'table-content-editing' : ''}>
-      {editing ? (
-        <input
-          className="rs-input"
-          defaultValue={rowData[dataKey]}
-          onChange={(event) => {
-            onChange && onChange(rowData.id, dataKey, event.target.value)
-          }}
-        />
-      ) : (
-        <span className="table-content-edit-span">{rowData[dataKey]}</span>
-      )}
-    </Cell>
-  )
-}
-
-const BaseCell = React.forwardRef((props, ref) => {
-  const { children, rowData, ...rest } = props
-  return (
-    <Cell
-      ref={ref}
-      rowData={rowData}
-      onDoubleClick={() => {
-        console.log(rowData)
-      }}
-      {...rest}
-    >
-      {children}
-    </Cell>
-  )
-})
-
-BaseCell.displayName = 'BaseCell'
-
-const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
-  return (
-    <BaseCell {...props} style={{ padding: 0 }}>
-      <div style={{ lineHeight: '46px' }}>
-        <input
-          type="checkbox"
-          value={rowData[dataKey]}
-          onChange={onChange}
-          checked={checkedKeys.some((item) => item === rowData[dataKey])}
-        />
-      </div>
-    </BaseCell>
-  )
-}
-
 // const NameCell = ({ rowData, dataKey, ...props }) => {
 //   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
 //     const styles = {
@@ -154,51 +108,6 @@ const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
 //     </BaseCell>
 //   )
 // }
-//
-const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {rowData.status === 'EDIT' ? 'Save' : 'Edit'}
-      </Button>
-    </Cell>
-  )
-}
-
-const DeleteCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {'Delete'}
-      </Button>
-    </Cell>
-  )
-}
-
-const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
-  function handleChange(event) {
-    onChange(rowData.id, event.target.value)
-  }
-
-  return (
-    <BaseCell {...props}>
-      <input value={data[rowData.id]} onChange={handleChange} />
-    </BaseCell>
-  )
-})
-
-InputCell.displayName = 'InputCell'
-
 // data.map((item) => {
 //   return db
 //     .collection('user')
@@ -209,28 +118,19 @@ InputCell.displayName = 'InputCell'
 //     })
 // })
 
-const ImageCell = ({ rowData, dataKey, ...rest }) => (
-  <Cell {...rest}>
-    <img
-      src={rowData[dataKey]}
-      width="50"
-      alt="avtar"
-      style={{
-        borderRadius: '50%',
-        verticalAlign: 'middle',
-        marginRight: '10px',
-      }}
-    />
-  </Cell>
-)
-
 const SpareParts = () => {
   const [checkedKeys, setCheckedKeys] = React.useState([])
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState([])
-
+  const [deleteUserModal, setDeleteUserModal] = React.useState(false)
+  const handleCloseDeleteModal = () => setDeleteUserModal(false)
+  const [deleteId, setDeleteId] = React.useState()
+  const handleShowDeleteModal = (id) => {
+    setDeleteUserModal(true)
+    setDeleteId(id)
+  }
   // useState for add user
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()

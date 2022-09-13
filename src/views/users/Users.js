@@ -1,79 +1,16 @@
 //remains same
 import React, { useEffect } from 'react'
-import {
-  IconButton,
-  FlexboxGrid,
-  Form,
-  Schema,
-  Button,
-  Input,
-  Modal,
-  SelectPicker,
-  Message,
-  useToaster,
-} from 'rsuite'
+import { IconButton, FlexboxGrid, SelectPicker, Message, useToaster } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
-import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
 //cell imports
-import {
-  ActionCell,
-  CheckCell,
-  DeleteCell,
-  EditableCell,
-  ImageCell,
-} from '../../utils/tableComponents'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
-import ImageUploader from '../../utils/formComponents/ImageUploader'
-// change according to your needs
-const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataDistrict = ['South-Goa', 'North-Goa'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataCity = ['Panjim', 'Margao'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataCountry = ['India', 'USA'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-// change form validation according to your needs
-const model = Schema.Model({
-  full_name: Schema.Types.StringType().isRequired('This field is required.'),
-  email: Schema.Types.StringType()
-    .isEmail('Please enter a valid email address.')
-    .addRule((value, data) => {
-      const auth = getAuth()
-    }, 'Email already exists'),
-  contact_no: Schema.Types.StringType().isRequired('This field is required.'),
-  password: Schema.Types.StringType()
-    .isRequired('This field is required.')
-    .minLength(6)
-    .maxLength(100),
-})
-// no changes
-const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
-Textarea.displayName = 'Textarea'
-
-const TextField = ({ cid, name, label, accepter, ...rest }) => (
-  <Form.Group controlId={cid}>
-    <Form.ControlLabel>{label}</Form.ControlLabel>
-    <Form.Control name={name} accepter={accepter} {...rest} />
-  </Form.Group>
-)
-
+import UserAddForm from './UserAddForm'
+import DeleteUsersModal from './DeleteUsersModal'
+import UserTable from './UserTable'
 const Users = () => {
   //table states
   const [checkedKeys, setCheckedKeys] = React.useState([])
@@ -101,8 +38,8 @@ const Users = () => {
     email: '',
     contact_no: '',
     password: '',
-    add_1: '',
-    add_2: '',
+    add_l1: '',
+    add_l2: '',
     state: '',
     city: '',
     country: '',
@@ -219,8 +156,8 @@ const Users = () => {
                       email: '',
                       contact_no: '',
                       password: '',
-                      add_1: '',
-                      add_2: '',
+                      add_l1: '',
+                      add_l2: '',
                       state: '',
                       city: '',
                       country: '',
@@ -250,8 +187,8 @@ const Users = () => {
               email: '',
               contact_no: '',
               password: '',
-              add_1: '',
-              add_2: '',
+              add_l1: '',
+              add_l2: '',
               state: '',
               city: '',
               country: '',
@@ -342,75 +279,16 @@ const Users = () => {
   return (
     <>
       {/* add new user button */}
-      <Modal open={open} onClose={handleClose} size="xs">
-        <Modal.Header>
-          <Modal.Title>New User</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
-            <TextField
-              cid="avatar"
-              name="avatar"
-              label="Profile Picture"
-              accepter={ImageUploader}
-              action="//jsonplaceholder.typicode.com/posts/"
-            />
-            <TextField cid="full_name-9" name="full_name" label="Full Name" />
-            <TextField cid="email-9" name="email" label="Email" type="email" />
-            <TextField cid="password-9" name="password" label="Password" type="password" />
-            <TextField
-              cid="contactNumber-9"
-              name="contact_no"
-              label="Contact Number"
-              type="number"
-            />
-            {/* <Form.Group controlId="textarea-9">
-              <Form.ControlLabel>Textarea</Form.ControlLabel>
-              <Form.Control rows={5} name="textarea" accepter={Textarea} />
-            </Form.Group> */}
-            <TextField cid="add_1-9" name="add_1" label="Address 1" type="text" />
-            <TextField cid="add_2-9" name="add_2" label="Address 2" type="text" />
-            <TextField cid="pincode-9" name="pincode" label="Pincode" type="number" />
-            <TextField
-              cid="state-10"
-              name="state"
-              label="State"
-              data={selectDataState}
-              accepter={SelectPicker}
-            />
-            <TextField
-              cid="district-10"
-              name="district"
-              label="District"
-              data={selectDataDistrict}
-              accepter={SelectPicker}
-            />
-            <TextField
-              cid="city-10"
-              name="city"
-              label="City"
-              data={selectDataCity}
-              accepter={SelectPicker}
-            />
-            <TextField
-              cid="country-10"
-              name="country"
-              label="Country"
-              data={selectDataCountry}
-              accepter={SelectPicker}
-            />
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={addDataToFirebase} appearance="primary" type="submit">
-            Confirm
-          </Button>
-          <Button onClick={handleClose} appearance="subtle">
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
+      <UserAddForm
+        open={open}
+        handleClose={handleClose}
+        formRef={formRef}
+        setFormValue={setFormValue}
+        formValue={formValue}
+        SelectPicker={SelectPicker}
+        addDataToFirebase={addDataToFirebase}
+        data={data}
+      />
       <FlexboxGrid justify="end" style={{ marginBottom: 10 }}>
         <FlexboxGrid.Item colspan={2}>
           <IconButton icon={<PlusIcon />} color="red" appearance="primary" onClick={handleOpen}>
@@ -420,111 +298,28 @@ const Users = () => {
       </FlexboxGrid>
       {/* end of add new user button */}
       {/* table */}
-      <Table
-        virtualized
-        height={600}
-        data={getData()}
+      <UserTable
+        getData={getData}
         sortColumn={sortColumn}
         sortType={sortType}
-        onSortColumn={handleSortColumn}
+        handleSortColumn={handleSortColumn}
         loading={loading}
-        headerHeight={50}
-        bordered
-        cellBordered
-        affixHorizontalScrollbar
-      >
-        <Column width={50} align="center" sortable fixed>
-          <HeaderCell style={{ padding: 0 }}>
-            <div style={{ lineHeight: '40px' }}>
-              <input
-                type="checkbox"
-                onChange={handleCheckAll}
-                checked={checkedKeys.length === data.length}
-              />
-            </div>
-          </HeaderCell>
-          <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
-        </Column>
-
-        <Column width={70} fixed sortable>
-          <HeaderCell>Id</HeaderCell>
-          <Cell dataKey="id" />
-        </Column>
-        <Column width={130} fixed>
-          <HeaderCell>Avatar</HeaderCell>
-          <ImageCell dataKey="avatar_url" />
-        </Column>
-        <Column width={100} sortable>
-          <HeaderCell>Full Name</HeaderCell>
-          <EditableCell dataKey="full_name" />
-        </Column>
-        <Column width={200} sortable onChange={handleChange}>
-          <HeaderCell>Email</HeaderCell>
-          <EditableCell dataKey="email" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>contactNumber</HeaderCell>
-          <EditableCell dataKey="contact_no" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Address 1</HeaderCell>
-          <EditableCell dataKey="add1" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Address 2</HeaderCell>
-          <EditableCell dataKey="add2" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Pincode</HeaderCell>
-          <EditableCell dataKey="pincode" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>District</HeaderCell>
-          <EditableCell dataKey="district" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>City</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>State</HeaderCell>
-          <EditableCell dataKey="state" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Country</HeaderCell>
-          <EditableCell dataKey="country" onChange={handleChange} />
-        </Column>
-        <Column width={200}>
-          <HeaderCell>Edit</HeaderCell>
-          <ActionCell dataKey="id" onClick={handleEditState} />
-        </Column>
-        <Column width={200}>
-          <HeaderCell>Delete</HeaderCell>
-          <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
-        </Column>
-      </Table>
+        handleCheckAll={handleCheckAll}
+        checkedKeys={checkedKeys}
+        handleCheck={handleCheck}
+        handleChange={handleChange}
+        handleEditState={handleEditState}
+        handleShowDeleteModal={handleShowDeleteModal}
+        data={data}
+      />
       {/* // no changes */}
       {/* Delete Modal */}
-      <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
-        <Modal.Header>
-          <Modal.Title>Delete User</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this user?</Modal.Body>
-        <Modal.Footer>
-          <Button
-            onClick={() => {
-              handleDeleteState(deleteId)
-              handleCloseDeleteModal()
-            }}
-            appearance="primary"
-          >
-            Confirm
-          </Button>
-          <Button onClick={handleCloseDeleteModal} appearance="subtle">
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <DeleteUsersModal
+        deleteUserModal={deleteUserModal}
+        handleCloseDeleteModal={handleCloseDeleteModal}
+        handleDeleteState={handleDeleteState}
+        deleteId={deleteId}
+      />
     </>
   )
 }
