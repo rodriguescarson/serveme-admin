@@ -21,6 +21,13 @@ function UserTable({
   handleShowDeleteModal,
   data,
 }) {
+  const TableParams = [
+    {
+      value: 'full_name',
+      width: 100,
+      dataKey: 'full_name',
+    },
+  ]
   return (
     <Table
       virtualized
@@ -56,9 +63,10 @@ function UserTable({
         <HeaderCell>Avatar</HeaderCell>
         <ImageCell dataKey="avatar_url" />
       </Column>
-      <Column width={100} sortable>
+
+      <Column width={100} sortable onChange={handleChange}>
         <HeaderCell>Full Name</HeaderCell>
-        <EditableCell dataKey="full_name" />
+        <EditableCell dataKey="full_name" onChange={handleChange} />
       </Column>
       <Column width={200} sortable onChange={handleChange}>
         <HeaderCell>Email</HeaderCell>
@@ -96,6 +104,7 @@ function UserTable({
         <HeaderCell>Country</HeaderCell>
         <EditableCell dataKey="country" onChange={handleChange} />
       </Column>
+
       <Column width={200}>
         <HeaderCell>Edit</HeaderCell>
         <ActionCell dataKey="id" onClick={handleEditState} />
