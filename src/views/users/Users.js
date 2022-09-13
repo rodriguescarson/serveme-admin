@@ -32,10 +32,6 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 }))
 const Users = () => {
   //table states
-  const [checkedKeys, setCheckedKeys] = React.useState([])
-  const [sortColumn, setSortColumn] = React.useState()
-  const [sortType, setSortType] = React.useState()
-  const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState([])
   //delete states
   const [modalStatus, setmodalStatus] = React.useState(false)
@@ -72,54 +68,6 @@ const Users = () => {
     <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
       {messageVal.message}
     </Message>
-  )
-
-  // table functions
-  const getData = () => {
-    if (sortColumn && sortType) {
-      return data.sort((a, b) => {
-        let x = a[sortColumn]
-        let y = b[sortColumn]
-        if (typeof x === 'string') {
-          x = x.charCodeAt()
-        }
-        if (typeof y === 'string') {
-          y = y.charCodeAt()
-        }
-        if (sortType === 'asc') {
-          return x - y
-        } else {
-          return y - x
-        }
-      })
-    }
-    return data
-  }
-
-  const handleSortColumn = (sortColumn, sortType) => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setSortColumn(sortColumn)
-      setSortType(sortType)
-    }, 500)
-  }
-
-  const handleCheckAll = React.useCallback((event) => {
-    const checked = event.target.checked
-    const keys = checked ? data.map((item) => item.id) : []
-    setCheckedKeys(keys)
-  }, [])
-
-  const handleCheck = React.useCallback(
-    (event) => {
-      const checked = event.target.checked
-      const value = +event.target.value
-      const keys = checked ? [...checkedKeys, value] : checkedKeys.filter((item) => item !== value)
-
-      setCheckedKeys(keys)
-    },
-    [checkedKeys],
   )
 
   // end of table functions
@@ -164,7 +112,7 @@ const Users = () => {
                     ...formValue,
                     avatar_url: downloadURL,
                   }).then(() => {
-                    const nextData = getData()
+                    const nextData = Object.assign([], data)
                     setData([...nextData, { id: uid, ...formValue, avatar_url: downloadURL }])
                     handleClose()
                     setMessageVal({ message: 'User added successfully', type: 'success' })
@@ -195,7 +143,9 @@ const Users = () => {
         } else {
           console.log('no file')
           set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-            const nextData = getData()
+            console.log(data)
+            const nextData = Object.assign([], data)
+            console.log(nextData)
             setData([...nextData, { id: uid, ...formValue }])
             handleClose()
             setMessageVal({ message: 'User added successfully', type: 'success' })
@@ -431,14 +381,6 @@ const Users = () => {
       {/* end of add new user button */}
       {/* table */}
       <DisplayTable
-        getData={getData}
-        sortColumn={sortColumn}
-        sortType={sortType}
-        handleSortColumn={handleSortColumn}
-        loading={loading}
-        handleCheckAll={handleCheckAll}
-        checkedKeys={checkedKeys}
-        handleCheck={handleCheck}
         handleChange={handleChange}
         handleEditState={handleEditState}
         handleShowDeleteModal={handleShowDeleteModal}
