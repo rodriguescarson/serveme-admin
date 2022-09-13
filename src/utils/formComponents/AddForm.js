@@ -6,21 +6,16 @@ import PlusIcon from '@rsuite/icons/Plus'
 
 function AddForm({
   open,
+  handleClose,
   formRef,
   setFormValue,
   formValue,
+  SelectPicker,
   addDataToFirebase,
   data,
   formDataParameters,
+  handleOpen,
 }) {
-  // handle states for add
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  const handleOpen = () => {
-    setOpen(true)
-  }
   const model = Schema.Model({
     full_name: Schema.Types.StringType().isRequired('This field is required.'),
     email: Schema.Types.StringType()

@@ -1,8 +1,11 @@
+//remains same
 import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster } from 'rsuite'
+
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
+//cell imports
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { AddForm, ImageUploader } from '../../utils/formComponents'
@@ -27,10 +30,13 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
   label: item,
   value: item,
 }))
-
 const Users = () => {
   //table states
   const [data, setData] = React.useState([])
+  //delete states
+  const [modalStatus, setmodalStatus] = React.useState(false)
+  const handleCloseDeleteModal = () => setmodalStatus(false)
+  const [deleteId, setDeleteId] = React.useState()
   // add states
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
@@ -39,7 +45,6 @@ const Users = () => {
     message: '',
     type: 'success',
   })
-
   ///change
   const [formValue, setFormValue] = React.useState({
     avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
@@ -65,12 +70,24 @@ const Users = () => {
     </Message>
   )
 
+  // end of table functions
+
+  // posting data to firebase
+  // make changes
   const addDataToFirebase = () => {
     if (!formRef.current.check()) {
       setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
       toaster.push(message, 'topCenter')
       return
     }
+
+    // only add this
+    // const db = getDatabase()
+    // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
+    //   console.log('Data saved!')
+    //   handleClose()
+    // })
+    // only
     const auth = getAuth()
     createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
       .then((userCredential) => {
@@ -164,8 +181,23 @@ const Users = () => {
       })
   }
 
+  // setting states for delete
+  const handleShowDeleteModal = (id) => {
+    setmodalStatus(true)
+    setDeleteId(id)
+  }
+
+  // handle states for add
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
   useEffect(() => {
     const dbRef = ref(getDatabase())
+    // changew only this
     get(child(dbRef, `users/customers`))
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -180,6 +212,38 @@ const Users = () => {
         toaster.push(message, 'topCenter')
       })
   }, [])
+
+  //change this - update data in firebase
+  const handleChange = (id, key, value) => {
+    // db.collection('user')
+    //   .doc(id)
+    //   .update({ [key]: value })
+    const nextData = Object.assign([], data)
+    nextData.find((item) => item.id === id)[key] = value
+    setData(nextData)
+    const db = getDatabase()
+    // changew only this
+    update(ref(db, 'users/customers/' + id), {
+      [key]: value,
+    })
+  }
+
+  const handleEditState = (id) => {
+    const nextData = Object.assign([], data)
+    const activeItem = nextData.find((item) => item.id === id)
+    activeItem.status = activeItem.status ? null : 'EDIT'
+    setData(nextData)
+  }
+
+  //change this - delete from firebase
+  const handleDeleteState = (id) => {
+    // delete data[id]
+    //
+    const db = getDatabase()
+    // changew only this
+    remove(ref(db, 'users/customers/' + id))
+    setData(data.filter((item) => item.id !== id))
+  }
 
   //change down here
   const formDataParameters = [
@@ -303,22 +367,30 @@ const Users = () => {
       {/* add new user button */}
       <AddForm
         open={open}
+        handleClose={handleClose}
         formRef={formRef}
         setFormValue={setFormValue}
         formValue={formValue}
         SelectPicker={SelectPicker}
         addDataToFirebase={addDataToFirebase}
         data={data}
+        handleOpen={handleOpen}
         // change down here
         formDataParameters={formDataParameters}
       />
       {/* end of add new user button */}
       {/* table */}
       <DisplayTable
+        handleChange={handleChange}
+        handleEditState={handleEditState}
+        handleShowDeleteModal={handleShowDeleteModal}
         data={data}
+        modalStatus={modalStatus}
+        handleCloseDeleteModal={handleCloseDeleteModal}
+        handleDeleteState={handleDeleteState}
+        deleteId={deleteId}
         // change down here
         TableParams={TableParams}
-        path="users/customers"
       />
     </>
   )

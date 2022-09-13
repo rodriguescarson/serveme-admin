@@ -8,17 +8,21 @@ import {
   ImageCell,
   DeleteModal,
 } from '../../utils/tableComponents'
-function DisplayTable({ dataOld, TableParams, path }) {
-  //delete states
-  const [modalStatus, setmodalStatus] = React.useState(false)
-  const handleCloseDeleteModal = () => setmodalStatus(false)
-  const [deleteId, setDeleteId] = React.useState()
-  const [data, setData] = React.useState(dataOld)
+function DisplayTable({
+  handleChange,
+  handleEditState,
+  handleShowDeleteModal,
+  data,
+  TableParams,
+  modalStatus,
+  handleCloseDeleteModal,
+  handleDeleteState,
+  deleteId,
+}) {
   const [checkedKeys, setCheckedKeys] = React.useState([])
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
-
   const getData = () => {
     if (sortColumn && sortType) {
       return data.sort((a, b) => {
@@ -39,13 +43,6 @@ function DisplayTable({ dataOld, TableParams, path }) {
     }
     return data
   }
-
-  // setting states for delete
-  const handleShowDeleteModal = (id) => {
-    setmodalStatus(true)
-    setDeleteId(id)
-  }
-
   const handleSortColumn = (sortColumn, sortType) => {
     setLoading(true)
     setTimeout(() => {
@@ -71,30 +68,6 @@ function DisplayTable({ dataOld, TableParams, path }) {
     },
     [checkedKeys],
   )
-
-  const handleChange = (id, key, value) => {
-    const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
-    setData(nextData)
-    const db = getDatabase()
-    update(ref(db, path + '/' + id), {
-      [key]: value,
-    })
-  }
-
-  const handleEditState = (id) => {
-    const nextData = Object.assign([], data)
-    const activeItem = nextData.find((item) => item.id === id)
-    activeItem.status = activeItem.status ? null : 'EDIT'
-    setData(nextData)
-  }
-
-  const handleDeleteState = (id) => {
-    const db = getDatabase()
-    remove(ref(db, path + '/' + id))
-    setData(data.filter((item) => item.id !== id))
-  }
-
   return (
     <>
       <Table
