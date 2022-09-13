@@ -1,17 +1,12 @@
 import React from 'react'
 import { Modal, Button } from 'rsuite'
-function DeleteUsersModal({
-  deleteUserModal,
-  handleCloseDeleteModal,
-  handleDeleteState,
-  deleteId,
-}) {
+function DeleteModal({ modalStatus, handleCloseDeleteModal, handleDeleteState, deleteId }) {
   return (
-    <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
+    <Modal open={modalStatus} onClose={handleCloseDeleteModal}>
       <Modal.Header>
-        <Modal.Title>Delete User</Modal.Title>
+        <Modal.Title>Delete</Modal.Title>
       </Modal.Header>
-      <Modal.Body>Are you sure you want to delete this user?</Modal.Body>
+      <Modal.Body>Are you sure you want to delete this item?</Modal.Body>
       <Modal.Footer>
         <Button
           onClick={() => {
@@ -30,4 +25,4 @@ function DeleteUsersModal({
   )
 }
 
-export default DeleteUsersModal
+export default DeleteModal
