@@ -1,5 +1,5 @@
 //remains same
-import React, { useEffect } from 'react'
+import React, { useEffect, createContext } from 'react'
 import { IconButton, FlexboxGrid, SelectPicker, Message, useToaster } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 import 'rsuite-table/dist/css/rsuite-table.css'
@@ -8,9 +8,29 @@ import { getAuth } from 'firebase/auth'
 //cell imports
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
-import UserAddForm from './UserAddForm'
 import DeleteUsersModal from './DeleteUsersModal'
+import { AddForm, ImageUploader } from '../../utils/formComponents'
 import UserTable from './UserTable'
+const UserDataContext = createContext()
+const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
+  label: item,
+  value: item,
+}))
+
+const selectDataDistrict = ['South-Goa', 'North-Goa'].map((item) => ({
+  label: item,
+  value: item,
+}))
+
+const selectDataCity = ['Panjim', 'Margao'].map((item) => ({
+  label: item,
+  value: item,
+}))
+
+const selectDataCountry = ['India', 'USA'].map((item) => ({
+  label: item,
+  value: item,
+}))
 const Users = () => {
   //table states
   const [checkedKeys, setCheckedKeys] = React.useState([])
@@ -275,11 +295,67 @@ const Users = () => {
     remove(ref(db, 'users/customers/' + id))
     setData(data.filter((item) => item.id !== id))
   }
+  const formDataParameters = [
+    {
+      cid: 'avatar',
+      name: 'avatar',
+      label: 'Profile Picture',
+      accepter: ImageUploader,
+      action: '//jsonplaceholder.typicode.com/posts/',
+    },
+    {
+      cid: 'full_name-9',
+      name: 'full_name',
+      label: 'Full Name',
+    },
+    {
+      cid: 'email-9',
+      name: 'email',
+      label: 'Email',
+      type: 'email',
+    },
+    { cid: 'password-9', name: 'password', label: 'Password', type: 'password' },
 
+    { cid: 'contactNumber-9', name: 'contact_no', label: 'Contact Number', type: 'number' },
+
+    { cid: 'add_1-9', name: 'add_1', label: 'Address 1', type: 'text' },
+
+    { cid: 'add_2-9', name: 'add_2', label: 'Address 2', type: 'text' },
+
+    { cid: 'pincode-9', name: 'pincode', label: 'Pincode', type: 'number' },
+    {
+      cid: 'state-10',
+      name: 'state',
+      label: 'State',
+      data: selectDataState,
+      accepter: SelectPicker,
+    },
+    {
+      cid: 'district-10',
+      name: 'district',
+      label: 'District',
+      data: selectDataDistrict,
+      accepter: SelectPicker,
+    },
+    {
+      cid: 'city-10',
+      name: 'city',
+      label: 'City',
+      data: selectDataCity,
+      accepter: SelectPicker,
+    },
+    {
+      cid: 'country-10',
+      name: 'country',
+      label: 'Country',
+      data: selectDataCountry,
+      accepter: SelectPicker,
+    },
+  ]
   return (
     <>
       {/* add new user button */}
-      <UserAddForm
+      <AddForm
         open={open}
         handleClose={handleClose}
         formRef={formRef}
@@ -288,6 +364,7 @@ const Users = () => {
         SelectPicker={SelectPicker}
         addDataToFirebase={addDataToFirebase}
         data={data}
+        formDataParameters={formDataParameters}
       />
       <FlexboxGrid justify="end" style={{ marginBottom: 10 }}>
         <FlexboxGrid.Item colspan={2}>
