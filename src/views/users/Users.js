@@ -74,7 +74,7 @@ const Users = () => {
 
   // posting data to firebase
   // make changes
-  const addDataToFirebase = (data) => {
+  const addDataToFirebase = () => {
     if (!formRef.current.check()) {
       setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
       toaster.push(message, 'topCenter')
@@ -143,7 +143,7 @@ const Users = () => {
         } else {
           console.log('no file')
           set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-            console.log(data)
+            console.log(typeof data)
             const nextData = Object.assign([], data)
             console.log(nextData)
             setData([...nextData, { id: uid, ...formValue }])
