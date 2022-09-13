@@ -16,7 +16,7 @@ import PlusIcon from '@rsuite/icons/Plus'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
-import { getAuth } from 'firebase/auth'
+import { AuthCredential, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 //cell imports
 import {
   ActionCell,
@@ -28,6 +28,7 @@ import {
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
 import ImageUploader from '../../utils/formComponents/ImageUploader'
+import { TextField } from '../../utils/formComponents/TextField'
 // change according to your needs
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
@@ -50,29 +51,9 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 }))
 
 // change form validation according to your needs
-const model = Schema.Model({
-  full_name: Schema.Types.StringType().isRequired('This field is required.'),
-  email: Schema.Types.StringType()
-    .isEmail('Please enter a valid email address.')
-    .addRule((value, data) => {
-      const auth = getAuth()
-    }, 'Email already exists'),
-  contact_no: Schema.Types.StringType().isRequired('This field is required.'),
-  password: Schema.Types.StringType()
-    .isRequired('This field is required.')
-    .minLength(6)
-    .maxLength(100),
-})
 // no changes
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
-
-const TextField = ({ cid, name, label, accepter, ...rest }) => (
-  <Form.Group controlId={cid}>
-    <Form.ControlLabel>{label}</Form.ControlLabel>
-    <Form.Control name={name} accepter={accepter} {...rest} />
-  </Form.Group>
-)
 
 const Users = () => {
   //table states
@@ -85,6 +66,7 @@ const Users = () => {
   const [deleteUserModal, setDeleteUserModal] = React.useState(false)
   const handleCloseDeleteModal = () => setDeleteUserModal(false)
   const [deleteId, setDeleteId] = React.useState()
+  const [userExists, setUserExists] = React.useState(false)
   // add states
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
@@ -101,8 +83,8 @@ const Users = () => {
     email: '',
     contact_no: '',
     password: '',
-    add_1: '',
-    add_2: '',
+    add_l1: '',
+    add_l2: '',
     state: '',
     city: '',
     country: '',
@@ -219,8 +201,8 @@ const Users = () => {
                       email: '',
                       contact_no: '',
                       password: '',
-                      add_1: '',
-                      add_2: '',
+                      add_l1: '',
+                      add_l2: '',
                       state: '',
                       city: '',
                       country: '',
@@ -250,8 +232,8 @@ const Users = () => {
               email: '',
               contact_no: '',
               password: '',
-              add_1: '',
-              add_2: '',
+              add_l1: '',
+              add_l2: '',
               state: '',
               city: '',
               country: '',
@@ -338,6 +320,28 @@ const Users = () => {
     remove(ref(db, 'users/customers/' + id))
     setData(data.filter((item) => item.id !== id))
   }
+
+  const model = Schema.Model({
+    full_name: Schema.Types.StringType().isRequired('This field is required.'),
+    email: Schema.Types.StringType()
+      .isEmail('Please enter a valid email address.')
+      .addRule((value) => {
+        const auth = getAuth()
+        signInWithEmailAndPassword(auth, value, '123456')
+          .then(() => {
+            setUserExists(true)
+          })
+          .catch(() => {
+            setUserExists(false)
+          })
+        return userExists
+      }, 'Email already exists'),
+    contact_no: Schema.Types.StringType().isRequired('This field is required.'),
+    password: Schema.Types.StringType()
+      .isRequired('This field is required.')
+      .minLength(6)
+      .maxLength(100),
+  })
 
   return (
     <>
@@ -468,11 +472,11 @@ const Users = () => {
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Address 1</HeaderCell>
-          <EditableCell dataKey="add1" onChange={handleChange} />
+          <EditableCell dataKey="add_l1" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Address 2</HeaderCell>
-          <EditableCell dataKey="add2" onChange={handleChange} />
+          <EditableCell dataKey="add_l2" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Pincode</HeaderCell>
