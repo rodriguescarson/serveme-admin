@@ -1,11 +1,8 @@
-//remains same
 import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster } from 'rsuite'
-
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
-//cell imports
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { AddForm, ImageUploader } from '../../utils/formComponents'
@@ -32,10 +29,6 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 }))
 const Users = () => {
   //table states
-  const [checkedKeys, setCheckedKeys] = React.useState([])
-  const [sortColumn, setSortColumn] = React.useState()
-  const [sortType, setSortType] = React.useState()
-  const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState([])
   //delete states
   const [modalStatus, setmodalStatus] = React.useState(false)
@@ -74,72 +67,12 @@ const Users = () => {
     </Message>
   )
 
-  // table functions
-  const getData = () => {
-    if (sortColumn && sortType) {
-      return data.sort((a, b) => {
-        let x = a[sortColumn]
-        let y = b[sortColumn]
-        if (typeof x === 'string') {
-          x = x.charCodeAt()
-        }
-        if (typeof y === 'string') {
-          y = y.charCodeAt()
-        }
-        if (sortType === 'asc') {
-          return x - y
-        } else {
-          return y - x
-        }
-      })
-    }
-    return data
-  }
-
-  const handleSortColumn = (sortColumn, sortType) => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setSortColumn(sortColumn)
-      setSortType(sortType)
-    }, 500)
-  }
-
-  const handleCheckAll = React.useCallback((event) => {
-    const checked = event.target.checked
-    const keys = checked ? data.map((item) => item.id) : []
-    setCheckedKeys(keys)
-  }, [])
-
-  const handleCheck = React.useCallback(
-    (event) => {
-      const checked = event.target.checked
-      const value = +event.target.value
-      const keys = checked ? [...checkedKeys, value] : checkedKeys.filter((item) => item !== value)
-
-      setCheckedKeys(keys)
-    },
-    [checkedKeys],
-  )
-
-  // end of table functions
-
-  // posting data to firebase
-  // make changes
-  const addDataToFirebase = (data) => {
+  const addDataToFirebase = () => {
     if (!formRef.current.check()) {
       setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
       toaster.push(message, 'topCenter')
       return
     }
-
-    // only add this
-    // const db = getDatabase()
-    // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-    //   console.log('Data saved!')
-    //   handleClose()
-    // })
-    // only
     const auth = getAuth()
     createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
       .then((userCredential) => {
@@ -164,7 +97,7 @@ const Users = () => {
                     ...formValue,
                     avatar_url: downloadURL,
                   }).then(() => {
-                    const nextData = getData()
+                    const nextData = Object.assign([], data)
                     setData([...nextData, { id: uid, ...formValue, avatar_url: downloadURL }])
                     handleClose()
                     setMessageVal({ message: 'User added successfully', type: 'success' })
@@ -195,7 +128,9 @@ const Users = () => {
         } else {
           console.log('no file')
           set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-            const nextData = getData()
+            console.log(typeof data)
+            const nextData = Object.assign([], data)
+            console.log(nextData)
             setData([...nextData, { id: uid, ...formValue }])
             handleClose()
             setMessageVal({ message: 'User added successfully', type: 'success' })
@@ -247,7 +182,6 @@ const Users = () => {
 
   useEffect(() => {
     const dbRef = ref(getDatabase())
-    // changew only this
     get(child(dbRef, `users/customers`))
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -263,16 +197,11 @@ const Users = () => {
       })
   }, [])
 
-  //change this - update data in firebase
   const handleChange = (id, key, value) => {
-    // db.collection('user')
-    //   .doc(id)
-    //   .update({ [key]: value })
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
-    // changew only this
     update(ref(db, 'users/customers/' + id), {
       [key]: value,
     })
@@ -287,10 +216,7 @@ const Users = () => {
 
   //change this - delete from firebase
   const handleDeleteState = (id) => {
-    // delete data[id]
-    //
     const db = getDatabase()
-    // changew only this
     remove(ref(db, 'users/customers/' + id))
     setData(data.filter((item) => item.id !== id))
   }
@@ -412,7 +338,6 @@ const Users = () => {
       dataKey: 'country',
     },
   ]
-
   return (
     <>
       {/* add new user button */}
@@ -432,14 +357,6 @@ const Users = () => {
       {/* end of add new user button */}
       {/* table */}
       <DisplayTable
-        getData={getData}
-        sortColumn={sortColumn}
-        sortType={sortType}
-        handleSortColumn={handleSortColumn}
-        loading={loading}
-        handleCheckAll={handleCheckAll}
-        checkedKeys={checkedKeys}
-        handleCheck={handleCheck}
         handleChange={handleChange}
         handleEditState={handleEditState}
         handleShowDeleteModal={handleShowDeleteModal}
