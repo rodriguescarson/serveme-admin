@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import {
   ActionCell,
@@ -9,14 +9,6 @@ import {
   DeleteModal,
 } from '../../utils/tableComponents'
 function DisplayTable({
-  getData,
-  sortColumn,
-  sortType,
-  handleSortColumn,
-  loading,
-  handleCheckAll,
-  checkedKeys,
-  handleCheck,
   handleChange,
   handleEditState,
   handleShowDeleteModal,
@@ -27,6 +19,55 @@ function DisplayTable({
   handleDeleteState,
   deleteId,
 }) {
+  const [checkedKeys, setCheckedKeys] = React.useState([])
+  const [sortColumn, setSortColumn] = React.useState()
+  const [sortType, setSortType] = React.useState()
+  const [loading, setLoading] = React.useState(false)
+  const getData = () => {
+    if (sortColumn && sortType) {
+      return data.sort((a, b) => {
+        let x = a[sortColumn]
+        let y = b[sortColumn]
+        if (typeof x === 'string') {
+          x = x.charCodeAt()
+        }
+        if (typeof y === 'string') {
+          y = y.charCodeAt()
+        }
+        if (sortType === 'asc') {
+          return x - y
+        } else {
+          return y - x
+        }
+      })
+    }
+    return data
+  }
+  const handleSortColumn = (sortColumn, sortType) => {
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+      setSortColumn(sortColumn)
+      setSortType(sortType)
+    }, 500)
+  }
+
+  const handleCheckAll = React.useCallback((event) => {
+    const checked = event.target.checked
+    const keys = checked ? data.map((item) => item.id) : []
+    setCheckedKeys(keys)
+  }, [])
+
+  const handleCheck = React.useCallback(
+    (event) => {
+      const checked = event.target.checked
+      const value = +event.target.value
+      const keys = checked ? [...checkedKeys, value] : checkedKeys.filter((item) => item !== value)
+
+      setCheckedKeys(keys)
+    },
+    [checkedKeys],
+  )
   return (
     <>
       <Table
