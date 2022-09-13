@@ -105,11 +105,11 @@ function DisplayTable({
             )
           }
         })}
-        <Column width={200}>
+        <Column width={70}>
           <HeaderCell>Edit</HeaderCell>
           <ActionCell dataKey="id" onClick={handleEditState} />
         </Column>
-        <Column width={200}>
+        <Column width={80}>
           <HeaderCell>Delete</HeaderCell>
           <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
         </Column>
