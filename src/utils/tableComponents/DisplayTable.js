@@ -9,14 +9,14 @@ import {
   DeleteModal,
 } from '../../utils/tableComponents'
 function DisplayTable({
-  handleChange,
+  handleUpdateFirebase,
   handleEditState,
   handleShowDeleteModal,
   data,
   TableParams,
   modalStatus,
   handleCloseDeleteModal,
-  handleDeleteState,
+  handleDeleteFirebase,
   deleteId,
 }) {
   const [checkedKeys, setCheckedKeys] = React.useState([])
@@ -83,36 +83,27 @@ function DisplayTable({
         cellBordered
         affixHorizontalScrollbar
       >
-        <Column width={50} align="center" sortable fixed>
-          <HeaderCell style={{ padding: 0 }}>
-            <div style={{ lineHeight: '40px' }}>
-              <input
-                type="checkbox"
-                onChange={handleCheckAll}
-                checked={checkedKeys.length === data.length}
-              />
-            </div>
-          </HeaderCell>
-          <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
-        </Column>
-
-        <Column width={70} fixed sortable>
-          <HeaderCell>Id</HeaderCell>
-          <Cell dataKey="id" />
-        </Column>
-
         {TableParams.map((item, i) => {
-          return !item.isAvatar ? (
-            <Column key={i} width={item.width} sortable onChange={handleChange}>
-              <HeaderCell>{item.value}</HeaderCell>
-              <EditableCell dataKey={item.dataKey} onChange={handleChange} />
-            </Column>
-          ) : (
-            <Column width={item.width} fixed>
-              <HeaderCell>{item.value}</HeaderCell>
-              <ImageCell dataKey="avatar_url" />
-            </Column>
-          )
+          if (!item.isId) {
+            return !item.isAvatar ? (
+              <Column key={i} width={item.width} sortable onChange={handleUpdateFirebase}>
+                <HeaderCell>{item.value}</HeaderCell>
+                <EditableCell dataKey={item.dataKey} onChange={handleUpdateFirebase} />
+              </Column>
+            ) : (
+              <Column key={i} width={item.width} fixed>
+                <HeaderCell>{item.value}</HeaderCell>
+                <ImageCell dataKey="avatar_url" />
+              </Column>
+            )
+          } else {
+            return (
+              <Column key={i} width={item.width} fixed sortable>
+                <HeaderCell>{item.value}</HeaderCell>
+                <Cell dataKey={item.dataKey} />
+              </Column>
+            )
+          }
         })}
         <Column width={200}>
           <HeaderCell>Edit</HeaderCell>
@@ -126,7 +117,7 @@ function DisplayTable({
       <DeleteModal
         modalStatus={modalStatus}
         handleCloseDeleteModal={handleCloseDeleteModal}
-        handleDeleteState={handleDeleteState}
+        handleDeleteState={handleDeleteFirebase}
         deleteId={deleteId}
       />
     </>
