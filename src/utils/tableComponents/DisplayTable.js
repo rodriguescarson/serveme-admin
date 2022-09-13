@@ -8,22 +8,14 @@ import {
   DeleteModal,
 } from '../../utils/tableComponents'
 function DisplayTable({
-  getData,
-  sortColumn,
-  sortType,
-  handleSortColumn,
-  loading,
-  handleCheckAll,
-  checkedKeys,
-  handleCheck,
-  handleChange,
+  handleUpdateFirebase,
   handleEditState,
   handleShowDeleteModal,
   data,
   TableParams,
   modalStatus,
   handleCloseDeleteModal,
-  handleDeleteState,
+  handleDeleteFirebase,
   deleteId,
 }) {
   const [sortColumn, setSortColumn] = React.useState()
@@ -76,9 +68,9 @@ function DisplayTable({
         {TableParams.map((item, i) => {
           if (!item.isId) {
             return !item.isAvatar ? (
-              <Column key={i} width={item.width} sortable onChange={handleChange}>
+              <Column key={i} width={item.width} sortable onChange={handleUpdateFirebase}>
                 <HeaderCell>{item.value}</HeaderCell>
-                <EditableCell dataKey={item.dataKey} onChange={handleChange} />
+                <EditableCell dataKey={item.dataKey} onChange={handleUpdateFirebase} />
               </Column>
             ) : (
               <Column key={i} width={item.width} fixed>
@@ -107,7 +99,7 @@ function DisplayTable({
       <DeleteModal
         modalStatus={modalStatus}
         handleCloseDeleteModal={handleCloseDeleteModal}
-        handleDeleteState={handleDeleteState}
+        handleDeleteState={handleDeleteFirebase}
         deleteId={deleteId}
       />
     </>
