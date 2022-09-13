@@ -1,10 +1,9 @@
-//remains same
-import React, { useEffect } from 'react'
+/* eslint-disable prettier/prettier */
+import React, { memo, useEffect } from 'react'
 import {
   IconButton,
   FlexboxGrid,
   Form,
-  Schema,
   Button,
   Input,
   Modal,
@@ -25,45 +24,13 @@ import {
 } from '../../utils/tableComponents'
 import ImageUploader from '../../utils/formComponents/ImageUploader'
 
-const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
+const selectDataAvailable = ['In Stock', 'Out Of Stock'].map((item) => ({
   label: item,
   value: item,
 }))
 
-const selectDataDistrict = ['South-Goa', 'North-Goa'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataCity = ['Panjim', 'Margao'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataCountry = ['India', 'USA'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-// change form validation according to your needs
-const model = Schema.Model({
-  available: Schema.Types.StringType().isRequired('This field is required'),
-  cost: Schema.Types.NumberType().isRequired('This field is required.'),
-  description: Schema.Types.StringType(),
-  model: Schema.Types.StringType().isRequired('This field is required.'),
-})
-// no changes
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
 Textarea.displayName = 'Textarea'
-
-const TextField = ({ cid, name, label, accepter, ...rest }) => (
-  <Form.Group controlId={cid}>
-    <Form.ControlLabel>{label}</Form.ControlLabel>
-    <Form.Control name={name} accepter={accepter} {...rest} />
-  </Form.Group>
-)
-//edited
-//edit 2
 // const NameCell = ({ rowData, dataKey, ...props }) => {
 //   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
 //     const styles = {
@@ -141,7 +108,6 @@ const TextField = ({ cid, name, label, accepter, ...rest }) => (
 //     </BaseCell>
 //   )
 // }
-
 // data.map((item) => {
 //   return db
 //     .collection('user')
@@ -153,7 +119,6 @@ const TextField = ({ cid, name, label, accepter, ...rest }) => (
 // })
 
 const SpareParts = () => {
-  //table states
   const [checkedKeys, setCheckedKeys] = React.useState([])
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
@@ -170,12 +135,10 @@ const SpareParts = () => {
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [formValue, setFormValue] = React.useState({
-    avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
-    avatar: null,
-    image: '',
     available: '',
     cost: '',
     description: '',
+    image: '',
     model: '',
   })
 
@@ -193,7 +156,6 @@ const SpareParts = () => {
     </Message>
   )
 
-  // handle states for add
   const handleClose = () => {
     setOpen(false)
   }
@@ -278,8 +240,10 @@ const SpareParts = () => {
     const nextData = getData()
     setData([...nextData, { id: newRef.key, ...formValue }])
     setFormValue({
-      partName: '',
-      Eng_id: '',
+      engineModel: '',
+      altMake: '',
+      engineMake: '',
+      controllerMode: '',
     })
     handleClose()
   }
@@ -301,7 +265,6 @@ const SpareParts = () => {
     setData(nextData)
   }
 
-  //change this - delete from firebase
   const handleDeleteState = (id) => {
     const db = getDatabase()
     remove(ref(db, 'machinery/spares/' + id))
@@ -310,28 +273,44 @@ const SpareParts = () => {
 
   return (
     <>
-      {/* add new user button */}
+      {/* add new Spare button */}
       <Modal open={open} onClose={handleClose} size="xs">
         <Modal.Header>
           <Modal.Title>New Spare</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
-            <TextField
-              cid="image"
-              name="image"
-              label="Profile Picture"
-              accepter={ImageUploader}
-              action="//jsonplaceholder.typicode.com/posts/"
-            />
-            <TextField cid="available-9" name="available" label="Available" />
-            <TextField cid="cost-9" name="cost" label="Cost" />
-            {/* <Form.Group controlId="textarea-9">
-              <Form.ControlLabel>Textarea</Form.ControlLabel>
-              <Form.Control rows={5} name="textarea" accepter={Textarea} />
-            </Form.Group> */}
-            <TextField cid="description-9" name="description" label="Description" type="text" />
-            <TextField cid="model-9" name="model" label="Model" type="number" />
+        <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue}>
+            <Form.Group>
+              <Form.ControlLabel>Image</Form.ControlLabel>
+              <Form.Control
+                name="image"
+                data={selectDataAvailable}
+                accepter={ImageUploader}
+                action="//jsonplaceholder.typicode.com/posts/"
+              />
+            </Form.Group>
+            <Form.Group controlId="available-10">
+              <Form.ControlLabel>Available</Form.ControlLabel>
+              <Form.Control
+                name="available"
+                data={selectDataAvailable}
+                accepter={SelectPicker}
+              />
+            </Form.Group>
+            <Form.Group controlId="cost-10">
+              <Form.ControlLabel>Cost</Form.ControlLabel>
+              <Form.Control name="cost"/>
+            </Form.Group>
+            <Form.Group controlId="description-10">
+              <Form.ControlLabel>Description</Form.ControlLabel>
+              <Form.Control name="description"/>
+            </Form.Group>
+            <Form.Group controlId="model-10">
+              <Form.ControlLabel>Model</Form.ControlLabel>
+              <Form.Control
+                name="model"
+              />
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -351,7 +330,7 @@ const SpareParts = () => {
           </IconButton>
         </FlexboxGrid.Item>
       </FlexboxGrid>
-      {/* end of add new user button */}
+      {/* end of add new engine button */}
       {/* table */}
       <Table
         virtualized
@@ -364,6 +343,9 @@ const SpareParts = () => {
         headerHeight={50}
         bordered
         cellBordered
+        onRowClick={(data) => {
+          console.log(data)
+        }}
         affixHorizontalScrollbar
       >
         <Column width={50} align="center" sortable fixed>
@@ -379,17 +361,18 @@ const SpareParts = () => {
           <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
         </Column>
 
-        <Column width={70} fixed sortable>
+        <Column width={70} align="center" fixed sortable>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
         </Column>
-        <Column width={130} fixed>
-          <HeaderCell>Avatar</HeaderCell>
-          <ImageCell dataKey="image" />
+        <Column width={200} sortable>
+          <HeaderCell>Image</HeaderCell>
+          <EditableCell dataKey="image" onChange={handleChange} />
         </Column>
-        <Column width={200}>
+
+        <Column width={200} sortable>
           <HeaderCell>Available</HeaderCell>
-          <EditableCell dataKey="available" onClick={handleEditState} />
+          <EditableCell dataKey="available" onChange={handleChange} />
         </Column>
         <Column width={200} sortable>
           <HeaderCell>Cost</HeaderCell>
@@ -403,37 +386,16 @@ const SpareParts = () => {
           <HeaderCell>Model</HeaderCell>
           <EditableCell dataKey="model" onChange={handleChange} />
         </Column>
+
         <Column width={200}>
           <HeaderCell>Edit</HeaderCell>
           <ActionCell dataKey="id" onClick={handleEditState} />
         </Column>
         <Column width={200}>
           <HeaderCell>Delete</HeaderCell>
-          <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
+          <DeleteCell dataKey="id" onClick={handleDeleteState} />
         </Column>
       </Table>
-      {/* // no changes */}
-      {/* Delete Modal */}
-      <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
-        <Modal.Header>
-          <Modal.Title>Delete Spare</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this user?</Modal.Body>
-        <Modal.Footer>
-          <Button
-            onClick={() => {
-              handleDeleteState(deleteId)
-              handleCloseDeleteModal()
-            }}
-            appearance="primary"
-          >
-            Confirm
-          </Button>
-          <Button onClick={handleCloseDeleteModal} appearance="subtle">
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   )
 }
