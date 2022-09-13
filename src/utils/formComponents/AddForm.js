@@ -15,27 +15,8 @@ function AddForm({
   data,
   formDataParameters,
   handleOpen,
+  model,
 }) {
-  const model = Schema.Model({
-    full_name: Schema.Types.StringType().isRequired('This field is required.'),
-    email: Schema.Types.StringType()
-      .isEmail('Please enter a valid email address.')
-      .addRule((value) => {
-        if (value) {
-          const email = value.toLowerCase()
-          const isExist = data.find((item) => item.email.toLowerCase() === email)
-          if (isExist) {
-            return false
-          }
-          return true
-        }
-      }, 'Email already exists'),
-    contact_no: Schema.Types.StringType().isRequired('This field is required.'),
-    password: Schema.Types.StringType()
-      .isRequired('This field is required.')
-      .minLength(6)
-      .maxLength(100),
-  })
   return (
     <>
       <Modal open={open} onClose={handleClose} size="xs">
@@ -53,6 +34,7 @@ function AddForm({
                   label={item.label}
                   data={item.data}
                   accepter={item.accepter}
+                  type={item.type}
                 />
               )
             })}
