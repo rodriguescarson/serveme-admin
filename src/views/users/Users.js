@@ -368,6 +368,7 @@ const Users = () => {
       dataKey: 'country',
     },
   ]
+
   return (
     <>
       {/* add new user button */}
