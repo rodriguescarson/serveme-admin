@@ -412,6 +412,7 @@ const Gensets = () => {
           console.log(data)
         }}
         affixHorizontalScrollbar
+        width={750}
       >
         <Column width={50} align="center" sortable fixed>
           <HeaderCell style={{ padding: 0 }}>
@@ -426,7 +427,7 @@ const Gensets = () => {
           <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
         </Column>
 
-        <Column width={70} align="center" fixed sortable>
+        <Column width={200} align="center" fixed sortable>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
         </Column>
@@ -434,15 +435,15 @@ const Gensets = () => {
           <HeaderCell>Genset Img</HeaderCell>
           <ImageCell dataKey="avatar" />
         </Column>
-        <Column width={100} sortable>
+        <Column width={220} sortable>
           <HeaderCell>Genset Name</HeaderCell>
           <Cell dataKey="GensetName" />
         </Column>
-        <Column width={200}>
+        <Column width={70}>
           <HeaderCell>Edit</HeaderCell>
           <ActionCell dataKey="id" onClick={handleEditState} />
         </Column>
-        <Column width={200}>
+        <Column width={80}>
           <HeaderCell>Delete</HeaderCell>
           <DeleteCell dataKey="id" onClick={handleDeleteState} />
         </Column>

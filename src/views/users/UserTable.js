@@ -23,9 +23,54 @@ function UserTable({
 }) {
   const TableParams = [
     {
-      value: 'full_name',
+      value: 'Full name',
       width: 100,
       dataKey: 'full_name',
+    },
+    {
+      value: 'Email',
+      width: 200,
+      dataKey: 'email',
+    },
+    {
+      value: 'Contact Number',
+      width: 200,
+      dataKey: 'contact_no',
+    },
+    {
+      value: 'Address 1',
+      width: 200,
+      dataKey: 'add_l1',
+    },
+    {
+      value: 'Address 2',
+      width: 200,
+      dataKey: 'add_l2',
+    },
+    {
+      value: 'Pincode',
+      width: 200,
+      dataKey: 'pincode',
+    },
+    {
+      value: 'District',
+      width: 200,
+      dataKey: 'district',
+    },
+    {
+      value: 'City',
+      width: 200,
+      dataKey: 'city',
+    },
+    {
+      value: 'State',
+      width: 200,
+      dataKey: 'state',
+    },
+    {
+      value: 'Country',
+      width: 200,
+      dataKey: 'country',
     },
   ]
   return (
