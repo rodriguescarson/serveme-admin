@@ -161,7 +161,6 @@ const Users = () => {
     message: '',
     type: 'success',
   })
-  const [downloadURL, setDownloadURL] = React.useState('')
   ///change 1
   const [formValue, setFormValue] = React.useState({
     avatar: null,
@@ -216,13 +215,9 @@ const Users = () => {
           uploadBytes(storageRef, file)
             .then((snapshot) => {
               getDownloadURL(storageRe(storage, snapshot.ref.fullPath)).then((downloadURL) => {
-                setDownloadURL(downloadURL)
                 update(ref(db, 'users/customers/' + uid), {
                   avatar_url: downloadURL,
                 })
-                const nextData = Object.assign([], data)
-                nextData.find((item) => item.id === uid)['avatar_url'] = downloadURL
-                setData(nextData)
               })
             })
             .catch((e) => {
