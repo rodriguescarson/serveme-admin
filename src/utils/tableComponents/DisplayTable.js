@@ -8,6 +8,14 @@ import {
   DeleteModal,
 } from '../../utils/tableComponents'
 function DisplayTable({
+  getData,
+  sortColumn,
+  sortType,
+  handleSortColumn,
+  loading,
+  handleCheckAll,
+  checkedKeys,
+  handleCheck,
   handleChange,
   handleEditState,
   handleShowDeleteModal,

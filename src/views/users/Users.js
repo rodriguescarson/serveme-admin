@@ -1,11 +1,8 @@
-//remains same
 import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster } from 'rsuite'
-
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
-//cell imports
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { AddForm, ImageUploader } from '../../utils/formComponents'
@@ -70,24 +67,12 @@ const Users = () => {
     </Message>
   )
 
-  // end of table functions
-
-  // posting data to firebase
-  // make changes
   const addDataToFirebase = () => {
     if (!formRef.current.check()) {
       setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
       toaster.push(message, 'topCenter')
       return
     }
-
-    // only add this
-    // const db = getDatabase()
-    // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-    //   console.log('Data saved!')
-    //   handleClose()
-    // })
-    // only
     const auth = getAuth()
     createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
       .then((userCredential) => {
@@ -197,7 +182,6 @@ const Users = () => {
 
   useEffect(() => {
     const dbRef = ref(getDatabase())
-    // changew only this
     get(child(dbRef, `users/customers`))
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -213,16 +197,11 @@ const Users = () => {
       })
   }, [])
 
-  //change this - update data in firebase
   const handleChange = (id, key, value) => {
-    // db.collection('user')
-    //   .doc(id)
-    //   .update({ [key]: value })
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
-    // changew only this
     update(ref(db, 'users/customers/' + id), {
       [key]: value,
     })
@@ -237,10 +216,7 @@ const Users = () => {
 
   //change this - delete from firebase
   const handleDeleteState = (id) => {
-    // delete data[id]
-    //
     const db = getDatabase()
-    // changew only this
     remove(ref(db, 'users/customers/' + id))
     setData(data.filter((item) => item.id !== id))
   }
@@ -368,7 +344,6 @@ const Users = () => {
       dataKey: 'country',
     },
   ]
-
   return (
     <>
       {/* add new user button */}
