@@ -279,7 +279,7 @@ const SpareParts = () => {
           <Modal.Title>New Spare</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue}>
+          <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue}>
             <Form.Group>
               <Form.ControlLabel>Image</Form.ControlLabel>
               <Form.Control
@@ -291,25 +291,19 @@ const SpareParts = () => {
             </Form.Group>
             <Form.Group controlId="available-10">
               <Form.ControlLabel>Available</Form.ControlLabel>
-              <Form.Control
-                name="available"
-                data={selectDataAvailable}
-                accepter={SelectPicker}
-              />
+              <Form.Control name="available" data={selectDataAvailable} accepter={SelectPicker} />
             </Form.Group>
             <Form.Group controlId="cost-10">
               <Form.ControlLabel>Cost</Form.ControlLabel>
-              <Form.Control name="cost"/>
+              <Form.Control name="cost" />
             </Form.Group>
             <Form.Group controlId="description-10">
               <Form.ControlLabel>Description</Form.ControlLabel>
-              <Form.Control name="description"/>
+              <Form.Control name="description" />
             </Form.Group>
             <Form.Group controlId="model-10">
               <Form.ControlLabel>Model</Form.ControlLabel>
-              <Form.Control
-                name="model"
-              />
+              <Form.Control name="model" />
             </Form.Group>
           </Form>
         </Modal.Body>
