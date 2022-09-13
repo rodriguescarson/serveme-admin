@@ -1,17 +1,16 @@
 //remains same
-import React, { useEffect, createContext } from 'react'
-import { IconButton, FlexboxGrid, SelectPicker, Message, useToaster } from 'rsuite'
-import PlusIcon from '@rsuite/icons/Plus'
+import React, { useEffect } from 'react'
+import { SelectPicker, Message, useToaster } from 'rsuite'
+
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
 //cell imports
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
-import DeleteUsersModal from './DeleteUsersModal'
 import { AddForm, ImageUploader } from '../../utils/formComponents'
-import UserTable from './UserTable'
-const UserDataContext = createContext()
+import DisplayTable from '../../utils/tableComponents/DisplayTable'
+
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
   value: item,
@@ -39,8 +38,8 @@ const Users = () => {
   const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState([])
   //delete states
-  const [deleteUserModal, setDeleteUserModal] = React.useState(false)
-  const handleCloseDeleteModal = () => setDeleteUserModal(false)
+  const [modalStatus, setmodalStatus] = React.useState(false)
+  const handleCloseDeleteModal = () => setmodalStatus(false)
   const [deleteId, setDeleteId] = React.useState()
   // add states
   const [open, setOpen] = React.useState(false)
@@ -234,7 +233,7 @@ const Users = () => {
 
   // setting states for delete
   const handleShowDeleteModal = (id) => {
-    setDeleteUserModal(true)
+    setmodalStatus(true)
     setDeleteId(id)
   }
 
@@ -295,6 +294,8 @@ const Users = () => {
     remove(ref(db, 'users/customers/' + id))
     setData(data.filter((item) => item.id !== id))
   }
+
+  //change down here
   const formDataParameters = [
     {
       cid: 'avatar',
@@ -318,9 +319,9 @@ const Users = () => {
 
     { cid: 'contactNumber-9', name: 'contact_no', label: 'Contact Number', type: 'number' },
 
-    { cid: 'add_1-9', name: 'add_1', label: 'Address 1', type: 'text' },
+    { cid: 'add_1-9', name: 'add_l1', label: 'Address 1', type: 'text' },
 
-    { cid: 'add_2-9', name: 'add_2', label: 'Address 2', type: 'text' },
+    { cid: 'add_2-9', name: 'add_l2', label: 'Address 2', type: 'text' },
 
     { cid: 'pincode-9', name: 'pincode', label: 'Pincode', type: 'number' },
     {
@@ -352,6 +353,65 @@ const Users = () => {
       accepter: SelectPicker,
     },
   ]
+  //change down here
+  const TableParams = [
+    {
+      isAvatar: true,
+      value: 'Avatar',
+      width: 130,
+      dataKey: 'avatar_url',
+    },
+    {
+      value: 'Full name',
+      width: 100,
+      dataKey: 'full_name',
+    },
+    {
+      value: 'Email',
+      width: 200,
+      dataKey: 'email',
+    },
+    {
+      value: 'Contact Number',
+      width: 200,
+      dataKey: 'contact_no',
+    },
+    {
+      value: 'Address 1',
+      width: 200,
+      dataKey: 'add_l1',
+    },
+    {
+      value: 'Address 2',
+      width: 200,
+      dataKey: 'add_l2',
+    },
+    {
+      value: 'Pincode',
+      width: 200,
+      dataKey: 'pincode',
+    },
+    {
+      value: 'District',
+      width: 200,
+      dataKey: 'district',
+    },
+    {
+      value: 'City',
+      width: 200,
+      dataKey: 'city',
+    },
+    {
+      value: 'State',
+      width: 200,
+      dataKey: 'state',
+    },
+    {
+      value: 'Country',
+      width: 200,
+      dataKey: 'country',
+    },
+  ]
   return (
     <>
       {/* add new user button */}
@@ -364,18 +424,13 @@ const Users = () => {
         SelectPicker={SelectPicker}
         addDataToFirebase={addDataToFirebase}
         data={data}
+        handleOpen={handleOpen}
+        // change down here
         formDataParameters={formDataParameters}
       />
-      <FlexboxGrid justify="end" style={{ marginBottom: 10 }}>
-        <FlexboxGrid.Item colspan={2}>
-          <IconButton icon={<PlusIcon />} color="red" appearance="primary" onClick={handleOpen}>
-            Add
-          </IconButton>
-        </FlexboxGrid.Item>
-      </FlexboxGrid>
       {/* end of add new user button */}
       {/* table */}
-      <UserTable
+      <DisplayTable
         getData={getData}
         sortColumn={sortColumn}
         sortType={sortType}
@@ -388,14 +443,12 @@ const Users = () => {
         handleEditState={handleEditState}
         handleShowDeleteModal={handleShowDeleteModal}
         data={data}
-      />
-      {/* // no changes */}
-      {/* Delete Modal */}
-      <DeleteUsersModal
-        deleteUserModal={deleteUserModal}
+        modalStatus={modalStatus}
         handleCloseDeleteModal={handleCloseDeleteModal}
         handleDeleteState={handleDeleteState}
         deleteId={deleteId}
+        // change down here
+        TableParams={TableParams}
       />
     </>
   )
