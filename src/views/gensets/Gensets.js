@@ -8,7 +8,7 @@ import DisplayTable from '../../utils/tableComponents/DisplayTable'
 const formDataParameters = [
   {
     cid: 'uploader',
-    name: 'uploader:',
+    name: 'uploader',
     label: 'Genset Img',
     accepter: ImageUploader,
   },
@@ -50,7 +50,6 @@ const Gensets = () => {
     message: '',
     type: 'success',
   })
-
   const [formValue, setFormValue] = React.useState({
     GensetName: '',
   })
@@ -86,6 +85,8 @@ const Gensets = () => {
     setFormValue({
       GensetName: '',
     })
+    setMessageval({ message: 'Genset added successfully', type: 'success' })
+    toaster.push(message, 'topCenter')
     handleClose()
   }
 
@@ -135,6 +136,7 @@ const Gensets = () => {
       {messageval.message}
     </Message>
   )
+
   return (
     <>
       <AddForm
