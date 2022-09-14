@@ -5,9 +5,6 @@ import { getDatabase, ref, set, child, push, update, get, remove } from 'firebas
 import { AddForm, ImageUploader } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
-const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
-Textarea.displayName = 'Textarea'
-
 const formDataParameters = [
   {
     cid: 'uploader',
