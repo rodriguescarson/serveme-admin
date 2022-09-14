@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
+import { getDatabase, ref, set, child, update, get, remove, push } from 'firebase/database'
 import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
@@ -44,7 +44,6 @@ const Faq = () => {
   const [deleteId, setDeleteId] = React.useState()
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
-  const [lenData, setLenData] = React.useState(0)
   const [messageval, setMessageval] = React.useState({
     message: '',
     type: 'success',
@@ -64,11 +63,9 @@ const Faq = () => {
         const data = Object.keys(snapshot.val()).map((key) => ({
           ...snapshot.val()[key],
           //change here
-          number: key,
           id: key,
         }))
         setData(data)
-        setLenData(data.length)
       })
       .catch((error) => {
         setMessageval({ message: error.message, type: 'error' })
@@ -83,13 +80,15 @@ const Faq = () => {
       return
     }
     const db = getDatabase()
-    const uid = lenData + 1
-    set(ref(db, 'FAQ/data/' + uid), {
-      number: uid,
+    const Ref = ref(db, 'FAQ/data/')
+    const newRef = push(Ref)
+
+    set(newRef, {
       ...formValue,
+      number: newRef.key,
     }).then(() => {
       const nextData = Object.assign([], data)
-      setData([...nextData, { id: uid, ...formValue }])
+      setData([...nextData, { ...formValue, id: newRef.key }])
       handleClose()
       setMessageval({ message: 'Faq added successfully', type: 'success' })
       toaster.push(message, 'topCenter')
