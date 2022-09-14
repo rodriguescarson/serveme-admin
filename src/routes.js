@@ -12,6 +12,8 @@ const SpareParts = React.lazy(() => import('./views/spareparts/SpareParts'))
 const Users = React.lazy(() => import('./views/users/Users'))
 const Engines = React.lazy(() => import('./views/engines/Engines'))
 
+const Faq = React.lazy(() => import('./views/faq/Faq'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/home', name: 'Home', element: Home },
@@ -29,6 +31,7 @@ const routes = [
   { path: '/users', name: 'Users', element: Users },
   { path: '/engines', name: 'Engines', element: Engines },
   { path: '/aboutus', name: 'AboutUs', element: AboutUs },
+  { path: '/faq', name: 'Faq', element: Faq },
 ]
 
 export default routes
