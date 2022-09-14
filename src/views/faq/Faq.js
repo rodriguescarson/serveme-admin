@@ -2,31 +2,8 @@ import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
-import { getAuth } from 'firebase/auth'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
-
-import { AddForm, ImageUploader } from '../../utils/formComponents'
+import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
-
-const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataDistrict = ['South-Goa', 'North-Goa'].map((item) => ({
-  label: item,
-  value: item,
-}))
-const selectDataCity = ['Panjim', 'Margao'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataCountry = ['India', 'USA'].map((item) => ({
-  label: item,
-  value: item,
-}))
 
 //change down here
 const formDataParameters = [
