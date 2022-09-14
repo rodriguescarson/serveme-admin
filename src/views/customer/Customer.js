@@ -1,34 +1,14 @@
-//remains same
 import React, { useEffect } from 'react'
-import {
-  IconButton,
-  FlexboxGrid,
-  Form,
-  Schema,
-  Button,
-  Input,
-  Modal,
-  SelectPicker,
-  Message,
-  useToaster,
-} from 'rsuite'
-import PlusIcon from '@rsuite/icons/Plus'
-import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
+import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
-//cell imports
-import {
-  ActionCell,
-  CheckCell,
-  DeleteCell,
-  EditableCell,
-  ImageCell,
-} from '../../utils/tableComponents'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
-import ImageUploader from '../../utils/formComponents/ImageUploader'
-// change according to your needs
+
+import { AddForm, ImageUploader } from '../../utils/formComponents'
+import DisplayTable from '../../utils/tableComponents/DisplayTable'
+
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
   value: item,
@@ -38,7 +18,6 @@ const selectDataDistrict = ['South-Goa', 'North-Goa'].map((item) => ({
   label: item,
   value: item,
 }))
-
 const selectDataCity = ['Panjim', 'Margao'].map((item) => ({
   label: item,
   value: item,
@@ -49,205 +28,285 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
   value: item,
 }))
 
-// change form validation according to your needs
-const model = Schema.Model({
-  full_name: Schema.Types.StringType().isRequired('This field is required.'),
-  email: Schema.Types.StringType().isEmail('Please enter a valid email address.'),
-  contact_no: Schema.Types.StringType().isRequired('This field is required.'),
-  password: Schema.Types.StringType()
-    .isRequired('This field is required.')
-    .minLength(6)
-    .maxLength(100),
-})
-// no changes
-const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
-Textarea.displayName = 'Textarea'
+const formDataParameters = [
+  {
+    cid: 'avatar',
+    name: 'avatar',
+    label: 'Profile Picture',
+    accepter: ImageUploader,
+    action: '//jsonplaceholder.typicode.com/posts/',
+  },
+  {
+    cid: 'full_name-9',
+    name: 'full_name',
+    label: 'Full Name',
+  },
+  {
+    cid: 'email-9',
+    name: 'email',
+    label: 'Email',
+    type: 'email',
+  },
+  { cid: 'password-9', name: 'password', label: 'Password', type: 'password' },
 
-const TextField = ({ cid, name, label, accepter, ...rest }) => (
-  <Form.Group controlId={cid}>
-    <Form.ControlLabel>{label}</Form.ControlLabel>
-    <Form.Control name={name} accepter={accepter} {...rest} />
-  </Form.Group>
-)
+  { cid: 'contactNumber-9', name: 'contact_no', label: 'Contact Number', type: 'number' },
+
+  { cid: 'add_1-9', name: 'add_l1', label: 'Address 1', type: 'text' },
+
+  { cid: 'add_2-9', name: 'add_l2', label: 'Address 2', type: 'text' },
+
+  { cid: 'pincode-9', name: 'pincode', label: 'Pincode', type: 'number' },
+  {
+    cid: 'state-10',
+    name: 'state',
+    label: 'State',
+    data: selectDataState,
+    accepter: SelectPicker,
+  },
+  {
+    cid: 'district-10',
+    name: 'district',
+    label: 'District',
+    data: selectDataDistrict,
+    accepter: SelectPicker,
+  },
+  {
+    cid: 'city-10',
+    name: 'city',
+    label: 'City',
+    data: selectDataCity,
+    accepter: SelectPicker,
+  },
+  {
+    cid: 'country-10',
+    name: 'country',
+    label: 'Country',
+    data: selectDataCountry,
+    accepter: SelectPicker,
+  },
+]
+const TableParams = [
+  {
+    isId: true,
+    value: 'Id',
+    width: 70,
+    dataKey: 'customer_id',
+  },
+  {
+    isAvatar: true,
+    value: 'Avatar',
+    width: 130,
+    dataKey: 'avatar_url',
+  },
+  {
+    value: 'Full name',
+    width: 100,
+    dataKey: 'full_name',
+  },
+  {
+    value: 'Email',
+    width: 200,
+    dataKey: 'email',
+  },
+  {
+    value: 'Contact Number',
+    width: 200,
+    dataKey: 'contact_no',
+  },
+  {
+    value: 'Address 1',
+    width: 200,
+    dataKey: 'add_l1',
+  },
+  {
+    value: 'Address 2',
+    width: 200,
+    dataKey: 'add_l2',
+  },
+  {
+    value: 'Pincode',
+    width: 200,
+    dataKey: 'pincode',
+  },
+  {
+    value: 'District',
+    width: 200,
+    dataKey: 'district',
+  },
+  {
+    value: 'City',
+    width: 200,
+    dataKey: 'city',
+  },
+  {
+    value: 'State',
+    width: 200,
+    dataKey: 'state',
+  },
+  {
+    value: 'Country',
+    width: 200,
+    dataKey: 'country',
+  },
+]
 
 const Customer = () => {
-  //table states
-  const [checkedKeys, setCheckedKeys] = React.useState([])
-  const [sortColumn, setSortColumn] = React.useState()
-  const [sortType, setSortType] = React.useState()
-  const [loading, setLoading] = React.useState(false)
   const [data, setData] = React.useState([])
-  //delete states
-  const [deleteUserModal, setDeleteUserModal] = React.useState(false)
-  const handleCloseDeleteModal = () => setDeleteUserModal(false)
+  const [modalStatus, setmodalStatus] = React.useState(false)
+  const handleCloseDeleteModal = () => setmodalStatus(false)
   const [deleteId, setDeleteId] = React.useState()
-  // add states
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
-  // message toast
-  const [messageVal, setMessageVal] = React.useState({
+  const [messageval, setMessageval] = React.useState({
     message: '',
     type: 'success',
   })
-  ///change
+  ///change 1
   const [formValue, setFormValue] = React.useState({
-    avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
     avatar: null,
     full_name: '',
     email: '',
     contact_no: '',
     password: '',
-    add_1: '',
-    add_2: '',
+    add_l1: '',
+    add_l2: '',
     state: '',
     city: '',
     country: '',
     pincode: '',
     district: '',
+    avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
   })
 
-  //toast
-  const toaster = useToaster()
-  const message = (
-    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
-      {messageVal.message}
-    </Message>
-  )
-
-  // table functions
-  const getData = () => {
-    if (sortColumn && sortType) {
-      return data.sort((a, b) => {
-        let x = a[sortColumn]
-        let y = b[sortColumn]
-        if (typeof x === 'string') {
-          x = x.charCodeAt()
-        }
-        if (typeof y === 'string') {
-          y = y.charCodeAt()
-        }
-        if (sortType === 'asc') {
-          return x - y
-        } else {
-          return y - x
-        }
+  useEffect(() => {
+    const dbRef = ref(getDatabase())
+    // change 2
+    get(child(dbRef, `user/customer`))
+      .then((snapshot) => {
+        const data = Object.keys(snapshot.val()).map((key) => ({
+          ...snapshot.val()[key],
+          //change here
+          customer_id: key,
+          id: key,
+        }))
+        setData(data)
       })
-    }
-    return data
-  }
-
-  const handleSortColumn = (sortColumn, sortType) => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setSortColumn(sortColumn)
-      setSortType(sortType)
-    }, 500)
-  }
-
-  const handleCheckAll = React.useCallback((event) => {
-    const checked = event.target.checked
-    const keys = checked ? data.map((item) => item.id) : []
-    setCheckedKeys(keys)
+      .catch((error) => {
+        setMessageval({ message: error.message, type: 'error' })
+        toaster.push(message, 'topCenter')
+      })
   }, [])
-
-  const handleCheck = React.useCallback(
-    (event) => {
-      const checked = event.target.checked
-      const value = +event.target.value
-      const keys = checked ? [...checkedKeys, value] : checkedKeys.filter((item) => item !== value)
-
-      setCheckedKeys(keys)
-    },
-    [checkedKeys],
-  )
-
-  // end of table functions
-
-  // posting data to firebase
-  // make changes
-  const addDataToFirebase = (data) => {
+  // change 3
+  const addDataToFirebase = () => {
     if (!formRef.current.check()) {
-      setMessageVal({ message: 'Please fill all the required fields', type: 'error' })
+      setMessageval({ message: 'Please fill all the required fields', type: 'error' })
       toaster.push(message, 'topCenter')
       return
     }
-
-    // only add this
-    // const db = getDatabase()
-    // set(ref(db, 'users/customers/' + uid), { id: uid, ...formValue }).then(() => {
-    //   console.log('Data saved!')
-    //   handleClose()
-    // })
-    // only
     const auth = getAuth()
     createUserWithEmailAndPassword(auth, formValue.email, formValue.password)
       .then((userCredential) => {
         const user = userCredential.user
         const uid = user.uid
         const db = getDatabase()
-
-        if (formValue.avatar[0].blobFile) {
+        if (formValue.avatar) {
           const file = formValue.avatar[0].blobFile
           const storage = getStorage()
           const storageRef = storageRe(storage, `/userAvatars/${uid}`)
           uploadBytes(storageRef, file)
             .then((snapshot) => {
-              getDownloadURL(storageRe(storage, snapshot.ref.fullPath))
-                .then((downloadURL) => {
-                  setFormValue({ ...formValue, avatar_url: downloadURL })
-                  return downloadURL
+              getDownloadURL(storageRe(storage, snapshot.ref.fullPath)).then((downloadURL) => {
+                update(ref(db, 'user/customer/' + uid), {
+                  avatar_url: downloadURL,
                 })
-                .then((downloadURL) => {
-                  set(ref(db, 'users/customer/' + uid), {
-                    id: uid,
-                    ...formValue,
-                    avatar_url: downloadURL,
-                  }).then(() => {
-                    const nextData = getData()
-                    setData([...nextData, { id: uid, ...formValue, avatar_url: downloadURL }])
-                    handleClose()
-                    setMessageVal({ message: 'User added successfully', type: 'success' })
-                    toaster.push(message, 'topCenter')
-                    setFormValue({
-                      avatar: null,
-                      full_name: '',
-                      email: '',
-                      contact_no: '',
-                      password: '',
-                      add_1: '',
-                      add_2: '',
-                      state: '',
-                      city: '',
-                      country: '',
-                      pincode: '',
-                      district: '',
-                      avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
-                    })
-                  })
-                })
+              })
             })
             .catch((e) => {
-              setMessageVal({ message: e.message, type: 'error' })
+              setMessageval({ message: e.message, type: 'error' })
               toaster.push(message, 'topCenter')
             })
         }
+        set(ref(db, 'user/customer/' + uid), {
+          customer_id: uid,
+          ...formValue,
+        }).then(() => {
+          const nextData = Object.assign([], data)
+          setData([...nextData, { id: uid, ...formValue }])
+          handleClose()
+          setMessageval({ message: 'User added successfully', type: 'success' })
+          toaster.push(message, 'topCenter')
+          setFormValue({
+            avatar: null,
+            full_name: '',
+            email: '',
+            contact_no: '',
+            password: '',
+            add_l1: '',
+            add_l2: '',
+            state: '',
+            city: '',
+            country: '',
+            pincode: '',
+            district: '',
+            avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+          })
+        })
       })
       .catch((error) => {
         const errorCode = error.code
         if (errorCode === 'auth/email-already-in-use') {
-          setMessageVal({ message: 'Email already in use', type: 'error' })
+          setMessageval({ message: 'Email already in use', type: 'error' })
           toaster.push(message, 'topCenter')
         } else if (errorCode === 'auth/invalid-email') {
-          setMessageVal({ message: 'Invalid email', type: 'error' })
+          setMessageval({ message: 'Invalid email', type: 'error' })
           toaster.push(message, 'topCenter')
         }
       })
   }
 
-  // setting states for delete
+  //change 3
+  const handleUpdateFirebase = (id, key, value) => {
+    const nextData = Object.assign([], data)
+    nextData.find((item) => item.id === id)[key] = value
+    setData(nextData)
+    const db = getDatabase()
+    // changew only this
+    update(ref(db, 'user/customer/' + id), {
+      [key]: value,
+    })
+  }
+  //change 4
+  const handleDeleteFirebase = (id) => {
+    const db = getDatabase()
+    // change only this
+    remove(ref(db, 'user/customer/' + id))
+    setData(data.filter((item) => item.id !== id))
+  }
+  //change 5
+  const model = Schema.Model({
+    full_name: Schema.Types.StringType().isRequired('This field is required.'),
+    email: Schema.Types.StringType()
+      .isEmail('Please enter a valid email address.')
+      .addRule((value) => {
+        if (value) {
+          const email = value.toLowerCase()
+          const isExist = data.find((item) => item.email.toLowerCase() === email)
+          if (isExist) {
+            return false
+          }
+          return true
+        }
+      }, 'Email already exists'),
+    contact_no: Schema.Types.StringType().isRequired('This field is required.'),
+    password: Schema.Types.StringType()
+      .isRequired('This field is required.')
+      .minLength(6)
+      .maxLength(100),
+  })
+
+  //no changes down here
   const handleShowDeleteModal = (id) => {
-    setDeleteUserModal(true)
+    setmodalStatus(true)
     setDeleteId(id)
   }
 
@@ -259,39 +318,6 @@ const Customer = () => {
     setOpen(true)
   }
 
-  useEffect(() => {
-    const dbRef = ref(getDatabase())
-    // changew only this
-    get(child(dbRef, `users/customer`))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          setData(Object.values(snapshot.val()))
-        } else {
-          setMessageVal({ message: 'No data available', type: 'error' })
-          toaster.push(message, 'topCenter')
-        }
-      })
-      .catch((error) => {
-        setMessageVal({ message: error.message, type: 'error' })
-        toaster.push(message, 'topCenter')
-      })
-  }, [])
-
-  //change this - update data in firebase
-  const handleChange = (id, key, value) => {
-    // db.collection('user')
-    //   .doc(id)
-    //   .update({ [key]: value })
-    const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
-    setData(nextData)
-    const db = getDatabase()
-    // changew only this
-    update(ref(db, 'users/customer/' + id), {
-      [key]: value,
-    })
-  }
-
   const handleEditState = (id) => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.id === id)
@@ -299,202 +325,38 @@ const Customer = () => {
     setData(nextData)
   }
 
-  //change this - delete from firebase
-  const handleDeleteState = (id) => {
-    // delete data[id]
-    //
-    const db = getDatabase()
-    // changew only this
-    remove(ref(db, 'users/customer/' + id))
-    setData(data.filter((item) => item.id !== id))
-  }
-
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type={messageval.type}>
+      {messageval.message}
+    </Message>
+  )
   return (
     <>
-      {/* add new user button */}
-      <Modal open={open} onClose={handleClose} size="xs">
-        <Modal.Header>
-          <Modal.Title>New Customer</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form fluid ref={formRef} model={model} onChange={setFormValue} formValue={formValue}>
-            <TextField
-              cid="avatar"
-              name="avatar"
-              label="Profile Picture"
-              accepter={ImageUploader}
-              action="//jsonplaceholder.typicode.com/posts/"
-            />
-            <TextField cid="full_name-9" name="full_name" label="Full Name" />
-            <TextField cid="email-9" name="email" label="Email" type="email" />
-            <TextField cid="password-9" name="password" label="Password" type="password" />
-            <TextField
-              cid="contactNumber-9"
-              name="contact_no"
-              label="Contact Number"
-              type="number"
-            />
-            {/* <Form.Group controlId="textarea-9">
-              <Form.ControlLabel>Textarea</Form.ControlLabel>
-              <Form.Control rows={5} name="textarea" accepter={Textarea} />
-            </Form.Group> */}
-            <TextField cid="add_1-9" name="add_1" label="Address 1" type="text" />
-            <TextField cid="add_2-9" name="add_2" label="Address 2" type="text" />
-            <TextField cid="pincode-9" name="pincode" label="Pincode" type="number" />
-            <TextField
-              cid="state-10"
-              name="state"
-              label="State"
-              data={selectDataState}
-              accepter={SelectPicker}
-            />
-            <TextField
-              cid="district-10"
-              name="district"
-              label="District"
-              data={selectDataDistrict}
-              accepter={SelectPicker}
-            />
-            <TextField
-              cid="city-10"
-              name="city"
-              label="City"
-              data={selectDataCity}
-              accepter={SelectPicker}
-            />
-            <TextField
-              cid="country-10"
-              name="country"
-              label="Country"
-              data={selectDataCountry}
-              accepter={SelectPicker}
-            />
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={addDataToFirebase} appearance="primary" type="submit">
-            Confirm
-          </Button>
-          <Button onClick={handleClose} appearance="subtle">
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <FlexboxGrid justify="end" style={{ marginBottom: 10 }}>
-        <FlexboxGrid.Item colspan={2}>
-          <IconButton icon={<PlusIcon />} color="red" appearance="primary" onClick={handleOpen}>
-            Add
-          </IconButton>
-        </FlexboxGrid.Item>
-      </FlexboxGrid>
-      {/* end of add new user button */}
-      {/* table */}
-      <Table
-        virtualized
-        height={600}
-        data={getData()}
-        sortColumn={sortColumn}
-        sortType={sortType}
-        onSortColumn={handleSortColumn}
-        loading={loading}
-        headerHeight={50}
-        bordered
-        cellBordered
-        affixHorizontalScrollbar
-      >
-        <Column width={50} align="center" sortable fixed>
-          <HeaderCell style={{ padding: 0 }}>
-            <div style={{ lineHeight: '40px' }}>
-              <input
-                type="checkbox"
-                onChange={handleCheckAll}
-                checked={checkedKeys.length === data.length}
-              />
-            </div>
-          </HeaderCell>
-          <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
-        </Column>
-
-        <Column width={70} fixed sortable>
-          <HeaderCell>Id</HeaderCell>
-          <Cell dataKey="id" />
-        </Column>
-        <Column width={130} fixed>
-          <HeaderCell>Avatar</HeaderCell>
-          <ImageCell dataKey="avatar_url" />
-        </Column>
-        <Column width={100} sortable>
-          <HeaderCell>Full Name</HeaderCell>
-          <EditableCell dataKey="full_name" />
-        </Column>
-        <Column width={200} sortable onChange={handleChange}>
-          <HeaderCell>Email</HeaderCell>
-          <EditableCell dataKey="email" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>contactNumber</HeaderCell>
-          <EditableCell dataKey="contact_no" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Address 1</HeaderCell>
-          <EditableCell dataKey="add1" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Address 2</HeaderCell>
-          <EditableCell dataKey="add2" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Pincode</HeaderCell>
-          <EditableCell dataKey="pincode" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>District</HeaderCell>
-          <EditableCell dataKey="district" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>City</HeaderCell>
-          <EditableCell dataKey="city" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>State</HeaderCell>
-          <EditableCell dataKey="state" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Country</HeaderCell>
-          <EditableCell dataKey="country" onChange={handleChange} />
-        </Column>
-        <Column width={200}>
-          <HeaderCell>Edit</HeaderCell>
-          <ActionCell dataKey="id" onClick={handleEditState} />
-        </Column>
-        <Column width={200}>
-          <HeaderCell>Delete</HeaderCell>
-          <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
-        </Column>
-      </Table>
-      {/* // no changes */}
-      {/* Delete Modal */}
-      <Modal open={deleteUserModal} onClose={handleCloseDeleteModal}>
-        <Modal.Header>
-          <Modal.Title>Delete Customer</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this Customer?</Modal.Body>
-        <Modal.Footer>
-          <Button
-            onClick={() => {
-              handleDeleteState(deleteId)
-              handleCloseDeleteModal()
-            }}
-            appearance="primary"
-          >
-            Confirm
-          </Button>
-          <Button onClick={handleCloseDeleteModal} appearance="subtle">
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <AddForm
+        open={open}
+        handleClose={handleClose}
+        formRef={formRef}
+        setFormValue={setFormValue}
+        formValue={formValue}
+        SelectPicker={SelectPicker}
+        addDataToFirebase={addDataToFirebase}
+        data={data}
+        handleOpen={handleOpen}
+        formDataParameters={formDataParameters}
+        model={model}
+      />
+      <DisplayTable
+        handleUpdateFirebase={handleUpdateFirebase}
+        handleEditState={handleEditState}
+        handleShowDeleteModal={handleShowDeleteModal}
+        data={data}
+        modalStatus={modalStatus}
+        handleCloseDeleteModal={handleCloseDeleteModal}
+        handleDeleteFirebase={handleDeleteFirebase}
+        deleteId={deleteId}
+        TableParams={TableParams}
+      />
     </>
   )
 }

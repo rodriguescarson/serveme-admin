@@ -1,10 +1,19 @@
-/* eslint-disable prettier/prettier */
-import React, { memo, useEffect } from 'react'
-import { IconButton, FlexboxGrid, Form, Button, Input, Modal, Message, useToaster } from 'rsuite'
-import PlusIcon from '@rsuite/icons/Plus'
-import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
+import React, { useEffect } from 'react'
+import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { getDatabase, ref, push, set, child, update, get, remove } from 'firebase/database'
+import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
+import {
+  getAuth,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+  PhoneAuthProvider,
+  signInWithCredential,
+  deleteUser as deleteAuthUser,
+} from 'firebase/auth'
+import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
+
+import { AddForm, ImageUploader } from '../../utils/formComponents'
+import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
   label: item,
@@ -15,7 +24,6 @@ const selectDataDistrict = ['South-Goa', 'North-Goa'].map((item) => ({
   label: item,
   value: item,
 }))
-
 const selectDataCity = ['Panjim', 'Margao'].map((item) => ({
   label: item,
   value: item,
@@ -26,346 +34,336 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
   value: item,
 }))
 
-const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />)
-Textarea.displayName = 'Textarea'
+const formDataParameters = [
+  {
+    cid: 'avatar',
+    name: 'avatar',
+    label: 'Profile Picture',
+    accepter: ImageUploader,
+    action: '//jsonplaceholder.typicode.com/posts/',
+  },
+  {
+    cid: 'full_name-9',
+    name: 'full_name',
+    label: 'Full Name',
+  },
 
-const EditableCell = ({ rowData, dataKey, onChange, ...props }) => {
-  const editing = rowData.status === 'EDIT'
-  return (
-    <Cell {...props} className={editing ? 'table-content-editing' : ''}>
-      {editing ? (
-        <input
-          className="rs-input"
-          defaultValue={rowData[dataKey]}
-          onChange={(event) => {
-            onChange && onChange(rowData.id, dataKey, event.target.value)
-          }}
-        />
-      ) : (
-        <span className="table-content-edit-span">{rowData[dataKey]}</span>
-      )}
-    </Cell>
-  )
-}
+  { cid: 'contactNumber-9', name: 'contact_no', label: 'Contact Number', type: 'number' },
 
-const BaseCell = React.forwardRef((props, ref) => {
-  const { children, rowData, ...rest } = props
-  return (
-    <Cell
-      ref={ref}
-      rowData={rowData}
-      onDoubleClick={() => {
-        console.log(rowData)
-      }}
-      {...rest}
-    >
-      {children}
-    </Cell>
-  )
-})
+  { cid: 'add_1-9', name: 'add_l1', label: 'Address 1', type: 'text' },
 
-BaseCell.displayName = 'BaseCell'
+  { cid: 'add_2-9', name: 'add_l2', label: 'Address 2', type: 'text' },
 
-const CheckCell = ({ rowData, onChange, checkedKeys, dataKey, ...props }) => {
-  return (
-    <BaseCell {...props} style={{ padding: 0 }}>
-      <div style={{ lineHeight: '46px' }}>
-        <input
-          type="checkbox"
-          value={rowData[dataKey]}
-          onChange={onChange}
-          checked={checkedKeys.some((item) => item === rowData[dataKey])}
-        />
-      </div>
-    </BaseCell>
-  )
-}
-//edited
-//edit 2
-// const NameCell = ({ rowData, dataKey, ...props }) => {
-//   const Overlay = React.forwardRef(({ style, onClose, ...rest }, ref) => {
-//     const styles = {
-//       ...style,
-//       shadows: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-//       color: '#000',
-//       background: '#fff',
-//       width: 200,
-//       opacity: 1,
-//       padding: 10,
-//       borderRadius: 4,
-//       boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
-//       position: 'absolute',
-//       zIndex: 1,
-//       transform: 'translate(0, -20px)',
-//     }
-
-//     return (
-//       <div {...rest} style={styles} ref={ref}>
-//         <p>
-//           <b>Name:</b> {`${rowData.firstName} ${rowData.lastName}`}{' '}
-//         </p>
-//         <p
-//           style={{
-//             display: 'flex',
-//             flexWrap: 'wrap',
-//           }}
-//         >
-//           <b>District:</b> {rowData.district}{' '}
-//         </p>
-//         <p>
-//           <b>City:</b> {rowData.city}{' '}
-//         </p>
-//         <p>
-//           <b>State:</b> {rowData.state}{' '}
-//         </p>
-//         <p>
-//           <b>Country:</b> {rowData.country}{' '}
-//         </p>
-//       </div>
-//     )
-//   })
-//   Overlay.displayName = 'Overlay'
-//   const speaker = (props, ref) => {
-//     const { className, top, onClose } = props
-//     return (
-//       <Overlay
-//         title="Description"
-//         style={{ top }}
-//         onClose={onClose}
-//         className={className}
-//         ref={ref}
-//         visible
-//       />
-//     )
-//   }
-
-//   return (
-//     <BaseCell rowData={rowData} {...props}>
-//       <Whisper trigger="click" placement="auto" speaker={speaker} enterable>
-//         <Button
-//           style={{
-//             background: '#fff',
-//             color: 'blue',
-//             border: '0px solid #000',
-//             lineHeight: '50px',
-//             textAlign: 'center',
-//             verticalAlign: 'middle',
-//             marginRight: '10px',
-//           }}
-//         >
-//           {rowData[dataKey].toLocaleString()}
-//         </Button>
-//       </Whisper>
-//     </BaseCell>
-//   )
-// }
-
-const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {rowData.status === 'EDIT' ? 'Save' : 'Edit'}
-      </Button>
-    </Cell>
-  )
-}
-
-const DeleteCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick(rowData.id)
-        }}
-      >
-        {'Delete'}
-      </Button>
-    </Cell>
-  )
-}
-
-const InputCell = memo(({ rowData, data, value, onChange, ...props }) => {
-  function handleChange(event) {
-    onChange(rowData.id, event.target.value)
-  }
-
-  return (
-    <BaseCell {...props}>
-      <input value={data[rowData.id]} onChange={handleChange} />
-    </BaseCell>
-  )
-})
-
-InputCell.displayName = 'InputCell'
-
-// data.map((item) => {
-//   return db
-//     .collection('user')
-//     .doc('one')
-//     .set(item)
-//     .then(() => {
-//       console.log('Document successfully written!')
-//     })
-// })
-
-const ImageCell = ({ rowData, dataKey, ...rest }) => (
-  <Cell {...rest}>
-    <img
-      src={rowData[dataKey]}
-      width="50"
-      alt="avtar"
-      style={{
-        borderRadius: '50%',
-        verticalAlign: 'middle',
-        marginRight: '10px',
-      }}
-    />
-  </Cell>
-)
+  { cid: 'pincode-9', name: 'pincode', label: 'Pincode', type: 'number' },
+  {
+    cid: 'state-10',
+    name: 'state',
+    label: 'State',
+    data: selectDataState,
+    accepter: SelectPicker,
+  },
+  {
+    cid: 'district-10',
+    name: 'district',
+    label: 'District',
+    data: selectDataDistrict,
+    accepter: SelectPicker,
+  },
+  {
+    cid: 'city-10',
+    name: 'city',
+    label: 'City',
+    data: selectDataCity,
+    accepter: SelectPicker,
+  },
+  {
+    cid: 'country-10',
+    name: 'country',
+    label: 'Country',
+    data: selectDataCountry,
+    accepter: SelectPicker,
+  },
+  {
+    cid: 'gen_id-10',
+    name: 'gen_id',
+    label: 'Gen Id',
+    type: 'text',
+  },
+  {
+    cid: 'service_schedule_list-10',
+    name: 'service_schedule_id',
+    label: 'Service Schedule List',
+    type: 'text',
+  },
+]
+const TableParams = [
+  {
+    isId: true,
+    value: 'Id',
+    width: 70,
+    dataKey: 'id',
+  },
+  {
+    isAvatar: true,
+    value: 'Avatar',
+    width: 130,
+    dataKey: 'avatar_url',
+  },
+  {
+    value: 'Full name',
+    width: 100,
+    dataKey: 'full_name',
+  },
+  {
+    value: 'Contact Number',
+    width: 200,
+    dataKey: 'contact_no',
+  },
+  {
+    value: 'Address 1',
+    width: 200,
+    dataKey: 'add_l1',
+  },
+  {
+    value: 'Address 2',
+    width: 200,
+    dataKey: 'add_l2',
+  },
+  {
+    value: 'Pincode',
+    width: 200,
+    dataKey: 'pincode',
+  },
+  {
+    value: 'District',
+    width: 200,
+    dataKey: 'district',
+  },
+  {
+    value: 'City',
+    width: 200,
+    dataKey: 'city',
+  },
+  {
+    value: 'State',
+    width: 200,
+    dataKey: 'state',
+  },
+  {
+    value: 'Country',
+    width: 200,
+    dataKey: 'country',
+  },
+  {
+    value: 'Gen Id',
+    width: 200,
+    dataKey: 'gen_id',
+  },
+  {
+    value: 'Service Schedule Id',
+    width: 200,
+    dataKey: 'service_schedule_id',
+  },
+  {
+    isIdEditDelete: true,
+    value: 'Edit or Delete',
+    width: 70,
+    dataKey: 'id',
+  },
+]
 
 const ServiceProvider = () => {
-  const [checkedKeys, setCheckedKeys] = React.useState([])
-  const [sortColumn, setSortColumn] = React.useState()
-  const [sortType, setSortType] = React.useState()
-  const [loading, setLoading] = React.useState(false)
+  const [phoneNumber, setPhoneNumber] = React.useState('')
+  const [verificationCode, setVerificationCode] = React.useState('')
+  const [verificationId, setVerificationId] = React.useState('')
+  const [user, setUser] = React.useState(null)
   const [data, setData] = React.useState([])
-  // useState for add user
+  const [modalStatus, setmodalStatus] = React.useState(false)
+  const handleCloseDeleteModal = () => setmodalStatus(false)
+  const [deleteId, setDeleteId] = React.useState()
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
-  const [formValue, setFormValue] = React.useState({
-    fullName: '',
-    email: '',
-    contactNumber: '',
-    add_1: '',
-    add_2: '',
-    pincode: '',
-    engineer: '',
-  })
-
-  // message toast
-  const [messageVal, setMessageVal] = React.useState({
+  const [messageval, setMessageval] = React.useState({
     message: '',
     type: 'success',
   })
-
-  //toast
-  const toaster = useToaster()
-  const message = (
-    <Message showIcon type={messageVal.type} messageVal={messageVal.message}>
-      {messageVal.message}
-    </Message>
-  )
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  const handleOpen = () => {
-    setOpen(true)
-  }
+  ///change 1
+  const [formValue, setFormValue] = React.useState({
+    avatar: null,
+    avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+    full_name: '',
+    contact_no: '',
+    add_l1: '',
+    add_l2: '',
+    city: '',
+    district: '',
+    state: '',
+    pincode: '',
+    country: '',
+    gen_id: '',
+    service_shedule_id: '',
+  })
 
   useEffect(() => {
     const dbRef = ref(getDatabase())
-    // changew only this
-    get(child(dbRef, `service_provider`))
+    // change 2
+    get(child(dbRef, `user/service_provider`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          setData(Object.values(snapshot.val()))
+          //set id to service_provider_id
+          const data = Object.keys(snapshot.val()).map((key) => ({
+            ...snapshot.val()[key],
+            //change here
+            service_provider_id: key,
+            id: key,
+          }))
+          setData(data)
         } else {
-          setMessageVal({ message: 'No data available', type: 'error' })
+          setMessageval({ message: 'No data available', type: 'error' })
           toaster.push(message, 'topCenter')
         }
       })
       .catch((error) => {
-        setMessageVal({ message: error.message, type: 'error' })
+        setMessageval({ message: error.message, type: 'error' })
         toaster.push(message, 'topCenter')
       })
   }, [])
-
-  const getData = () => {
-    if (sortColumn && sortType) {
-      return data.sort((a, b) => {
-        let x = a[sortColumn]
-        let y = b[sortColumn]
-        if (typeof x === 'string') {
-          x = x.charCodeAt()
-        }
-        if (typeof y === 'string') {
-          y = y.charCodeAt()
-        }
-        if (sortType === 'asc') {
-          return x - y
-        } else {
-          return y - x
-        }
-      })
+  // change 3
+  const addDataToFirebase = () => {
+    if (!formRef.current.check()) {
+      setMessageval({ message: 'Please fill all the required fields', type: 'error' })
+      toaster.push(message, 'topCenter')
+      return
     }
-    return data
-  }
-
-  const handleSortColumn = (sortColumn, sortType) => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-      setSortColumn(sortColumn)
-      setSortType(sortType)
-    }, 500)
-  }
-
-  const handleCheckAll = React.useCallback((event) => {
-    const checked = event.target.checked
-    const keys = checked ? data.map((item) => item.id) : []
-    setCheckedKeys(keys)
-  }, [])
-
-  const handleCheck = React.useCallback(
-    (event) => {
-      const checked = event.target.checked
-      const value = +event.target.value
-      const keys = checked ? [...checkedKeys, value] : checkedKeys.filter((item) => item !== value)
-
-      setCheckedKeys(keys)
-    },
-    [checkedKeys],
-  )
-
-  const addDataToFirebase = (data) => {
-    const db = getDatabase()
-    const Ref = ref(db, 'service_provider')
-    const newRef = push(Ref)
-    set(newRef, {
-      id: newRef.key,
-      ...formValue,
+    const auth = getAuth()
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        'recaptcha-container',
+        {
+          size: 'invisible',
+          callback: (response) => {
+            // reCAPTCHA solved, allow signInWithPhoneNumber.
+            // ...
+          },
+        },
+        auth,
+      )
+    }
+    let appVerifier = window.recaptchaVerifier
+    const phoneNumber = '+91' + formValue.contact_no
+    signInWithPhoneNumber(auth, phoneNumber, appVerifier).then((confirmationResult) => {
+      setVerificationId(confirmationResult.verificationId)
+      // SMS sent. Prompt user to type the code from the message, then sign the
+      // user in with confirmationResult.confirm(code).
+      const verificationCode = window.prompt('Enter OTP')
+      //verify code
+      const credential = PhoneAuthProvider.credential(verificationId, String(verificationCode))
+      signInWithCredential(auth, credential)
+        .then((userCredential) => {
+          const user = userCredential.user
+          const uid = user.uid
+          const db = getDatabase()
+          if (formValue.avatar) {
+            const file = formValue.avatar[0].blobFile
+            const storage = getStorage()
+            const storageRef = storageRe(storage, `/serviceProviderAvatars/${uid}`)
+            uploadBytes(storageRef, file)
+              .then((snapshot) => {
+                getDownloadURL(storageRe(storage, snapshot.ref.fullPath)).then((downloadURL) => {
+                  update(ref(db, 'user/service_provider/' + uid), {
+                    avatar_url: downloadURL,
+                  })
+                })
+              })
+              .catch((e) => {
+                setMessageval({ message: e.message, type: 'error' })
+                toaster.push(message, 'topCenter')
+              })
+          }
+          //chnage heres
+          set(ref(db, 'user/service_provider/' + uid), {
+            //change here
+            service_provider_id: uid,
+            ...formValue,
+          }).then(() => {
+            const nextData = Object.assign([], data)
+            setData([...nextData, { id: uid, ...formValue }])
+            handleClose()
+            setMessageval({ message: 'User added successfully', type: 'success' })
+            toaster.push(message, 'topCenter')
+            setFormValue({
+              avatar: null,
+              avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
+              full_name: '',
+              contact_no: '',
+              add_l1: '',
+              add_l2: '',
+              city: '',
+              district: '',
+              state: '',
+              pincode: '',
+              country: '',
+              gen_id: '',
+              service_shedule_id: '',
+            })
+          })
+        })
+        .catch((error) => {
+          setMessageval({ message: error.message, type: 'error' })
+          toaster.push(message, 'topCenter')
+        })
     })
-    const nextData = getData()
-    setData([...nextData, { id: newRef.key, ...formValue }])
-    setFormValue({
-      fullName: '',
-      email: '',
-      contactNumber: '',
-      add_1: '',
-      add_2: '',
-      pincode: '',
-      engineer: '',
-    })
-    handleClose()
   }
 
-  //change this
-  const handleChange = (id, key, value) => {
+  //change 3
+  const handleUpdateFirebase = (id, key, value) => {
     const nextData = Object.assign([], data)
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
-    update(ref(db, 'service_provider/' + id), {
+    // changew only this
+    update(ref(db, 'user/service_provider/' + id), {
       [key]: value,
     })
+  }
+  //change 4
+  const handleDeleteFirebase = (id) => {
+    const db = getDatabase()
+    console.log(id)
+    // change only this
+    remove(ref(db, 'user/service_provider/' + id))
+    setData(data.filter((item) => item.id !== id))
+  }
+  //change 5
+  const model = Schema.Model({
+    full_name: Schema.Types.StringType().isRequired('This field is required.'),
+    contact_no: Schema.Types.StringType()
+      .isRequired('This field is required.')
+      .addRule((value) => {
+        if (value) {
+          const contact_no = value
+          const isExist = data.find((item) => item.contact_no === contact_no)
+          if (isExist) {
+            return false
+          }
+          return true
+        }
+      }, 'PHone number already exists'),
+  })
+
+  //no changes down here
+  const handleShowDeleteModal = (id) => {
+    setmodalStatus(true)
+    console.log(id, 'idmodel')
+    setDeleteId(id)
+  }
+
+  // handle states for add
+  const handleClose = () => {
+    setOpen(false)
+  }
+  const handleOpen = () => {
+    setOpen(true)
   }
 
   const handleEditState = (id) => {
@@ -375,148 +373,39 @@ const ServiceProvider = () => {
     setData(nextData)
   }
 
-  //change this
-  const handleDeleteState = (id) => {
-    const db = getDatabase()
-    remove(ref(db, 'service_provider/' + id))
-    setData(data.filter((item) => item.id !== id))
-  }
-
+  const toaster = useToaster()
+  const message = (
+    <Message showIcon type={messageval.type}>
+      {messageval.message}
+    </Message>
+  )
   return (
     <>
-      {/* add new user button */}
-      <Modal open={open} onClose={handleClose} size="xs">
-        <Modal.Header>
-          <Modal.Title>Service Provider</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form fluid onChange={setFormValue} formValue={formValue}>
-            <Form.Group controlId="fullName-9">
-              <Form.ControlLabel>Full Name</Form.ControlLabel>
-              <Form.Control name="fullName" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="email-9">
-              <Form.ControlLabel>Email</Form.ControlLabel>
-              <Form.Control name="email" type="email" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-            <Form.Group controlId="contactNumber-9">
-              <Form.ControlLabel>contactNumber</Form.ControlLabel>
-              <Form.Control name="contactNumber" type="number" />
-            </Form.Group>
-            {/* <Form.Group controlId="textarea-9">
-              <Form.ControlLabel>Textarea</Form.ControlLabel>
-              <Form.Control rows={5} name="textarea" accepter={Textarea} />
-            </Form.Group> */}
-            <Form.Group controlId="add_1-9">
-              <Form.ControlLabel>Address 1</Form.ControlLabel>
-              <Form.Control name="add_1" type="text" />
-            </Form.Group>
-            <Form.Group controlId="add_2-9">
-              <Form.ControlLabel>Address 2</Form.ControlLabel>
-              <Form.Control name="add_2" type="text" />
-            </Form.Group>
-            <Form.Group controlId="pincode-9">
-              <Form.ControlLabel>Pincode</Form.ControlLabel>
-              <Form.Control name="pincode" type="number" />
-            </Form.Group>
-            <Form.Group controlId="engineer-9">
-              <Form.ControlLabel>Engineer</Form.ControlLabel>
-              <Form.Control name="engineer" />
-              <Form.HelpText>Required</Form.HelpText>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={addDataToFirebase} appearance="primary">
-            Confirm
-          </Button>
-          <Button onClick={handleClose} appearance="subtle">
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <FlexboxGrid justify="end" style={{ marginBottom: 10 }}>
-        <FlexboxGrid.Item colspan={2}>
-          <IconButton icon={<PlusIcon />} color="red" appearance="primary" onClick={handleOpen}>
-            Add
-          </IconButton>
-        </FlexboxGrid.Item>
-      </FlexboxGrid>
-      {/* end of add new user button */}
-      {/* table */}
-      <Table
-        virtualized
-        height={600}
-        data={getData()}
-        sortColumn={sortColumn}
-        sortType={sortType}
-        onSortColumn={handleSortColumn}
-        loading={loading}
-        headerHeight={50}
-        bordered
-        cellBordered
-        onRowClick={(data) => {
-          console.log(data)
-        }}
-        affixHorizontalScrollbar
-      >
-        <Column width={50} align="center" sortable fixed>
-          <HeaderCell style={{ padding: 0 }}>
-            <div style={{ lineHeight: '40px' }}>
-              <input
-                type="checkbox"
-                onChange={handleCheckAll}
-                checked={checkedKeys.length === data.length}
-              />
-            </div>
-          </HeaderCell>
-          <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
-        </Column>
-
-        <Column width={70} align="center" fixed sortable>
-          <HeaderCell>Id</HeaderCell>
-          <Cell dataKey="id" />
-        </Column>
-        <Column width={100} sortable>
-          <HeaderCell>Full Name</HeaderCell>
-          <Cell dataKey="fullName" />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Email</HeaderCell>
-          <EditableCell dataKey="email" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>contactNumber</HeaderCell>
-          <EditableCell dataKey="contactNumber" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Address 1</HeaderCell>
-          <EditableCell dataKey="add_1" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Address 2</HeaderCell>
-          <EditableCell dataKey="add_2" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Pincode</HeaderCell>
-          <EditableCell dataKey="pincode" onChange={handleChange} />
-        </Column>
-        <Column width={200} sortable>
-          <HeaderCell>Engineer</HeaderCell>
-          <EditableCell dataKey="engineer" onChange={handleChange} />
-        </Column>
-        <Column width={200}>
-          <HeaderCell>Edit</HeaderCell>
-          <ActionCell dataKey="id" onClick={handleEditState} />
-        </Column>
-        <Column width={200}>
-          <HeaderCell>Delete</HeaderCell>
-          <DeleteCell dataKey="id" onClick={handleDeleteState} />
-        </Column>
-      </Table>
+      <div id="recaptcha-container"></div>
+      <AddForm
+        open={open}
+        handleClose={handleClose}
+        formRef={formRef}
+        setFormValue={setFormValue}
+        formValue={formValue}
+        SelectPicker={SelectPicker}
+        addDataToFirebase={addDataToFirebase}
+        data={data}
+        handleOpen={handleOpen}
+        formDataParameters={formDataParameters}
+        model={model}
+      />
+      <DisplayTable
+        handleUpdateFirebase={handleUpdateFirebase}
+        handleEditState={handleEditState}
+        handleShowDeleteModal={handleShowDeleteModal}
+        data={data}
+        modalStatus={modalStatus}
+        handleCloseDeleteModal={handleCloseDeleteModal}
+        handleDeleteFirebase={handleDeleteFirebase}
+        deleteId={deleteId}
+        TableParams={TableParams}
+      />
     </>
   )
 }

@@ -182,7 +182,7 @@ const Users = () => {
   useEffect(() => {
     const dbRef = ref(getDatabase())
     // change 2
-    get(child(dbRef, `users/customers`))
+    get(child(dbRef, `user/customer`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
@@ -216,7 +216,7 @@ const Users = () => {
           uploadBytes(storageRef, file)
             .then((snapshot) => {
               getDownloadURL(storageRe(storage, snapshot.ref.fullPath)).then((downloadURL) => {
-                update(ref(db, 'users/customers/' + uid), {
+                update(ref(db, 'user/customer/' + uid), {
                   avatar_url: downloadURL,
                 })
               })
@@ -226,7 +226,7 @@ const Users = () => {
               toaster.push(message, 'topCenter')
             })
         }
-        set(ref(db, 'users/customers/' + uid), {
+        set(ref(db, 'user/customer/' + uid), {
           id: uid,
           ...formValue,
         }).then(() => {
@@ -271,7 +271,7 @@ const Users = () => {
     setData(nextData)
     const db = getDatabase()
     // changew only this
-    update(ref(db, 'users/customers/' + id), {
+    update(ref(db, 'user/customer/' + id), {
       [key]: value,
     })
   }
@@ -279,7 +279,7 @@ const Users = () => {
   const handleDeleteFirebase = (id) => {
     const db = getDatabase()
     // change only this
-    remove(ref(db, 'users/customers/' + id))
+    remove(ref(db, 'user/customer/' + id))
     setData(data.filter((item) => item.id !== id))
   }
   //change 5
