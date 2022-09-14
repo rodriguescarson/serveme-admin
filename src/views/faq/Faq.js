@@ -91,12 +91,12 @@ const Faq = () => {
           id: key,
         }))
         setData(data)
+        setLenData(data.length)
       })
       .catch((error) => {
         setMessageval({ message: error.message, type: 'error' })
         toaster.push(message, 'topCenter')
       })
-    setLenData(data.length)
   }, [])
   // change 3
   const addDataToFirebase = () => {
