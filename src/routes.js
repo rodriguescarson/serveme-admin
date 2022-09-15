@@ -8,8 +8,9 @@ const Customer = React.lazy(() => import('./views/customer/Customer'))
 const ServiceProvider = React.lazy(() => import('./views/serviceprovider/ServiceProvider'))
 const SpareParts = React.lazy(() => import('./views/spareparts/SpareParts'))
 const ServiceSchedule = React.lazy(() => import('./views/serviceschedule/ServiceShedule'))
-const Faq = React.lazy(() => import('./views/faq/Faq'))
 
+const Faq = React.lazy(() => import('./views/faq/Faq'))
+const ServiceSchedule = React.lazy(() => import('./views/serviceschedule/ServiceShedule'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/home', name: 'Home', element: Home },
