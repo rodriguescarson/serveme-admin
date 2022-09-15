@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
+import { SelectPicker, Message, useToaster } from 'rsuite'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, push, update, get, remove } from 'firebase/database'
 import { AddForm } from '../../utils/formComponents'
@@ -44,7 +44,7 @@ const TableParams = [
   },
 ]
 
-const ServiceLists = () => {
+const ServiceSchedule = () => {
   const [data, setData] = React.useState([])
   const [modalStatus, setmodalStatus] = React.useState(false)
   const handleCloseDeleteModal = () => setmodalStatus(false)
@@ -172,4 +172,4 @@ const ServiceLists = () => {
     </>
   )
 }
-export default ServiceLists
+export default ServiceSchedule
