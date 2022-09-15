@@ -27,10 +27,6 @@ const _nav = [
     icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
   },
   {
-    component: CNavTitle,
-    name: 'Users',
-  },
-  {
     component: CNavItem,
     name: 'Customers',
     to: '/customer',

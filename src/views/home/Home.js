@@ -20,59 +20,6 @@ const Home = () => {
         <CCol xs>
           <CCard>
             <CCardBody>
-              <CCardTitle>User Dashboard</CCardTitle>
-              <CCol
-                style={{ display: 'flex', margin: 'auto' }}
-                xs={6}
-                sm={4}
-                md={3}
-                xl={2}
-                key={'cas'}
-              >
-                <CIcon icon={cilUser} size="9xl" />
-              </CCol>
-              <CCardText>
-                Add, Modify, Delete, View Users
-                {/* <CListGroup>
-                                    <CListGroupItem>
-                                        <CNav>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Add</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Modify</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Delete</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                        </CNav>
-                                    </CListGroupItem>
-                                </CListGroup> */}
-              </CCardText>
-              <NavLink to="/users">
-                <CButton color="primary" size="sm">
-                  <CIcon icon={cilUser} />
-                  <span className="ml-2">Users</span>
-                </CButton>
-              </NavLink>
-            </CCardBody>
-            <CCardFooter>
-              <small className="text-medium-emphasis">Last updated 3 mins ago</small>
-            </CCardFooter>
-          </CCard>
-        </CCol>
-        <CCol xs>
-          <CCard>
-            <CCardBody>
               <CCardTitle>Spare Dashboard</CCardTitle>
               <CCol
                 style={{ display: 'flex', margin: 'auto' }}
