@@ -5,54 +5,26 @@ import { getDatabase, ref, set, child, update, push, get, remove } from 'firebas
 import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
-const selectDataEnginemodel = ['abc', 'def', 'efg'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataAltmake = ['hij', 'klm'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataEnginemake = ['mno', 'pqr'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const selectDataControllermode = ['stu', 'vwxyz'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
 const formDataParameters = [
   {
-    cid: 'engineModel-10',
-    name: 'engineModel',
-    label: 'Engine Model',
-    data: selectDataEnginemodel,
-    accepter: SelectPicker,
+    cid: 'gensetModel-10',
+    name: 'gensetModel',
+    label: 'Genset Model',
   },
   {
     cid: 'altMake-10',
     name: 'altMake',
     label: 'Alt Make',
-    data: selectDataAltmake,
-    accepter: SelectPicker,
   },
   {
-    cid: 'engineMake-10',
-    name: 'engineMake',
-    label: 'Enginemake',
-    data: selectDataEnginemake,
-    accepter: SelectPicker,
+    cid: 'gensetMake-10',
+    name: 'gensetMake',
+    label: 'Gensetmake',
   },
   {
     cid: 'controllerMode-10',
     name: 'controllerMode',
     label: 'Controllermode',
-    data: selectDataControllermode,
-    accepter: SelectPicker,
   },
 ]
 
@@ -64,9 +36,9 @@ const TableParams = [
     dataKey: 'id',
   },
   {
-    value: 'Engine Model',
+    value: 'Genset Model',
     width: 200,
-    dataKey: 'engineModel',
+    dataKey: 'gensetModel',
   },
   {
     value: 'AltMake',
@@ -74,9 +46,9 @@ const TableParams = [
     dataKey: 'altMake',
   },
   {
-    value: 'Engine Make',
+    value: 'Genset Make',
     width: 200,
-    dataKey: 'engineMake',
+    dataKey: 'gensetMake',
   },
   {
     value: 'Controller Mode',
@@ -85,7 +57,7 @@ const TableParams = [
   },
 ]
 
-const Engines = () => {
+const Gensets = () => {
   const [data, setData] = React.useState([])
   const [modalStatus, setmodalStatus] = React.useState(false)
   const handleCloseDeleteModal = () => setmodalStatus(false)
@@ -97,16 +69,16 @@ const Engines = () => {
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
-    engineModel: '',
+    gensetModel: '',
     altMake: '',
-    engineMake: '',
+    gensetMake: '',
     controllerMode: '',
   })
 
   useEffect(() => {
     const dbRef = ref(getDatabase())
     // changew only this
-    get(child(dbRef, `machinery/engines`))
+    get(child(dbRef, `machinery/genset`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
@@ -123,7 +95,7 @@ const Engines = () => {
 
   const addDataToFirebase = () => {
     const db = getDatabase()
-    const Ref = ref(db, 'machinery/engines')
+    const Ref = ref(db, 'machinery/genset')
     const newRef = push(Ref)
     set(newRef, {
       id: newRef.key,
@@ -132,9 +104,9 @@ const Engines = () => {
     const nextData = data
     setData([...nextData, { id: newRef.key, ...formValue }])
     setFormValue({
-      engineModel: '',
+      gensetModel: '',
       altMake: '',
-      engineMake: '',
+      gensetMake: '',
       controllerMode: '',
     })
     handleClose()
@@ -147,7 +119,7 @@ const Engines = () => {
     const db = getDatabase()
 
     // changew only this
-    update(ref(db, 'machinery/engines/' + id), {
+    update(ref(db, 'machinery/genset/' + id), {
       [key]: value,
     })
   }
@@ -155,7 +127,7 @@ const Engines = () => {
   const handleDeleteFirebase = (id) => {
     const db = getDatabase()
     // change only this
-    remove(ref(db, 'machinery/engines/' + id))
+    remove(ref(db, 'machinery/genset/' + id))
     setData(data.filter((item) => item.id !== id))
   }
 
@@ -214,4 +186,4 @@ const Engines = () => {
     </>
   )
 }
-export default Engines
+export default Gensets

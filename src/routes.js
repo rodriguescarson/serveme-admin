@@ -7,10 +7,8 @@ const Admin = React.lazy(() => import('./views/admin/Admin'))
 const Customer = React.lazy(() => import('./views/customer/Customer'))
 const ServiceProvider = React.lazy(() => import('./views/serviceprovider/ServiceProvider'))
 const SpareParts = React.lazy(() => import('./views/spareparts/SpareParts'))
-const Engines = React.lazy(() => import('./views/engines/Engines'))
-const ServiceSchedule = React.lazy(() => import('./views/serviceschedule/ServiceShedule'))
 const Faq = React.lazy(() => import('./views/faq/Faq'))
-
+const ServiceSchedule = React.lazy(() => import('./views/serviceschedule/ServiceShedule'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/home', name: 'Home', element: Home },
@@ -24,7 +22,6 @@ const routes = [
   },
   { path: '/serviceschedule', name: 'ServiceLists', element: ServiceSchedule },
   { path: '/spareparts', name: 'SpareParts', element: SpareParts },
-  { path: '/engines', name: 'Engines', element: Engines },
   { path: '/aboutus', name: 'AboutUs', element: AboutUs },
   { path: '/faq', name: 'Faq', element: Faq },
 ]
