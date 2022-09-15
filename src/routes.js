@@ -1,15 +1,14 @@
 import React from 'react'
+
 const Home = React.lazy(() => import('./views/home/Home'))
 const Analytics = React.lazy(() => import('./views/analytics/Analytics'))
 const AboutUs = React.lazy(() => import('./views/aboutus/AboutUs'))
 const Admin = React.lazy(() => import('./views/admin/Admin'))
 const Customer = React.lazy(() => import('./views/customer/Customer'))
 const ServiceProvider = React.lazy(() => import('./views/serviceprovider/ServiceProvider'))
-
-const ServiceLists = React.lazy(() => import('./views/servicelists/ServiceLists'))
 const SpareParts = React.lazy(() => import('./views/spareparts/SpareParts'))
 const Engines = React.lazy(() => import('./views/engines/Engines'))
-
+const ServiceSchedule = React.lazy(() => import('./views/serviceschedule/ServiceShedule'))
 const Faq = React.lazy(() => import('./views/faq/Faq'))
 
 const routes = [
@@ -23,7 +22,7 @@ const routes = [
     name: 'ServiceProvider',
     element: ServiceProvider,
   },
-  { path: '/servicelists', name: 'ServiceLists', element: ServiceLists },
+  { path: '/serviceschedule', name: 'ServiceLists', element: ServiceSchedule },
   { path: '/spareparts', name: 'SpareParts', element: SpareParts },
   { path: '/engines', name: 'Engines', element: Engines },
   { path: '/aboutus', name: 'AboutUs', element: AboutUs },

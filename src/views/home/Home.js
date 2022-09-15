@@ -72,7 +72,7 @@ const Home = () => {
         <CCol xs>
           <CCard>
             <CCardBody>
-              <CCardTitle>Service List</CCardTitle>
+              <CCardTitle>Service Schedule</CCardTitle>
               <CCol
                 style={{ display: 'flex', margin: 'auto' }}
                 xs={6}
@@ -110,7 +110,7 @@ const Home = () => {
                                     </CListGroupItem>
                                 </CListGroup> */}
               </CCardText>
-              <NavLink to="/servicelists">
+              <NavLink to="/serviceschedule">
                 <CButton color="primary" size="sm">
                   <CIcon icon={cilList} />
                   <span className="ml-2"> Service List</span>
