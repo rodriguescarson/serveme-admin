@@ -125,7 +125,7 @@ const Home = () => {
         <CCol xs>
           <CCard>
             <CCardBody>
-              <CCardTitle>Engine Dashboard</CCardTitle>
+              <CCardTitle>Genset Dashboard</CCardTitle>
               <CCol
                 style={{ display: 'flex', margin: 'auto' }}
                 xs={6}
@@ -163,10 +163,10 @@ const Home = () => {
                                     </CListGroupItem>
                                 </CListGroup> */}
               </CCardText>
-              <NavLink to="/engines">
+              <NavLink to="/gensets">
                 <CButton color="primary" size="sm">
                   <CIcon icon={cilUser} />
-                  <span className="ml-2">Engines</span>
+                  <span className="ml-2">Gensets</span>
                 </CButton>
               </NavLink>
             </CCardBody>
