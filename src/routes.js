@@ -7,7 +7,6 @@ const Customer = React.lazy(() => import('./views/customer/Customer'))
 const ServiceProvider = React.lazy(() => import('./views/serviceprovider/ServiceProvider'))
 
 const ServiceLists = React.lazy(() => import('./views/servicelists/ServiceLists'))
-const Gensets = React.lazy(() => import('./views/gensets/Gensets'))
 const SpareParts = React.lazy(() => import('./views/spareparts/SpareParts'))
 const Engines = React.lazy(() => import('./views/engines/Engines'))
 
@@ -25,7 +24,6 @@ const routes = [
     element: ServiceProvider,
   },
   { path: '/servicelists', name: 'ServiceLists', element: ServiceLists },
-  { path: '/gensets', name: 'Gensets', element: Gensets },
   { path: '/spareparts', name: 'SpareParts', element: SpareParts },
   { path: '/engines', name: 'Engines', element: Engines },
   { path: '/aboutus', name: 'AboutUs', element: AboutUs },
