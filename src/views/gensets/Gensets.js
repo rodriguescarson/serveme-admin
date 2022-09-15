@@ -1,21 +1,30 @@
 import React, { useEffect } from 'react'
-import { SelectPicker, Message, useToaster } from 'rsuite'
+import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
 import 'rsuite-table/dist/css/rsuite-table.css'
-import { getDatabase, ref, set, child, push, update, get, remove } from 'firebase/database'
-import { AddForm, ImageUploader } from '../../utils/formComponents'
+import { getDatabase, ref, set, child, update, push, get, remove } from 'firebase/database'
+import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
 const formDataParameters = [
   {
-    cid: 'uploader',
-    name: 'uploader',
-    label: 'Genset Img',
-    accepter: ImageUploader,
+    cid: 'gensetModel-10',
+    name: 'gensetModel',
+    label: 'Genset Model',
   },
   {
-    cid: 'GensetName-9',
-    name: 'GensetName',
-    label: 'Genset Name',
+    cid: 'altMake-10',
+    name: 'altMake',
+    label: 'Alt Make',
+  },
+  {
+    cid: 'gensetMake-10',
+    name: 'gensetMake',
+    label: 'Gensetmake',
+  },
+  {
+    cid: 'controllerMode-10',
+    name: 'controllerMode',
+    label: 'Controllermode',
   },
 ]
 
@@ -23,19 +32,28 @@ const TableParams = [
   {
     isId: true,
     value: 'Id',
-    width: 100,
+    width: 170,
     dataKey: 'id',
   },
   {
-    isAvatar: true,
-    value: 'Genset Img',
-    width: 130,
-    dataKey: 'avatar',
+    value: 'Genset Model',
+    width: 200,
+    dataKey: 'gensetModel',
   },
   {
-    value: 'Genset Name',
-    width: 220,
-    dataKey: 'GensetName',
+    value: 'AltMake',
+    width: 200,
+    dataKey: 'altMake',
+  },
+  {
+    value: 'Genset Make',
+    width: 200,
+    dataKey: 'gensetMake',
+  },
+  {
+    value: 'Controller Mode',
+    width: 200,
+    dataKey: 'controllerMode',
   },
 ]
 
@@ -51,7 +69,10 @@ const Gensets = () => {
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
-    GensetName: '',
+    gensetModel: '',
+    altMake: '',
+    gensetMake: '',
+    controllerMode: '',
   })
 
   useEffect(() => {
@@ -83,10 +104,11 @@ const Gensets = () => {
     const nextData = data
     setData([...nextData, { id: newRef.key, ...formValue }])
     setFormValue({
-      GensetName: '',
+      gensetModel: '',
+      altMake: '',
+      gensetMake: '',
+      controllerMode: '',
     })
-    setMessageval({ message: 'Genset added successfully', type: 'success' })
-    toaster.push(message, 'topCenter')
     handleClose()
   }
 
@@ -136,7 +158,6 @@ const Gensets = () => {
       {messageval.message}
     </Message>
   )
-
   return (
     <>
       <AddForm
