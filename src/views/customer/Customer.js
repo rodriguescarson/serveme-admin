@@ -192,14 +192,22 @@ const Customer = () => {
         setData(data)
       })
       .catch((error) => {
-        setMessageval({ message: error.message, type: 'error' })
+        setMessageval((prev) => ({
+          ...prev,
+          message: error.message,
+          type: 'error',
+        }))
         toaster.push(message, 'topCenter')
       })
   }, [])
   // change 3
   const addDataToFirebase = () => {
     if (!formRef.current.check()) {
-      setMessageval({ message: 'Please fill all the required fields', type: 'error' })
+      setMessageval((prev) => ({
+        ...prev,
+        message: 'Please fill all the fields',
+        type: 'error',
+      }))
       toaster.push(message, 'topCenter')
       return
     }
@@ -222,7 +230,11 @@ const Customer = () => {
               })
             })
             .catch((e) => {
-              setMessageval({ message: e.message, type: 'error' })
+              setMessageval((prev) => ({
+                ...prev,
+                message: e.message,
+                type: 'error',
+              }))
               toaster.push(message, 'topCenter')
             })
         }
@@ -233,7 +245,11 @@ const Customer = () => {
           const nextData = Object.assign([], data)
           setData([...nextData, { id: uid, ...formValue }])
           handleClose()
-          setMessageval({ message: 'User added successfully', type: 'success' })
+          setMessageval((prev) => ({
+            ...prev,
+            message: 'Data added successfully',
+            type: 'success',
+          }))
           toaster.push(message, 'topCenter')
           setFormValue({
             avatar: null,
@@ -255,10 +271,18 @@ const Customer = () => {
       .catch((error) => {
         const errorCode = error.code
         if (errorCode === 'auth/email-already-in-use') {
-          setMessageval({ message: 'Email already in use', type: 'error' })
+          setMessageval((prev) => ({
+            ...prev,
+            message: 'Email already in use',
+            type: 'error',
+          }))
           toaster.push(message, 'topCenter')
         } else if (errorCode === 'auth/invalid-email') {
-          setMessageval({ message: 'Invalid email', type: 'error' })
+          setMessageval((prev) => ({
+            ...prev,
+            message: 'Invalid email',
+            type: 'error',
+          }))
           toaster.push(message, 'topCenter')
         }
       })

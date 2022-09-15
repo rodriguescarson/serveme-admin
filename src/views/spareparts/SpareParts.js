@@ -105,12 +105,20 @@ const SpareParts = () => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
         } else {
-          setMessageval({ message: 'No data available', type: 'error' })
+          setMessageval((prev) => ({
+            ...prev,
+            message: 'No data available',
+            type: 'warning',
+          }))
           toaster.push(message, 'topCenter')
         }
       })
       .catch((error) => {
-        setMessageval({ message: error.message, type: 'error' })
+        setMessageval((prev) => ({
+          ...prev,
+          message: error.message,
+          type: 'error',
+        }))
         toaster.push(message, 'topCenter')
       })
   }, [])
@@ -129,7 +137,11 @@ const SpareParts = () => {
     setFormValue({
       GensetName: '',
     })
-    setMessageval({ message: 'Spare part added successfully', type: 'success' })
+    setMessageval((prev) => ({
+      ...prev,
+      message: 'Data Added Successfully',
+      type: 'success',
+    }))
     toaster.push(message, 'topCenter')
     handleClose()
   }
