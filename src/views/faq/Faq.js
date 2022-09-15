@@ -45,7 +45,7 @@ const Faq = () => {
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [messageval, setMessageval] = React.useState({
-    message: '',
+    message: 'success',
     type: 'success',
   })
   ///change 1
@@ -121,6 +121,13 @@ const Faq = () => {
     // changew only this
     update(ref(db, 'FAQ/data/' + id), {
       [key]: value,
+    }).then(() => {
+      setMessageval((prev) => ({
+        ...prev,
+        message: 'Data updated successfully',
+        type: 'success',
+      }))
+      toaster.push(message, 'topCenter')
     })
   }
   //change 4
@@ -189,6 +196,7 @@ const Faq = () => {
         handleDeleteFirebase={handleDeleteFirebase}
         deleteId={deleteId}
         TableParams={TableParams}
+        wordWrapToggle={true}
       />
     </>
   )

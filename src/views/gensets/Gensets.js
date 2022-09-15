@@ -8,23 +8,23 @@ import DisplayTable from '../../utils/tableComponents/DisplayTable'
 const formDataParameters = [
   {
     cid: 'gensetModel-10',
-    name: 'gensetModel',
+    name: 'genset_model',
     label: 'Genset Model',
   },
   {
     cid: 'altMake-10',
-    name: 'altMake',
+    name: 'alt_make',
     label: 'Alt Make',
   },
   {
     cid: 'gensetMake-10',
-    name: 'gensetMake',
-    label: 'Gensetmake',
+    name: 'genset_make',
+    label: 'Genset Make',
   },
   {
     cid: 'controllerMode-10',
-    name: 'controllerMode',
-    label: 'Controllermode',
+    name: 'controller_mode',
+    label: 'Controller Mode',
   },
 ]
 
@@ -38,22 +38,22 @@ const TableParams = [
   {
     value: 'Genset Model',
     width: 200,
-    dataKey: 'gensetModel',
+    dataKey: 'genset_model',
   },
   {
     value: 'AltMake',
     width: 200,
-    dataKey: 'altMake',
+    dataKey: 'alt_make',
   },
   {
     value: 'Genset Make',
     width: 200,
-    dataKey: 'gensetMake',
+    dataKey: 'genset_make',
   },
   {
     value: 'Controller Mode',
     width: 200,
-    dataKey: 'controllerMode',
+    dataKey: 'controller_mode',
   },
 ]
 
@@ -65,7 +65,7 @@ const Gensets = () => {
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [messageval, setMessageval] = React.useState({
-    message: '',
+    message: 'success',
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
@@ -133,6 +133,15 @@ const Gensets = () => {
     // changew only this
     update(ref(db, 'machinery/genset/' + id), {
       [key]: value,
+    }).then(() => {
+      setMessageval((prev) => {
+        return {
+          ...prev,
+          message: 'Updated Successfully',
+          type: 'success',
+        }
+      })
+      toaster.push(message, 'topCenter')
     })
   }
   //change 4

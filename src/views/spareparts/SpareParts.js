@@ -86,7 +86,7 @@ const SpareParts = () => {
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [messageval, setMessageval] = React.useState({
-    message: '',
+    message: 'success',
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
@@ -155,6 +155,13 @@ const SpareParts = () => {
     // changew only this
     update(ref(db, 'machinery/spares/' + id), {
       [key]: value,
+    }).then(() => {
+      setMessageval((prev) => ({
+        ...prev,
+        message: 'Data Updated Successfully',
+        type: 'success',
+      }))
+      toaster.push(message, 'topCenter')
     })
   }
   //change 4

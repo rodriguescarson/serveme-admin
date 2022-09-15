@@ -7,6 +7,7 @@ import {
   ImageCell,
   DeleteModal,
 } from '../../utils/tableComponents'
+import DropDownCell from './DropDownCell'
 function DisplayTable({
   handleUpdateFirebase,
   handleEditState,
@@ -17,6 +18,7 @@ function DisplayTable({
   handleCloseDeleteModal,
   handleDeleteFirebase,
   deleteId,
+  wordWrapToggle,
 }) {
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
@@ -64,21 +66,10 @@ function DisplayTable({
         bordered
         cellBordered
         affixHorizontalScrollbar
+        wordWrap={wordWrapToggle ? 'break-word' : false}
       >
         {TableParams.map((item, i) => {
-          if (!item.isId) {
-            return !item.isAvatar ? (
-              <Column key={i} width={item.width} sortable onChange={handleUpdateFirebase} resizable>
-                <HeaderCell>{item.value}</HeaderCell>
-                <EditableCell dataKey={item.dataKey} onChange={handleUpdateFirebase} />
-              </Column>
-            ) : (
-              <Column key={i} width={item.width} fixed resizable>
-                <HeaderCell>{item.value}</HeaderCell>
-                <ImageCell dataKey="avatar_url" />
-              </Column>
-            )
-          } else {
+          if (item.isId) {
             return (
               <Column key={i} width={item.width} fixed sortable resizable>
                 <HeaderCell>{item.value}</HeaderCell>
@@ -86,6 +77,39 @@ function DisplayTable({
               </Column>
             )
           }
+          if (item.isAvatar) {
+            return (
+              <Column key={i} width={item.width} fixed resizable>
+                <HeaderCell>{item.value}</HeaderCell>
+                <ImageCell dataKey="avatar_url" />
+              </Column>
+            )
+          }
+          if (item.isDropDown) {
+            return (
+              <Column key={i} width={item.width} fixed resizable>
+                <HeaderCell>{item.value}</HeaderCell>
+                <DropDownCell
+                  dataKey={item.dataKey}
+                  onChange={handleUpdateFirebase}
+                  data={item.data}
+                  showPopover={item.showPopover}
+                />
+              </Column>
+            )
+          }
+          return (
+            <Column
+              key={i}
+              width={item.width}
+              sortable
+              onChange={handleUpdateFirebase}
+              flexGrow={1}
+            >
+              <HeaderCell>{item.value}</HeaderCell>
+              <EditableCell dataKey={item.dataKey} onChange={handleUpdateFirebase} />
+            </Column>
+          )
         })}
         <Column width={70}>
           <HeaderCell>Edit</HeaderCell>

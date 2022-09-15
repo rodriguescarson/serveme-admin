@@ -10,13 +10,13 @@ import { AddForm, ImageUploader } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
 const formDataParameters = [
-  {
-    cid: 'avatar',
-    name: 'avatar',
-    label: 'Profile Picture',
-    accepter: ImageUploader,
-    action: '//jsonplaceholder.typicode.com/posts/',
-  },
+  // {
+  //   cid: 'avatar',
+  //   name: 'avatar',
+  //   label: 'Profile Picture',
+  //   accepter: ImageUploader,
+  //   action: '//jsonplaceholder.typicode.com/posts/',
+  // },
   {
     cid: 'email-9',
     name: 'email',
@@ -33,12 +33,12 @@ const TableParams = [
     width: 70,
     dataKey: 'a_id',
   },
-  {
-    isAvatar: true,
-    value: 'Avatar',
-    width: 130,
-    dataKey: 'avatar_url',
-  },
+  // {
+  //   isAvatar: true,
+  //   value: 'Avatar',
+  //   width: 130,
+  //   dataKey: 'avatar_url',
+  // },
   {
     value: 'Email',
     width: 200,
@@ -64,7 +64,7 @@ const Admin = () => {
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [messageval, setMessageval] = React.useState({
-    message: '',
+    message: 'success',
     type: 'success',
   })
   ///change 1
@@ -175,6 +175,13 @@ const Admin = () => {
     // changew only this
     update(ref(db, 'user/admin/' + id), {
       [key]: value,
+    }).then(() => {
+      setMessageval((prev) => ({
+        ...prev,
+        message: 'Data updated successfully',
+        type: 'success',
+      }))
+      toaster.push(message, 'topCenter')
     })
   }
   //change 4
