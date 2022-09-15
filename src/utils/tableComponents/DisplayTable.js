@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import {
   ActionCell,
-  CheckCell,
   DeleteCell,
   EditableCell,
   ImageCell,
@@ -19,7 +18,6 @@ function DisplayTable({
   handleDeleteFirebase,
   deleteId,
 }) {
-  const [checkedKeys, setCheckedKeys] = React.useState([])
   const [sortColumn, setSortColumn] = React.useState()
   const [sortType, setSortType] = React.useState()
   const [loading, setLoading] = React.useState(false)
@@ -52,22 +50,6 @@ function DisplayTable({
     }, 500)
   }
 
-  const handleCheckAll = React.useCallback((event) => {
-    const checked = event.target.checked
-    const keys = checked ? data.map((item) => item.id) : []
-    setCheckedKeys(keys)
-  }, [])
-
-  const handleCheck = React.useCallback(
-    (event) => {
-      const checked = event.target.checked
-      const value = +event.target.value
-      const keys = checked ? [...checkedKeys, value] : checkedKeys.filter((item) => item !== value)
-
-      setCheckedKeys(keys)
-    },
-    [checkedKeys],
-  )
   return (
     <>
       <Table
@@ -86,19 +68,19 @@ function DisplayTable({
         {TableParams.map((item, i) => {
           if (!item.isId) {
             return !item.isAvatar ? (
-              <Column key={i} width={item.width} sortable onChange={handleUpdateFirebase}>
+              <Column key={i} width={item.width} sortable onChange={handleUpdateFirebase} resizable>
                 <HeaderCell>{item.value}</HeaderCell>
                 <EditableCell dataKey={item.dataKey} onChange={handleUpdateFirebase} />
               </Column>
             ) : (
-              <Column key={i} width={item.width} fixed>
+              <Column key={i} width={item.width} fixed resizable>
                 <HeaderCell>{item.value}</HeaderCell>
                 <ImageCell dataKey="avatar_url" />
               </Column>
             )
           } else {
             return (
-              <Column key={i} width={item.width} fixed sortable>
+              <Column key={i} width={item.width} fixed sortable resizable>
                 <HeaderCell>{item.value}</HeaderCell>
                 <Cell dataKey={item.dataKey} />
               </Column>

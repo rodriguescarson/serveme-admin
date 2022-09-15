@@ -22,17 +22,17 @@ const TableParams = [
   {
     isId: true,
     value: 'Id',
-    width: 70,
+    width: 150,
     dataKey: 'id',
   },
   {
     value: 'Question',
-    width: 100,
+    width: 300,
     dataKey: 'question',
   },
   {
     value: 'Answer',
-    width: 100,
+    width: 300,
     dataKey: 'answer',
   },
 ]

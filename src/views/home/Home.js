@@ -29,44 +29,33 @@ const Home = () => {
                 xl={2}
                 key={'cas'}
               >
-                <CIcon icon={cilCog} size="xxl" />
+                {/* increase size of CIcon */}
+                <CIcon
+                  icon={cilCog}
+                  customClassName="c-icon-xl"
+                  style={{ margin: 'auto', marginBlock: 60 }}
+                />
               </CCol>
-              <CCardText>Add, Modify, Delete, View Spare Parts</CCardText>
-              {/* <CListGroup>
-                                    <CListGroupItem>
-                                        <CNav>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Add</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Modify</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Delete</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                        </CNav>
-                                    </CListGroupItem>
-                                </CListGroup> */}
-
-              <NavLink to="/spareparts">
-                <CButton color="primary" size="sm">
+              <NavLink
+                to="/spareparts"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                <CButton
+                  color="primary"
+                  style={{
+                    width: '100%',
+                  }}
+                >
                   <CIcon icon={cilCog} />
                   <span className="ml-2">Spare Parts</span>
                 </CButton>
               </NavLink>
             </CCardBody>
-            <CCardFooter>
-              <small className="text-medium-emphasis">Last updated 3 mins ago</small>
-            </CCardFooter>
           </CCard>
         </CCol>
         <CCol xs>
@@ -81,45 +70,33 @@ const Home = () => {
                 xl={2}
                 key={'cas'}
               >
-                <CIcon icon={cilList} size="9xl" />
+                <CIcon
+                  icon={cilList}
+                  customClassName="c-icon-xl"
+                  style={{ margin: 'auto', marginBlock: 60 }}
+                />
               </CCol>
-              <CCardText>
-                Add, Modify, Delete, View Service Lists
-                {/* <CListGroup>
-                                    <CListGroupItem>
-                                        <CNav>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Add</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Modify</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Delete</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                        </CNav>
-                                    </CListGroupItem>
-                                </CListGroup> */}
-              </CCardText>
-              <NavLink to="/serviceschedule">
-                <CButton color="primary" size="sm">
+              <CCardText></CCardText>
+              <NavLink
+                to="/serviceschedule"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                <CButton
+                  color="primary"
+                  style={{
+                    width: '100%',
+                  }}
+                >
                   <CIcon icon={cilList} />
                   <span className="ml-2"> Service List</span>
                 </CButton>
               </NavLink>
             </CCardBody>
-            <CCardFooter>
-              <small className="text-medium-emphasis">Last updated 3 mins ago</small>
-            </CCardFooter>
           </CCard>
         </CCol>
         <CCol xs>
@@ -134,45 +111,34 @@ const Home = () => {
                 xl={2}
                 key={'cas'}
               >
-                <CIcon icon={cilCasino} size="9xl" />
+                <CIcon
+                  icon={cilCasino}
+                  customClassName="c-icon-xl"
+                  style={{ margin: 'auto', marginBlock: 60 }}
+                />
               </CCol>
-              <CCardText>
-                Add, Modify, Delete, View Engines
-                {/* <CListGroup>
-                                    <CListGroupItem>
-                                        <CNav>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Add</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Modify</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Delete</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                        </CNav>
-                                    </CListGroupItem>
-                                </CListGroup> */}
-              </CCardText>
-              <NavLink to="/gensets">
-                <CButton color="primary" size="sm">
+              <CCardText></CCardText>
+              {/* center NavLink */}
+              <NavLink
+                to="/gensets"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                <CButton
+                  color="primary"
+                  style={{
+                    width: '100%',
+                  }}
+                >
                   <CIcon icon={cilUser} />
                   <span className="ml-2">Gensets</span>
                 </CButton>
               </NavLink>
             </CCardBody>
-            <CCardFooter>
-              <small className="text-medium-emphasis">Last updated 3 mins ago</small>
-            </CCardFooter>
           </CCard>
         </CCol>
       </CRow>
