@@ -30,13 +30,13 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 
 //change down here
 const formDataParameters = [
-  {
-    cid: 'avatar',
-    name: 'avatar',
-    label: 'Profile Picture',
-    accepter: ImageUploader,
-    action: '//jsonplaceholder.typicode.com/posts/',
-  },
+  // {
+  //   cid: 'avatar',
+  //   name: 'avatar',
+  //   label: 'Profile Picture',
+  //   accepter: ImageUploader,
+  //   action: '//jsonplaceholder.typicode.com/posts/',
+  // },
   {
     cid: 'full_name-9',
     name: 'full_name',
@@ -93,12 +93,12 @@ const TableParams = [
     width: 70,
     dataKey: 'id',
   },
-  {
-    isAvatar: true,
-    value: 'Avatar',
-    width: 130,
-    dataKey: 'avatar_url',
-  },
+  // {
+  //   isAvatar: true,
+  //   value: 'Avatar',
+  //   width: 130,
+  //   dataKey: 'avatar_url',
+  // },
   {
     value: 'Full name',
     width: 100,
