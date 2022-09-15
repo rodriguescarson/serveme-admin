@@ -8,11 +8,10 @@ import {
   RecaptchaVerifier,
   PhoneAuthProvider,
   signInWithCredential,
-  deleteUser as deleteAuthUser,
 } from 'firebase/auth'
 import { getStorage, ref as storageRe, uploadBytes, getDownloadURL } from 'firebase/storage'
 
-import { AddForm, ImageUploader } from '../../utils/formComponents'
+import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
 const selectDataState = ['Goa', 'Karnataka', 'Maharshtra'].map((item) => ({
@@ -184,7 +183,7 @@ const ServiceProvider = () => {
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [messageval, setMessageval] = React.useState({
-    message: '',
+    message: 'success',
     type: 'success',
   })
   ///change 1
@@ -329,6 +328,9 @@ const ServiceProvider = () => {
     // changew only this
     update(ref(db, 'user/service_provider/' + id), {
       [key]: value,
+    }).then(() => {
+      setMessageval({ message: 'User updated successfully', type: 'success' })
+      toaster.push(message, 'topCenter')
     })
   }
   //change 4

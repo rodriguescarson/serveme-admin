@@ -5,45 +5,6 @@ import { getDatabase, ref, set, child, push, update, get, remove } from 'firebas
 import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
-const selectDataType = ['abc', 'def', 'ghi'].map((item) => ({
-  label: item,
-  value: item,
-}))
-
-const formDataParameters = [
-  {
-    cid: 'city-9',
-    name: 'type',
-    label: 'Type',
-    data: selectDataType,
-    accepter: SelectPicker,
-  },
-  {
-    cid: 'cost-9',
-    name: 'cost',
-    label: 'Cost',
-  },
-]
-
-const TableParams = [
-  {
-    isId: true,
-    value: 'Id',
-    width: 100,
-    dataKey: 'id',
-  },
-  {
-    value: 'Type',
-    width: 200,
-    dataKey: 'type',
-  },
-  {
-    value: 'Cost',
-    width: 200,
-    dataKey: 'cost',
-  },
-]
-
 const ServiceSchedule = () => {
   const [data, setData] = React.useState([])
   const [modalStatus, setmodalStatus] = React.useState(false)
@@ -51,8 +12,10 @@ const ServiceSchedule = () => {
   const [deleteId, setDeleteId] = React.useState()
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
+  const [spData, setSpData] = React.useState([{ label: '', value: '' }])
+  const [sparesData, setSparesData] = React.useState([{ label: '', value: '' }])
   const [messageval, setMessageval] = React.useState({
-    message: '',
+    message: 'success',
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
@@ -60,13 +23,91 @@ const ServiceSchedule = () => {
     Cost: '',
   })
 
+  const selectDataType = ['pending', 'accepted', 'rejected'].map((item) => ({
+    label: item,
+    value: item,
+  }))
+
+  const formDataParameters = [
+    {
+      cid: 'type-9',
+      name: 'type',
+      label: 'Type',
+      data: selectDataType,
+      accepter: SelectPicker,
+    },
+    {
+      cid: 'cost-9',
+      name: 'cost',
+      label: 'Cost',
+    },
+  ]
+
+  const TableParams = [
+    {
+      isId: true,
+      value: 'Id',
+      width: 100,
+      dataKey: 'ss_id',
+    },
+    {
+      value: 'Requirement Date',
+      width: 200,
+      dataKey: 'req_date',
+    },
+    {
+      value: 'Cost',
+      width: 200,
+      dataKey: 'cost',
+    },
+    {
+      isDropDown: true,
+      value: 'Service Status',
+      width: 200,
+      dataKey: 'service_status',
+      data: selectDataType,
+    },
+    {
+      value: 'Customer Id',
+      width: 200,
+      dataKey: 'u_customer_id',
+    },
+    {
+      value: 'Genset_Id',
+      width: 200,
+      dataKey: 'ged_id',
+    },
+    {
+      isDropDown: true,
+      showPopover: true,
+      value: 'Service Provider Id',
+      width: 200,
+      dataKey: 'sp_id',
+      data: spData,
+    },
+    {
+      isDropDown: true,
+      showPopover: true,
+      value: 'Spare Part Id',
+      width: 200,
+      dataKey: 'spares_id',
+      data: sparesData,
+    },
+  ]
+
   useEffect(() => {
     const dbRef = ref(getDatabase())
     // changew only this
     get(child(dbRef, `service_schedule`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          setData(Object.values(snapshot.val()))
+          const data = Object.keys(snapshot.val()).map((key) => ({
+            ...snapshot.val()[key],
+            //change here
+            ss_id: key,
+            id: key,
+          }))
+          setData(data)
         } else {
           setMessageval((prev) => ({
             ...prev,
@@ -84,6 +125,20 @@ const ServiceSchedule = () => {
         }))
         toaster.push(message, 'topCenter')
       })
+    get(child(dbRef, `user/service_provider/`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        Object.keys(snapshot.val()).map((key) => {
+          setSpData([...spData, { label: key, value: key, ...snapshot.val()[key] }])
+        })
+      }
+    })
+    get(child(dbRef, `machinery/spares/`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        Object.keys(snapshot.val()).map((key) => {
+          setSparesData([...sparesData, { label: key, value: key, ...snapshot.val()[key] }])
+        })
+      }
+    })
   }, [])
 
   const addDataToFirebase = () => {
@@ -118,6 +173,13 @@ const ServiceSchedule = () => {
     // changew only this
     update(ref(db, 'service_schedule/' + id), {
       [key]: value,
+    }).then(() => {
+      setMessageval((prev) => ({
+        ...prev,
+        message: 'Data updated successfully',
+        type: 'success',
+      }))
+      toaster.push(message, 'topCenter')
     })
   }
   //change 4

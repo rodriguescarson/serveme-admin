@@ -93,7 +93,7 @@ const Home = () => {
                   }}
                 >
                   <CIcon icon={cilList} />
-                  <span className="ml-2"> Service List</span>
+                  <span className="ml-2"> Service Schedule</span>
                 </CButton>
               </NavLink>
             </CCardBody>
