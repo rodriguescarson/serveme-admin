@@ -72,59 +72,6 @@ const Home = () => {
         <CCol xs>
           <CCard>
             <CCardBody>
-              <CCardTitle>Genset Dashboard</CCardTitle>
-              <CCol
-                style={{ display: 'flex', margin: 'auto' }}
-                xs={6}
-                sm={4}
-                md={3}
-                xl={2}
-                key={'cas'}
-              >
-                <CIcon icon={cilBriefcase} size="9xl" />
-              </CCol>
-              <CCardText>
-                Add, Modify, Delete, View Gensets
-                {/* <CListGroup>
-                                    <CListGroupItem>
-                                        <CNav>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Add</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Modify</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                            <CNavItem>
-                                                <CNavLink href="#">
-                                                    <CIcon icon={cilUser} size="lg" />
-                                                    <span>Delete</span>
-                                                </CNavLink>
-                                            </CNavItem>
-                                        </CNav>
-                                    </CListGroupItem>
-                                </CListGroup> */}
-              </CCardText>
-              <NavLink to="/gensets">
-                <CButton color="primary" size="sm">
-                  <CIcon icon={cilBriefcase} />
-                  <span className="ml-2">Gensets</span>
-                </CButton>
-              </NavLink>
-            </CCardBody>
-            <CCardFooter>
-              <small className="text-medium-emphasis">Last updated 3 mins ago</small>
-            </CCardFooter>
-          </CCard>
-        </CCol>
-        <CCol xs>
-          <CCard>
-            <CCardBody>
               <CCardTitle>Service List</CCardTitle>
               <CCol
                 style={{ display: 'flex', margin: 'auto' }}
