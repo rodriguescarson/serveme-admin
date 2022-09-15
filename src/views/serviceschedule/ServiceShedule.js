@@ -68,12 +68,20 @@ const ServiceSchedule = () => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
         } else {
-          setMessageval({ message: 'No data available', type: 'error' })
+          setMessageval((prev) => ({
+            ...prev,
+            message: 'No data available',
+            type: 'warning',
+          }))
           toaster.push(message, 'topCenter')
         }
       })
       .catch((error) => {
-        setMessageval({ message: error.message, type: 'error' })
+        setMessageval((prev) => ({
+          ...prev,
+          message: error.message,
+          type: 'error',
+        }))
         toaster.push(message, 'topCenter')
       })
   }, [])
@@ -92,7 +100,11 @@ const ServiceSchedule = () => {
       Type: '',
       Cost: '',
     })
-    setMessageval({ message: 'Service added successfully', type: 'success' })
+    setMessageval((prev) => ({
+      ...prev,
+      message: 'Data added successfully',
+      type: 'success',
+    }))
     toaster.push(message, 'topCenter')
     handleClose()
   }

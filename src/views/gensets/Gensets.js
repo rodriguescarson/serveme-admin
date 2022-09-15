@@ -83,12 +83,24 @@ const Gensets = () => {
         if (snapshot.exists()) {
           setData(Object.values(snapshot.val()))
         } else {
-          setMessageval({ message: 'No data available', type: 'error' })
+          setMessageval((prev) => {
+            return {
+              ...prev,
+              message: 'No data available',
+              type: 'error',
+            }
+          })
           toaster.push(message, 'topCenter')
         }
       })
       .catch((error) => {
-        setMessageval({ message: error.message, type: 'error' })
+        setMessageval((prev) => {
+          return {
+            ...prev,
+            message: error.message,
+            type: 'error',
+          }
+        })
         toaster.push(message, 'topCenter')
       })
   }, [])

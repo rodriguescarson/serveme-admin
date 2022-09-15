@@ -219,7 +219,12 @@ const ServiceProvider = () => {
           }))
           setData(data)
         } else {
-          setMessageval({ message: 'No data available', type: 'error' })
+          setMessageval((prev) => ({
+            ...prev,
+            message: 'No data available',
+            type: 'warning',
+          }))
+
           toaster.push(message, 'topCenter')
         }
       })

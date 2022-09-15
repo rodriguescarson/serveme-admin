@@ -68,14 +68,21 @@ const Faq = () => {
         setData(data)
       })
       .catch((error) => {
-        setMessageval({ message: error.message, type: 'error' })
+        setMessageval({
+          message: error.message,
+          type: 'error',
+        })
         toaster.push(message, 'topCenter')
       })
   }, [])
   // change 3
   const addDataToFirebase = () => {
     if (!formRef.current.check()) {
-      setMessageval({ message: 'Please fill all the required fields', type: 'error' })
+      setMessageval((prev) => ({
+        ...prev,
+        message: 'Please fill all the fields',
+        type: 'error',
+      }))
       toaster.push(message, 'topCenter')
       return
     }
@@ -90,7 +97,12 @@ const Faq = () => {
       const nextData = Object.assign([], data)
       setData([...nextData, { ...formValue, id: newRef.key }])
       handleClose()
-      setMessageval({ message: 'Faq added successfully', type: 'success' })
+
+      setMessageval((prev) => ({
+        ...prev,
+        message: 'Data added successfully',
+        type: 'success',
+      }))
       toaster.push(message, 'topCenter')
       setFormValue({
         answer: '',
