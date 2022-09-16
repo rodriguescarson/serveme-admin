@@ -30,16 +30,31 @@ const ServiceSchedule = () => {
 
   const formDataParameters = [
     {
-      cid: 'type-9',
-      name: 'type',
-      label: 'Type',
+      cid: 'cost-9',
+      name: 'cost',
+      label: 'Cost',
+    },
+    {
+      cid: 'Requirement Date',
+      name: 'req_data',
+      label: 'Requirement Date',
+    },
+    {
+      cid: 'Service Status',
+      name: 'service_status',
+      label: 'Service Status',
       data: selectDataType,
       accepter: SelectPicker,
     },
     {
-      cid: 'cost-9',
-      name: 'cost',
-      label: 'Cost',
+      cid: 'u_customer_id',
+      name: 'u_customer_id',
+      label: 'Customer ID',
+    },
+    {
+      cid: 'gen_id',
+      name: 'gen_id',
+      label: 'GEN ID',
     },
   ]
 
@@ -75,7 +90,7 @@ const ServiceSchedule = () => {
     {
       value: 'Genset_Id',
       width: 200,
-      dataKey: 'ged_id',
+      dataKey: 'gen_id',
     },
     {
       isDropDown: true,
