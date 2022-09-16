@@ -11,14 +11,14 @@ const selectDataAvailable = ['In Stock', 'Out Of Stock'].map((item) => ({
 }))
 
 const formDataParameters = [
-  {
-    cid: 'image-10',
-    name: 'image',
-    label: 'Image',
-    data: selectDataAvailable,
-    accepter: ImageUploader,
-    action: '//jsonplaceholder.typicode.com/posts/',
-  },
+  // {
+  //   cid: 'image-10',
+  //   name: 'image',
+  //   label: 'Image',
+  //   data: selectDataAvailable,
+  //   accepter: ImageUploader,
+  //   action: '//jsonplaceholder.typicode.com/posts/',
+  // },
   {
     cid: 'available-10',
     name: 'available',
@@ -50,12 +50,12 @@ const TableParams = [
     width: 100,
     dataKey: 'id',
   },
-  {
-    isAvatar: true,
-    value: 'Image',
-    width: 200,
-    dataKey: 'image',
-  },
+  // {
+  //   isAvatar: true,
+  //   value: 'Image',
+  //   width: 200,
+  //   dataKey: 'image',
+  // },
   {
     value: 'Available',
     width: 220,

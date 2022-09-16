@@ -13,7 +13,7 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 
 import { auth } from '../../firebase'
-import avatar8 from './../../assets/images/avatars/8.jpg'
+import avatar8 from './../../assets/images/avatars/avatar.jpg'
 
 const AppHeaderDropdown = () => {
   const navigate = useNavigate()
@@ -31,7 +31,7 @@ const AppHeaderDropdown = () => {
         <CAvatar src={avatar8} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownHeader className="bg-light fw-semibold py-2">Settings</CDropdownHeader>
+        {/* <CDropdownHeader className="bg-light fw-semibold py-2">Settings</CDropdownHeader>
         <CDropdownItem href="#">
           <CIcon icon={cilUser} className="me-2" />
           Profile
@@ -39,8 +39,8 @@ const AppHeaderDropdown = () => {
         <CDropdownItem href="#">
           <CIcon icon={cilSettings} className="me-2" />
           Settings
-        </CDropdownItem>
-        <CDropdownDivider />
+        </CDropdownItem> */}
+        {/* <CDropdownDivider /> */}
         <CDropdownItem onClick={logoutHandler}>
           <CIcon icon={cilLockLocked} className="me-2" />
           Logout
