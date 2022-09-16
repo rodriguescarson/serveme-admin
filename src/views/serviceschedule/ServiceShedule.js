@@ -128,14 +128,15 @@ const ServiceSchedule = () => {
     get(child(dbRef, `user/service_provider/`)).then((snapshot) => {
       if (snapshot.exists()) {
         Object.keys(snapshot.val()).map((key) => {
-          setSpData([...spData, { label: key, value: key, ...snapshot.val()[key] }])
+          setSpData((prev) => [...prev, { label: key, value: key, ...snapshot.val()[key] }])
+          // setSpData([...spData, { label: key, value: key, ...snapshot.val()[key] }])
         })
       }
     })
     get(child(dbRef, `machinery/spares/`)).then((snapshot) => {
       if (snapshot.exists()) {
         Object.keys(snapshot.val()).map((key) => {
-          setSparesData([...sparesData, { label: key, value: key, ...snapshot.val()[key] }])
+          setSparesData((prev) => [...prev, { label: key, value: key, ...snapshot.val()[key] }])
         })
       }
     })

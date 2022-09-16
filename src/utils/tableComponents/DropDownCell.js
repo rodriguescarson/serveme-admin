@@ -4,40 +4,39 @@ import { Popover, Whisper, Button, Toggle } from 'rsuite'
 
 const DropDownCell = ({ rowData, dataKey, onChange, data, showPopover, ...props }) => {
   const editing = rowData.status === 'EDIT'
-  console.log('rowData', rowData[dataKey])
-  console.log('rowData', rowData)
   const speaker = (
     <Popover title="Info">
-      {data.map((item, i) => (
-        <>
-          {rowData[dataKey] === item.value && (
-            <>
-              <div key={i}>
-                {Object.keys(item).map((key) => {
-                  if (item[key] !== null && item[key] !== '' && key !== 'value') {
-                    return (
-                      <>
-                        <span
-                          style={{
-                            fontWeight: 'bold',
-                            textTransform: 'capitalize',
-                          }}
-                        >
-                          {key}:
-                        </span>
-                        <span>{item[key]}</span>
-                        <br />
-                      </>
-                    )
-                  }
-                })}
-              </div>
-
-              <hr />
-            </>
-          )}
-        </>
-      ))}
+      <>
+        {data.map((item, i) => (
+          <div key={i}>
+            {rowData[dataKey] === item.value && (
+              <>
+                <div key={i}>
+                  {Object.keys(item).map((key) => {
+                    if (item[key] !== null && item[key] !== '' && key !== 'value') {
+                      return (
+                        <>
+                          <span
+                            style={{
+                              fontWeight: 'bold',
+                              textTransform: 'capitalize',
+                            }}
+                          >
+                            {key}:
+                          </span>
+                          <span>{item[key]}</span>
+                          <br />
+                        </>
+                      )
+                    }
+                  })}
+                </div>
+                <hr />
+              </>
+            )}
+          </div>
+        ))}
+      </>
     </Popover>
   )
   return (
@@ -61,7 +60,6 @@ const DropDownCell = ({ rowData, dataKey, onChange, data, showPopover, ...props 
           {showPopover ? (
             <Whisper placement="top" trigger="click" controlId="control-id-click" speaker={speaker}>
               <Button>
-                {' '}
                 <span className="table-content-edit-span">{rowData[dataKey]}</span>
               </Button>
             </Whisper>
