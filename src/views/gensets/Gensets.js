@@ -69,10 +69,10 @@ const Gensets = () => {
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
-    gensetModel: '',
-    altMake: '',
-    gensetMake: '',
-    controllerMode: '',
+    genset_model: '',
+    alt_make: '',
+    genset_make: '',
+    controller_mode: '',
   })
 
   useEffect(() => {
@@ -116,10 +116,10 @@ const Gensets = () => {
     const nextData = data
     setData([...nextData, { id: newRef.key, ...formValue }])
     setFormValue({
-      gensetModel: '',
-      altMake: '',
-      gensetMake: '',
-      controllerMode: '',
+      genset_model: '',
+      alt_make: '',
+      genset_make: '',
+      controller_mode: '',
     })
     handleClose()
   }
