@@ -36,6 +36,11 @@ const _nav = [
     items: [
       {
         component: CNavItem,
+        name: 'Admin',
+        to: '/admin',
+      },
+      {
+        component: CNavItem,
         name: 'Customers',
         to: '/customer',
       },
@@ -43,11 +48,6 @@ const _nav = [
         component: CNavItem,
         name: 'Service Providers',
         to: '/serviceprovider',
-      },
-      {
-        component: CNavItem,
-        name: 'Admin',
-        to: '/admin',
       },
     ],
   },
