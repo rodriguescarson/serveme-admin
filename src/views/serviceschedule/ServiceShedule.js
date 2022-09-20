@@ -185,7 +185,7 @@ const ServiceSchedule = () => {
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
-
+    console.log(id, key, value)
     // changew only this
     update(ref(db, 'service_schedule/' + id), {
       [key]: value,
@@ -197,6 +197,30 @@ const ServiceSchedule = () => {
       }))
       toaster.push(message, 'topCenter')
     })
+    // update ss_id list in service_provider
+    if (key === 'sp_id') {
+      const db = getDatabase()
+      const Ref = ref(db, 'user/service_provider/' + value)
+      const prevVal = get(Ref)
+
+      prevVal.then((snapshot) => {
+        if (snapshot.exists()) {
+          const prevData = snapshot.val()
+          const nextData = Object.assign([], prevData.ss_id)
+          nextData.push(id)
+          update(ref(db, 'user/service_provider/' + value), {
+            ss_id: nextData,
+          }).then(() => {
+            setMessageval((prev) => ({
+              ...prev,
+              message: 'Data updated successfully',
+              type: 'success',
+            }))
+            toaster.push(message, 'topCenter')
+          })
+        }
+      })
+    }
   }
   //change 4
   const handleDeleteFirebase = (id) => {
