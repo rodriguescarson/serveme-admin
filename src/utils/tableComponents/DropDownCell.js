@@ -12,10 +12,10 @@ const DropDownCell = ({ rowData, dataKey, onChange, data, showPopover, ...props 
             {rowData[dataKey] === item.value && (
               <>
                 <div key={i}>
-                  {Object.keys(item).map((key) => {
+                  {Object.keys(item).map((key, i) => {
                     if (item[key] !== null && item[key] !== '' && key !== 'value') {
                       return (
-                        <>
+                        <div key={i}>
                           <span
                             style={{
                               fontWeight: 'bold',
@@ -26,7 +26,7 @@ const DropDownCell = ({ rowData, dataKey, onChange, data, showPopover, ...props 
                           </span>
                           <span>{item[key]}</span>
                           <br />
-                        </>
+                        </div>
                       )
                     }
                   })}
