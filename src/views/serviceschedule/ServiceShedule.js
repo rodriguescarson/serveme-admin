@@ -84,7 +84,7 @@ const ServiceSchedule = () => {
     },
     {
       value: 'Customer Id',
-      width: 200,
+      width: 100,
       dataKey: 'u_customer_id',
     },
     {
