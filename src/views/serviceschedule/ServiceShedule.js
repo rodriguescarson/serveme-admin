@@ -4,6 +4,7 @@ import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, push, update, get, remove } from 'firebase/database'
 import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
+import { setDate } from 'rsuite/esm/utils/dateUtils'
 
 const ServiceSchedule = () => {
   const [data, setData] = React.useState([])
@@ -88,6 +89,11 @@ const ServiceSchedule = () => {
       dataKey: 'u_customer_id',
     },
     {
+      value: 'Customer Name',
+      width: 100,
+      dataKey: 'u_customer_name',
+    },
+    {
       value: 'Genset_Id',
       width: 200,
       dataKey: 'gen_id',
@@ -109,20 +115,48 @@ const ServiceSchedule = () => {
       data: sparesData,
     },
   ]
-
+  const [tempName, setTempName] = React.useState('')
   useEffect(() => {
     const dbRef = ref(getDatabase())
     // changew only this
     get(child(dbRef, `service_schedule`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          const data = Object.keys(snapshot.val()).map((key) => ({
-            ...snapshot.val()[key],
-            //change here
-            ss_id: key,
-            id: key,
-          }))
+          const data = Object.keys(snapshot.val()).map((key) => {
+            return {
+              ...snapshot.val()[key],
+              //change here
+              ss_id: key,
+              id: key,
+              u_customer_name: tempName,
+            }
+          })
           setData(data)
+          data.map((key) => {
+            const dbRef = ref(getDatabase())
+            get(child(dbRef, `user/customer/${key.u_customer_id}`))
+              .then((snapshot1) => {
+                if (snapshot1.exists()) {
+                  console.log(snapshot1.val())
+                  setData((prev) => {
+                    return prev.map((item) => {
+                      console.log(item.u_customer_id, key.u_customer_id)
+                      if (item.u_customer_id === key.u_customer_id) {
+                        return {
+                          ...item,
+                          u_customer_name: snapshot1.val().full_name,
+                        }
+                      }
+                      return item
+                    })
+                  })
+                }
+              })
+              .then(console.log(data))
+              .catch((error) => {
+                console.error(error)
+              })
+          })
         } else {
           setMessageval((prev) => ({
             ...prev,
@@ -143,7 +177,10 @@ const ServiceSchedule = () => {
     get(child(dbRef, `user/service_provider/`)).then((snapshot) => {
       if (snapshot.exists()) {
         Object.keys(snapshot.val()).map((key) => {
-          setSpData((prev) => [...prev, { label: key, value: key, ...snapshot.val()[key] }])
+          setSpData((prev) => [
+            ...prev,
+            { label: snapshot.val()[key].full_name, value: key, ...snapshot.val()[key] },
+          ])
           // setSpData([...spData, { label: key, value: key, ...snapshot.val()[key] }])
         })
       }
@@ -185,7 +222,6 @@ const ServiceSchedule = () => {
     nextData.find((item) => item.id === id)[key] = value
     setData(nextData)
     const db = getDatabase()
-    console.log(id, key, value)
     // changew only this
     update(ref(db, 'service_schedule/' + id), {
       [key]: value,

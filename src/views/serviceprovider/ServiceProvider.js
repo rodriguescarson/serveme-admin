@@ -336,7 +336,6 @@ const ServiceProvider = () => {
   //change 4
   const handleDeleteFirebase = (id) => {
     const db = getDatabase()
-    console.log(id)
     // change only this
     remove(ref(db, 'user/service_provider/' + id))
     setData(data.filter((item) => item.id !== id))
@@ -361,7 +360,6 @@ const ServiceProvider = () => {
   //no changes down here
   const handleShowDeleteModal = (id) => {
     setmodalStatus(true)
-    console.log(id, 'idmodel')
     setDeleteId(id)
   }
 
