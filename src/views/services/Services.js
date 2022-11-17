@@ -6,7 +6,7 @@ import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
 import { setDate } from 'rsuite/esm/utils/dateUtils'
 
-const ServiceSchedule = () => {
+const Services = () => {
   const [data, setData] = React.useState([])
   const [modalStatus, setmodalStatus] = React.useState(false)
   const handleCloseDeleteModal = () => setmodalStatus(false)
@@ -322,4 +322,4 @@ const ServiceSchedule = () => {
     </>
   )
 }
-export default ServiceSchedule
+export default Services

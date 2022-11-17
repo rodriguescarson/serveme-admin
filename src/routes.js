@@ -9,6 +9,7 @@ const ServiceProvider = React.lazy(() => import('./views/serviceprovider/Service
 const SpareParts = React.lazy(() => import('./views/spareparts/SpareParts'))
 const Gensets = React.lazy(() => import('./views/gensets/Gensets'))
 const ServiceSchedule = React.lazy(() => import('./views/serviceschedule/ServiceShedule'))
+const Services = React.lazy(() => import('./views/services/Services'))
 
 const Faq = React.lazy(() => import('./views/faq/Faq'))
 const routes = [
@@ -23,6 +24,7 @@ const routes = [
     element: ServiceProvider,
   },
   { path: '/serviceschedule', name: 'ServiceLists', element: ServiceSchedule },
+  { path: '/services', name: 'Services', element: Services },
   { path: '/spareparts', name: 'SpareParts', element: SpareParts },
   { path: '/aboutus', name: 'AboutUs', element: AboutUs },
   { path: '/gensets', name: 'Gensets', element: Gensets },

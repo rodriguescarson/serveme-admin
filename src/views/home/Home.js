@@ -141,6 +141,48 @@ const Home = () => {
             </CCardBody>
           </CCard>
         </CCol>
+        <CCol xs>
+          <CCard>
+            <CCardBody>
+              <CCardTitle>Services</CCardTitle>
+              <CCol
+                style={{ display: 'flex', margin: 'auto' }}
+                xs={6}
+                sm={4}
+                md={3}
+                xl={2}
+                key={'cas'}
+              >
+                <CIcon
+                  icon={cilCasino}
+                  customClassName="c-icon-xl"
+                  style={{ margin: 'auto', marginBlock: 60 }}
+                />
+              </CCol>
+              <CCardText></CCardText>
+              {/* center NavLink */}
+              <NavLink
+                to="/services"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+              >
+                <CButton
+                  color="primary"
+                  style={{
+                    width: '100%',
+                  }}
+                >
+                  <CIcon icon={cilUser} />
+                  <span className="ml-2">Services</span>
+                </CButton>
+              </NavLink>
+            </CCardBody>
+          </CCard>
+        </CCol>
       </CRow>
     </>
   )

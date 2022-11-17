@@ -71,7 +71,7 @@ function DisplayTable({
         {TableParams.map((item, i) => {
           if (item.isId) {
             return (
-              <Column key={i} width={item.width} fixed sortable resizable>
+              <Column key={i} width={item.width} sortable resizable>
                 <HeaderCell>{item.value}</HeaderCell>
                 <Cell dataKey={item.dataKey} />
               </Column>
@@ -79,7 +79,7 @@ function DisplayTable({
           }
           if (item.isAvatar) {
             return (
-              <Column key={i} width={item.width} fixed resizable>
+              <Column key={i} width={item.width} resizable>
                 <HeaderCell>{item.value}</HeaderCell>
                 <ImageCell dataKey="avatar_url" />
               </Column>
@@ -87,7 +87,7 @@ function DisplayTable({
           }
           if (item.isDropDown) {
             return (
-              <Column key={i} width={item.width} fixed resizable>
+              <Column key={i} width={item.width} resizable>
                 <HeaderCell>{item.value}</HeaderCell>
                 <DropDownCell
                   dataKey={item.dataKey}
@@ -99,23 +99,17 @@ function DisplayTable({
             )
           }
           return (
-            <Column
-              key={i}
-              width={item.width}
-              sortable
-              onChange={handleUpdateFirebase}
-              flexGrow={1}
-            >
+            <Column key={i} resizable sortable onChange={handleUpdateFirebase}>
               <HeaderCell>{item.value}</HeaderCell>
               <EditableCell dataKey={item.dataKey} onChange={handleUpdateFirebase} />
             </Column>
           )
         })}
-        <Column width={70}>
+        <Column>
           <HeaderCell>Edit</HeaderCell>
           <ActionCell dataKey="id" onClick={handleEditState} />
         </Column>
-        <Column width={80}>
+        <Column>
           <HeaderCell>Delete</HeaderCell>
           <DeleteCell dataKey="id" onClick={handleShowDeleteModal} />
         </Column>
