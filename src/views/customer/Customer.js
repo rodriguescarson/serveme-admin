@@ -51,9 +51,9 @@ const formDataParameters = [
 
   { cid: 'contactNumber-9', name: 'contact_no', label: 'Contact Number', type: 'number' },
 
-  { cid: 'add_1-9', name: 'add_l1', label: 'Address 1', type: 'text' },
+  { cid: 'add_1-9', name: 'add_1', label: 'Address 1', type: 'text' },
 
-  { cid: 'add_2-9', name: 'add_l2', label: 'Address 2', type: 'text' },
+  { cid: 'add_2-9', name: 'add_2', label: 'Address 2', type: 'text' },
 
   { cid: 'pincode-9', name: 'pincode', label: 'Pincode', type: 'number' },
   {
@@ -121,7 +121,7 @@ const TableParams = [
   {
     value: 'Address 2',
     width: 200,
-    dataKey: 'add_l2',
+    dataKey: 'add_2',
   },
   {
     value: 'Pincode',
@@ -169,7 +169,7 @@ const Customer = () => {
     contact_no: '',
     password: '',
     add_l1: '',
-    add_l2: '',
+    add_2: '',
     state: '',
     city: '',
     country: '',
@@ -258,7 +258,7 @@ const Customer = () => {
             contact_no: '',
             password: '',
             add_l1: '',
-            add_l2: '',
+            add_2: '',
             state: '',
             city: '',
             country: '',
