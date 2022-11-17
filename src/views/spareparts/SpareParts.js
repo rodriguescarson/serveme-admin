@@ -86,7 +86,7 @@ const SpareParts = () => {
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [messageval, setMessageval] = React.useState({
-    message: 'success',
+    message: 'Success',
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
