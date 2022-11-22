@@ -153,22 +153,7 @@ const TableParams = [
     width: 200,
     dataKey: 'country',
   },
-  {
-    value: 'Gen Id',
-    width: 200,
-    dataKey: 'gen_id',
-  },
-  {
-    value: 'Service Schedule Id',
-    width: 200,
-    dataKey: 'service_schedule_id',
-  },
-  {
-    isIdEditDelete: true,
-    value: 'Edit or Delete',
-    width: 70,
-    dataKey: 'id',
-  },
+
 ]
 
 const ServiceProvider = () => {
