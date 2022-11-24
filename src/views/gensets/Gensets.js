@@ -25,6 +25,7 @@ const formDataParameters = [
 
 const TableParams = [
   {
+
     isgenset_id: true,
     value: 'genset_id',
     wgenset_idth: 170,
@@ -33,11 +34,13 @@ const TableParams = [
   {
     value: 'Alternate Make',
     wgenset_idth: 200,
+
     dataKey: 'alt_make',
   },
   {
     value: 'Engine Make',
     wgenset_idth: 200,
+
     dataKey: 'engine_make',
   },
   {
@@ -59,6 +62,7 @@ const Gensets = () => {
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
+
     //genset_genset_id: '',
     alt_make: '',
     engine_make: '',
@@ -71,7 +75,14 @@ const Gensets = () => {
     get(child(dbRef, `machinery/genset`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          setData(Object.values(snapshot.val()))
+          const data = Object.keys(snapshot.val()).map((key) => {
+            return {
+              ...snapshot.val()[key],
+              //change here
+              id: key,
+            }
+          })
+          setData(data)
         } else {
           setMessageval((prev) => {
             return {
