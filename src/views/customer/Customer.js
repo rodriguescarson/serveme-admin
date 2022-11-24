@@ -29,13 +29,6 @@ const selectDataCountry = ['India', 'USA'].map((item) => ({
 }))
 
 const formDataParameters = [
-  // {
-  //   cid: 'avatar',
-  //   name: 'avatar',
-  //   label: 'Profile Picture',
-  //   accepter: ImageUploader,
-  //   action: '//jsonplaceholder.typicode.com/posts/',
-  // },
   {
     cid: 'full_name-9',
     name: 'full_name',
@@ -92,12 +85,6 @@ const TableParams = [
     width: 70,
     dataKey: 'customer_id',
   },
-  // {
-  //   isAvatar: true,
-  //   value: 'Avatar',
-  //   width: 130,
-  //   dataKey: 'avatar_url',
-  // },
   {
     value: 'Full name',
     width: 100,
@@ -163,7 +150,6 @@ const Customer = () => {
   })
   ///change 1
   const [formValue, setFormValue] = React.useState({
-    avatar: null,
     full_name: '',
     email: '',
     contact_no: '',
@@ -175,7 +161,6 @@ const Customer = () => {
     country: '',
     pincode: '',
     district: '',
-    avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
   })
 
   useEffect(() => {
@@ -217,33 +202,13 @@ const Customer = () => {
         const user = userCredential.user
         const uid = user.uid
         const db = getDatabase()
-        if (formValue.avatar) {
-          const file = formValue.avatar[0].blobFile
-          const storage = getStorage()
-          const storageRef = storageRe(storage, `/userAvatars/${uid}`)
-          uploadBytes(storageRef, file)
-            .then((snapshot) => {
-              getDownloadURL(storageRe(storage, snapshot.ref.fullPath)).then((downloadURL) => {
-                update(ref(db, 'user/customer/' + uid), {
-                  avatar_url: downloadURL,
-                })
-              })
-            })
-            .catch((e) => {
-              setMessageval((prev) => ({
-                ...prev,
-                message: e.message,
-                type: 'error',
-              }))
-              toaster.push(message, 'topCenter')
-            })
-        }
+
         set(ref(db, 'user/customer/' + uid), {
           customer_id: uid,
           ...formValue,
         }).then(() => {
           const nextData = Object.assign([], data)
-          setData([...nextData, { id: uid, ...formValue }])
+          setData([...nextData, { id: uid, customer_id: uid, ...formValue }])
           handleClose()
           setMessageval((prev) => ({
             ...prev,
@@ -252,7 +217,6 @@ const Customer = () => {
           }))
           toaster.push(message, 'topCenter')
           setFormValue({
-            avatar: null,
             full_name: '',
             email: '',
             contact_no: '',
@@ -264,7 +228,6 @@ const Customer = () => {
             country: '',
             pincode: '',
             district: '',
-            avatar_url: 'https://www.gravatar.com/avatar/0?d=mp&f=y',
           })
         })
       })
