@@ -7,24 +7,19 @@ import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
 const formDataParameters = [
   {
-    cid: 'gensetModel-10',
-    name: 'genset_model',
-    label: 'Genset Model',
-  },
-  {
     cid: 'altMake-10',
     name: 'alt_make',
     label: 'Alt Make',
   },
   {
-    cid: 'gensetMake-10',
-    name: 'genset_make',
+    cid: 'engineMake-10',
+    name: 'engine_make',
     label: 'Genset Make',
   },
   {
-    cid: 'controllerMode-10',
-    name: 'controller_mode',
-    label: 'Controller Mode',
+    cid: 'kva-10',
+    name: 'kva',
+    label: 'KVA',
   },
 ]
 
@@ -36,24 +31,19 @@ const TableParams = [
     dataKey: 'id',
   },
   {
-    value: 'Genset Model',
-    width: 200,
-    dataKey: 'genset_model',
-  },
-  {
     value: 'AltMake',
     width: 200,
     dataKey: 'alt_make',
   },
   {
-    value: 'Genset Make',
+    value: 'Engine Make',
     width: 200,
-    dataKey: 'genset_make',
+    dataKey: 'engine_make',
   },
   {
-    value: 'Controller Mode',
+    value: 'KVA',
     width: 200,
-    dataKey: 'controller_mode',
+    dataKey: 'kva',
   },
 ]
 
@@ -69,10 +59,9 @@ const Gensets = () => {
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
-    genset_model: '',
+    engine_make: '',
     alt_make: '',
-    genset_make: '',
-    controller_mode: '',
+    kva: '',
   })
 
   useEffect(() => {
@@ -118,8 +107,8 @@ const Gensets = () => {
     setFormValue({
       genset_model: '',
       alt_make: '',
-      genset_make: '',
-      controller_mode: '',
+      engine_make: '',
+      kva: '',
     })
     handleClose()
   }
