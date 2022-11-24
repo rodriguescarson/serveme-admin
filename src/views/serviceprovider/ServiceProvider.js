@@ -82,18 +82,6 @@ const formDataParameters = [
     data: selectDataCountry,
     accepter: SelectPicker,
   },
-  {
-    cid: 'gen_id-10',
-    name: 'gen_id',
-    label: 'Gen Id',
-    type: 'text',
-  },
-  {
-    cid: 'service_schedule_list-10',
-    name: 'service_schedule_id',
-    label: 'Service Schedule List',
-    type: 'text',
-  },
 ]
 const TableParams = [
   {
@@ -152,16 +140,6 @@ const TableParams = [
     value: 'Country',
     width: 200,
     dataKey: 'country',
-  },
-  {
-    value: 'Gen Id',
-    width: 200,
-    dataKey: 'gen_id',
-  },
-  {
-    value: 'Service Schedule Id',
-    width: 200,
-    dataKey: 'service_schedule_id',
   },
   {
     isIdEditDelete: true,
