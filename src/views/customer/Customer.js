@@ -116,7 +116,7 @@ const TableParams = [
   {
     value: 'Address 1',
     width: 200,
-    dataKey: 'add_l1',
+    dataKey: 'add_1',
   },
   {
     value: 'Address 2',
@@ -168,7 +168,7 @@ const Customer = () => {
     email: '',
     contact_no: '',
     password: '',
-    add_l1: '',
+    add_1: '',
     add_2: '',
     state: '',
     city: '',
@@ -257,7 +257,7 @@ const Customer = () => {
             email: '',
             contact_no: '',
             password: '',
-            add_l1: '',
+            add_1: '',
             add_2: '',
             state: '',
             city: '',
