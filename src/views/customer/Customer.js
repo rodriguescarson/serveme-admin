@@ -291,7 +291,17 @@ const Customer = () => {
           return true
         }
       }, 'Email already exists'),
-    contact_no: Schema.Types.StringType().isRequired('This field is required.'),
+    contact_no: Schema.Types.StringType()
+      .isRequired('This field is required.')
+      .addRule((value) => {
+        if (value) {
+          const isExist = data.find((item) => item.contact_no === value)
+          if (isExist) {
+            return false
+          }
+          return true
+        }
+      }, 'Contact number already exists'),
     password: Schema.Types.StringType()
       .isRequired('This field is required.')
       .minLength(6)
