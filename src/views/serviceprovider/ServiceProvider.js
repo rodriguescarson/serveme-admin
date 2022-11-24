@@ -141,12 +141,14 @@ const TableParams = [
     width: 200,
     dataKey: 'country',
   },
+
   {
     isIdEditDelete: true,
     value: 'Edit or Delete',
     width: 70,
     dataKey: 'id',
   },
+
 ]
 
 const ServiceProvider = () => {

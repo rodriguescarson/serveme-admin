@@ -7,17 +7,17 @@ import DisplayTable from '../../utils/tableComponents/DisplayTable'
 
 const formDataParameters = [
   {
-    cid: 'altMake-10',
+    cgenset_id: 'altMake-10',
     name: 'alt_make',
     label: 'Alt Make',
   },
   {
-    cid: 'engineMake-10',
+    cgenset_id: 'gensetMake-10',
     name: 'engine_make',
-    label: 'Genset Make',
+    label: 'Engine Make',
   },
   {
-    cid: 'kva-10',
+    cgenset_id: 'controllerMode-10',
     name: 'kva',
     label: 'KVA',
   },
@@ -25,24 +25,27 @@ const formDataParameters = [
 
 const TableParams = [
   {
-    isId: true,
-    value: 'Id',
-    width: 170,
-    dataKey: 'id',
+
+    isgenset_id: true,
+    value: 'genset_id',
+    wgenset_idth: 170,
+    dataKey: 'genset_id',
   },
   {
-    value: 'AltMake',
-    width: 200,
+    value: 'Alternate Make',
+    wgenset_idth: 200,
+
     dataKey: 'alt_make',
   },
   {
     value: 'Engine Make',
-    width: 200,
+    wgenset_idth: 200,
+
     dataKey: 'engine_make',
   },
   {
     value: 'KVA',
-    width: 200,
+    wgenset_idth: 200,
     dataKey: 'kva',
   },
 ]
@@ -51,7 +54,7 @@ const Gensets = () => {
   const [data, setData] = React.useState([])
   const [modalStatus, setmodalStatus] = React.useState(false)
   const handleCloseDeleteModal = () => setmodalStatus(false)
-  const [deleteId, setDeleteId] = React.useState()
+  const [deletegenset_id, setDeletegenset_id] = React.useState()
   const [open, setOpen] = React.useState(false)
   const formRef = React.useRef()
   const [messageval, setMessageval] = React.useState({
@@ -59,8 +62,10 @@ const Gensets = () => {
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
-    engine_make: '',
+
+    //genset_genset_id: '',
     alt_make: '',
+    engine_make: '',
     kva: '',
   })
 
@@ -106,13 +111,13 @@ const Gensets = () => {
     const Ref = ref(db, 'machinery/genset')
     const newRef = push(Ref)
     set(newRef, {
-      id: newRef.key,
+      genset_id: newRef.key,
       ...formValue,
     })
     const nextData = data
-    setData([...nextData, { id: newRef.key, ...formValue }])
+    setData([...nextData, { genset_id: newRef.key, ...formValue }])
     setFormValue({
-      genset_model: '',
+      //genset_genset_id: '',
       alt_make: '',
       engine_make: '',
       kva: '',
@@ -120,14 +125,14 @@ const Gensets = () => {
     handleClose()
   }
 
-  const handleUpdateFirebase = (id, key, value) => {
+  const handleUpdateFirebase = (genset_id, key, value) => {
     const nextData = Object.assign([], data)
-    nextData.find((item) => item.id === id)[key] = value
+    nextData.find((item) => item.genset_id === genset_id)[key] = value
     setData(nextData)
     const db = getDatabase()
 
     // changew only this
-    update(ref(db, 'machinery/genset/' + id), {
+    update(ref(db, 'machinery/genset/' + genset_id), {
       [key]: value,
     }).then(() => {
       setMessageval((prev) => {
@@ -141,17 +146,17 @@ const Gensets = () => {
     })
   }
   //change 4
-  const handleDeleteFirebase = (id) => {
+  const handleDeleteFirebase = (genset_id) => {
     const db = getDatabase()
     // change only this
-    remove(ref(db, 'machinery/genset/' + id))
-    setData(data.filter((item) => item.id !== id))
+    remove(ref(db, 'machinery/genset/' + genset_id))
+    setData(data.filter((item) => item.genset_id !== genset_id))
   }
 
   //no changes down here
-  const handleShowDeleteModal = (id) => {
+  const handleShowDeleteModal = (genset_id) => {
     setmodalStatus(true)
-    setDeleteId(id)
+    setDeletegenset_id(genset_id)
   }
 
   // handle states for add
@@ -162,9 +167,9 @@ const Gensets = () => {
     setOpen(true)
   }
 
-  const handleEditState = (id) => {
+  const handleEditState = (genset_id) => {
     const nextData = Object.assign([], data)
-    const activeItem = nextData.find((item) => item.id === id)
+    const activeItem = nextData.find((item) => item.genset_id === genset_id)
     activeItem.status = activeItem.status ? null : 'EDIT'
     setData(nextData)
   }
@@ -197,7 +202,7 @@ const Gensets = () => {
         modalStatus={modalStatus}
         handleCloseDeleteModal={handleCloseDeleteModal}
         handleDeleteFirebase={handleDeleteFirebase}
-        deleteId={deleteId}
+        deletegenset_id={deletegenset_id}
         TableParams={TableParams}
       />
     </>
