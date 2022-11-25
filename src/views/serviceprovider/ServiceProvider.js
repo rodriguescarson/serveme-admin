@@ -148,7 +148,6 @@ const TableParams = [
     width: 70,
     dataKey: 'id',
   },
-
 ]
 
 const ServiceProvider = () => {

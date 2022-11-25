@@ -25,7 +25,6 @@ const formDataParameters = [
 
 const TableParams = [
   {
-
     isgenset_id: true,
     value: 'genset_id',
     wgenset_idth: 170,
@@ -34,13 +33,11 @@ const TableParams = [
   {
     value: 'Alternate Make',
     wgenset_idth: 200,
-
     dataKey: 'alt_make',
   },
   {
     value: 'Engine Make',
     wgenset_idth: 200,
-
     dataKey: 'engine_make',
   },
   {
@@ -62,7 +59,6 @@ const Gensets = () => {
     type: 'success',
   })
   const [formValue, setFormValue] = React.useState({
-
     //genset_genset_id: '',
     alt_make: '',
     engine_make: '',
@@ -202,7 +198,7 @@ const Gensets = () => {
         modalStatus={modalStatus}
         handleCloseDeleteModal={handleCloseDeleteModal}
         handleDeleteFirebase={handleDeleteFirebase}
-        deletegenset_id={deletegenset_id}
+        deleteId={deletegenset_id}
         TableParams={TableParams}
       />
     </>
