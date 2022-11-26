@@ -17,7 +17,7 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
-import { Modal, Button, ButtonToolbar, Placeholder } from 'rsuite'
+import { Modal, Button } from 'rsuite'
 const auth = getAuth()
 
 const Login = () => {

@@ -15,8 +15,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { db } from '../../../firebase'
-import { Modal, Button, ButtonToolbar, Placeholder } from 'rsuite'
+import { Modal, Button } from 'rsuite'
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
 import { getDatabase, ref, set } from 'firebase/database'
 

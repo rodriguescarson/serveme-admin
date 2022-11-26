@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
-import 'rsuite-table/dist/css/rsuite-table.css'
 import { getDatabase, ref, set, child, update, get, remove, push } from 'firebase/database'
 import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'

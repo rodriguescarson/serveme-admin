@@ -4,13 +4,12 @@ import {
   CButton,
   CCard,
   CCardBody,
-  CCardFooter,
   CCardText,
   CCardTitle,
   CCol,
   CRow,
 } from '@coreui/react'
-import { cilUser, cilBriefcase, cilCog, cilCasino, cilList } from '@coreui/icons'
+import { cilUser, cilCog, cilCasino, cilList } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { NavLink } from 'react-router-dom'
 const Home = () => {

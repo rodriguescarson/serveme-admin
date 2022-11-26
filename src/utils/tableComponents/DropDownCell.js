@@ -1,6 +1,6 @@
 import React from 'react'
 import { Cell } from 'rsuite-table'
-import { Popover, Whisper, Button, Toggle } from 'rsuite'
+import { Popover, Whisper, Button } from 'rsuite'
 
 const DropDownCell = ({ rowData, dataKey, onChange, data, showPopover, ...props }) => {
   const editing = rowData.status === 'EDIT'
@@ -28,6 +28,8 @@ const DropDownCell = ({ rowData, dataKey, onChange, data, showPopover, ...props 
                           <br />
                         </div>
                       )
+                    } else {
+                      return null
                     }
                   })}
                 </div>

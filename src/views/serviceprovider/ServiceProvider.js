@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster, Schema } from 'rsuite'
-import 'rsuite-table/dist/css/rsuite-table.css'
+
 import { getDatabase, ref, set, child, update, get, remove } from 'firebase/database'
 import {
   getAuth,

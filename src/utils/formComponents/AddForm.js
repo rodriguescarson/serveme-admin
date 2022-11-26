@@ -1,6 +1,6 @@
 import React from 'react'
 import { TextField } from './TextField'
-import { Modal, Button, Form, Schema, IconButton, FlexboxGrid } from 'rsuite'
+import { Modal, Button, Form, IconButton, FlexboxGrid } from 'rsuite'
 import PlusIcon from '@rsuite/icons/Plus'
 // change according to your needs
 

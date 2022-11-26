@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react'
 import { SelectPicker, Message, useToaster } from 'rsuite'
-import 'rsuite-table/dist/css/rsuite-table.css'
+
 import { getDatabase, ref, set, child, push, update, get, remove } from 'firebase/database'
 import { AddForm } from '../../utils/formComponents'
 import DisplayTable from '../../utils/tableComponents/DisplayTable'
-import { setDate } from 'rsuite/esm/utils/dateUtils'
 
 const ServiceSchedule = () => {
   const [data, setData] = React.useState([])
@@ -150,6 +149,8 @@ const ServiceSchedule = () => {
                       return item
                     })
                   })
+                } else {
+                  return null
                 }
               })
               .then(console.log(data))

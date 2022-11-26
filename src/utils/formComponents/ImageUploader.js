@@ -37,7 +37,7 @@ const ImageUploader = (props) => {
       <button style={{ width: 150, height: 150 }}>
         {uploading && <Loader backdrop center />}
         {fileInfo ? (
-          <img src={fileInfo} width="100%" height="100%" />
+          <img src={fileInfo} width="100%" height="100%" alt="img" />
         ) : (
           <AvatarIcon style={{ fontSize: 80 }} />
         )}
