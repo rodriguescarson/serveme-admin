@@ -114,7 +114,6 @@ const ServiceSchedule = () => {
       data: sparesData,
     },
   ]
-  const [tempName, setTempName] = React.useState('')
   useEffect(() => {
     const dbRef = ref(getDatabase())
     // changew only this
@@ -127,7 +126,7 @@ const ServiceSchedule = () => {
               //change here
               ss_id: key,
               id: key,
-              u_customer_name: tempName,
+              u_customer_name: '',
             }
           })
           setData(data)
@@ -157,6 +156,7 @@ const ServiceSchedule = () => {
               .catch((error) => {
                 console.error(error)
               })
+            return null
           })
         } else {
           setMessageval((prev) => ({
@@ -183,6 +183,7 @@ const ServiceSchedule = () => {
             { label: snapshot.val()[key].full_name, value: key, ...snapshot.val()[key] },
           ])
           // setSpData([...spData, { label: key, value: key, ...snapshot.val()[key] }])
+          return null
         })
       }
     })
@@ -190,6 +191,7 @@ const ServiceSchedule = () => {
       if (snapshot.exists()) {
         Object.keys(snapshot.val()).map((key) => {
           setSparesData((prev) => [...prev, { label: key, value: key, ...snapshot.val()[key] }])
+          return null
         })
       }
     })

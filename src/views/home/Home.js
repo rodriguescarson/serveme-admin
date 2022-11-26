@@ -1,14 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React from 'react'
-import {
-  CButton,
-  CCard,
-  CCardBody,
-  CCardText,
-  CCardTitle,
-  CCol,
-  CRow,
-} from '@coreui/react'
+import { CButton, CCard, CCardBody, CCardText, CCardTitle, CCol, CRow } from '@coreui/react'
 import { cilUser, cilCog, cilCasino, cilList } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { NavLink } from 'react-router-dom'

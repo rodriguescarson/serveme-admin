@@ -151,10 +151,7 @@ const TableParams = [
 ]
 
 const ServiceProvider = () => {
-  const [phoneNumber, setPhoneNumber] = React.useState('')
-  const [verificationCode, setVerificationCode] = React.useState('')
   const [verificationId, setVerificationId] = React.useState('')
-  const [user, setUser] = React.useState(null)
   const [data, setData] = React.useState([])
   const [modalStatus, setmodalStatus] = React.useState(false)
   const handleCloseDeleteModal = () => setmodalStatus(false)
