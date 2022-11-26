@@ -156,12 +156,12 @@ const SpareParts = () => {
     update(ref(db, 'machinery/spares/' + id), {
       [key]: value,
     }).then(() => {
-      setMessageval((prev) => ({
-        ...prev,
-        message: 'Data Updated Successfully',
-        type: 'success',
-      }))
-      toaster.push(message, 'topCenter')
+      // setMessageval((prev) => ({
+      //   ...prev,
+      //   message: 'Data Updated Successfully',
+      //   type: 'success',
+      // }))
+      // toaster.push(message, 'topCenter')
     })
   }
   //change 4

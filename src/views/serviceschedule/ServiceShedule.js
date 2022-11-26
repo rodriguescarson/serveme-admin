@@ -226,12 +226,12 @@ const ServiceSchedule = () => {
     update(ref(db, 'service_schedule/' + id), {
       [key]: value,
     }).then(() => {
-      setMessageval((prev) => ({
-        ...prev,
-        message: 'Data updated successfully',
-        type: 'success',
-      }))
-      toaster.push(message, 'topCenter')
+      // setMessageval((prev) => ({
+      //   ...prev,
+      //   message: 'Data updated successfully',
+      //   type: 'success',
+      // }))
+      // toaster.push(message, 'topCenter')
     })
     // update ss_id list in service_provider
     if (key === 'sp_id') {
@@ -247,12 +247,12 @@ const ServiceSchedule = () => {
           update(ref(db, 'user/service_provider/' + value), {
             ss_id: nextData,
           }).then(() => {
-            setMessageval((prev) => ({
-              ...prev,
-              message: 'Data updated successfully',
-              type: 'success',
-            }))
-            toaster.push(message, 'topCenter')
+            // setMessageval((prev) => ({
+            //   ...prev,
+            //   message: 'Data updated successfully',
+            //   type: 'success',
+            // }))
+            // toaster.push(message, 'topCenter')
           })
         }
       })

@@ -308,8 +308,8 @@ const ServiceProvider = () => {
     update(ref(db, 'user/service_provider/' + id), {
       [key]: value,
     }).then(() => {
-      setMessageval({ message: 'User updated successfully', type: 'success' })
-      toaster.push(message, 'topCenter')
+      // setMessageval({ message: 'User updated successfully', type: 'success' })
+      // toaster.push(message, 'topCenter')
     })
   }
   //change 4

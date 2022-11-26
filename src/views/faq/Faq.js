@@ -122,12 +122,12 @@ const Faq = () => {
     update(ref(db, 'FAQ/data/' + id), {
       [key]: value,
     }).then(() => {
-      setMessageval((prev) => ({
-        ...prev,
-        message: 'Data updated successfully',
-        type: 'success',
-      }))
-      toaster.push(message, 'topCenter')
+      // setMessageval((prev) => ({
+      //   ...prev,
+      //   message: 'Data updated successfully',
+      //   type: 'success',
+      // }))
+      // toaster.push(message, 'topCenter')
     })
   }
   //change 4

@@ -176,12 +176,12 @@ const Admin = () => {
     update(ref(db, 'user/admin/' + id), {
       [key]: value,
     }).then(() => {
-      setMessageval((prev) => ({
-        ...prev,
-        message: 'Data updated successfully',
-        type: 'success',
-      }))
-      toaster.push(message, 'topCenter')
+      // setMessageval((prev) => ({
+      //   ...prev,
+      //   message: 'Data updated successfully',
+      //   type: 'success',
+      // }))
+      // toaster.push(message, 'topCenter')
     })
   }
   //change 4

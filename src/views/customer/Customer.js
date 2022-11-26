@@ -261,12 +261,12 @@ const Customer = () => {
     update(ref(db, 'user/customer/' + id), {
       [key]: value,
     }).then(() => {
-      setMessageval((prev) => ({
-        ...prev,
-        message: 'Data updated successfully',
-        type: 'success',
-      }))
-      toaster.push(message, 'topCenter')
+      // setMessageval((prev) => ({
+      //   ...prev,
+      //   message: 'Data updated successfully',
+      //   type: 'success',
+      // }))
+      // toaster.push(message, 'topCenter')
     })
   }
   //change 4

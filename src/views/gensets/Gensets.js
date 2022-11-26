@@ -108,10 +108,11 @@ const Gensets = () => {
     const newRef = push(Ref)
     set(newRef, {
       genset_id: newRef.key,
+      id: newRef.key,
       ...formValue,
     })
     const nextData = data
-    setData([...nextData, { genset_id: newRef.key, ...formValue }])
+    setData([...nextData, { genset_id: newRef.key, id: newRef.key, ...formValue }])
     setFormValue({
       //genset_genset_id: '',
       alt_make: '',
@@ -131,14 +132,15 @@ const Gensets = () => {
     update(ref(db, 'machinery/genset/' + genset_id), {
       [key]: value,
     }).then(() => {
-      setMessageval((prev) => {
-        return {
-          ...prev,
-          message: 'Updated Successfully',
-          type: 'success',
-        }
-      })
-      toaster.push(message, 'topCenter')
+      console.log(value)
+      // setMessageval((prev) => {
+      //   return {
+      //     ...prev,
+      //     message: 'Updated Successfully',
+      //     type: 'success',
+      //   }
+      // })
+      // toaster.push(message, 'topCenter')
     })
   }
   //change 4

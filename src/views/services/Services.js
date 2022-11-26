@@ -110,15 +110,15 @@ const Services = () => {
     update(ref(db, 'services/data/' + id), {
       [key]: value,
     }).then(() => {
-      setMessageval((prev) => {
-        console.log(prev)
-        return {
-          ...prev,
-          message: 'Updated Successfully',
-          type: 'success',
-        }
-      })
-      toaster.push(message, 'topCenter')
+      // setMessageval((prev) => {
+      //   console.log(prev)
+      //   return {
+      //     ...prev,
+      //     message: 'Updated Successfully',
+      //     type: 'success',
+      //   }
+      // })
+      // toaster.push(message, 'topCenter')
     })
   }
   //change 4
