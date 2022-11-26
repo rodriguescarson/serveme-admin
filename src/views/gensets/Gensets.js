@@ -143,6 +143,7 @@ const Gensets = () => {
       // toaster.push(message, 'topCenter')
     })
   }
+
   //change 4
   const handleDeleteFirebase = (genset_id) => {
     const db = getDatabase()
@@ -169,6 +170,7 @@ const Gensets = () => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.genset_id === genset_id)
     activeItem.status = activeItem.status ? null : 'EDIT'
+    console.log(activeItem)
     setData(nextData)
   }
 

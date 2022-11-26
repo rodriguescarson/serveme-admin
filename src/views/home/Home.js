@@ -111,7 +111,7 @@ const Home = () => {
               <CCardText></CCardText>
               {/* center NavLink */}
               <NavLink
-                to="/gensets"
+                to="/Gensets"
                 style={{
                   display: 'flex',
                   justifyContent: 'center',

@@ -99,7 +99,7 @@ function DisplayTable({
             )
           }
           return (
-            <Column key={i} resizable sortable onChange={handleUpdateFirebase}>
+            <Column key={i} resizable sortable>
               <HeaderCell>{item.value}</HeaderCell>
               <EditableCell dataKey={item.dataKey} onChange={handleUpdateFirebase} />
             </Column>
