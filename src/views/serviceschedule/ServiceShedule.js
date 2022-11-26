@@ -135,10 +135,8 @@ const ServiceSchedule = () => {
             get(child(dbRef, `user/customer/${key.u_customer_id}`))
               .then((snapshot1) => {
                 if (snapshot1.exists()) {
-                  console.log(snapshot1.val())
                   setData((prev) => {
                     return prev.map((item) => {
-                      console.log(item.u_customer_id, key.u_customer_id)
                       if (item.u_customer_id === key.u_customer_id) {
                         return {
                           ...item,
@@ -152,7 +150,7 @@ const ServiceSchedule = () => {
                   return null
                 }
               })
-              .then(console.log(data))
+              .then()
               .catch((error) => {
                 console.error(error)
               })

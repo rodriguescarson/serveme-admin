@@ -27,7 +27,6 @@ const ImageUploader = (props) => {
       }}
       onSuccess={(response, file) => {
         setUploading(false)
-        console.log(response)
       }}
       onError={() => {
         setFileInfo(null)

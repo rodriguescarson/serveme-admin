@@ -7,7 +7,7 @@ export const BaseCell = React.forwardRef((props, ref) => {
       ref={ref}
       rowData={rowData}
       onDoubleClick={() => {
-        console.log(rowData)
+        // console.log(rowData)
       }}
       {...rest}
     >

@@ -132,7 +132,7 @@ const Gensets = () => {
     update(ref(db, 'machinery/genset/' + genset_id), {
       [key]: value,
     }).then(() => {
-      console.log(value)
+      // console.log(value)
       // setMessageval((prev) => {
       //   return {
       //     ...prev,
@@ -170,7 +170,6 @@ const Gensets = () => {
     const nextData = Object.assign([], data)
     const activeItem = nextData.find((item) => item.genset_id === genset_id)
     activeItem.status = activeItem.status ? null : 'EDIT'
-    console.log(activeItem)
     setData(nextData)
   }
 
