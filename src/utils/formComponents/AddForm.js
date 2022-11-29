@@ -49,7 +49,7 @@ function AddForm({
           </Button>
         </Modal.Footer>
       </Modal>
-      <FlexboxGrid justify="end" style={{ marginBottom: 10 }}>
+      <FlexboxGrid style={{ marginBottom: 20 }}>
         <FlexboxGrid.Item colspan={2}>
           <IconButton icon={<PlusIcon />} color="red" appearance="primary" onClick={handleOpen}>
             Add
